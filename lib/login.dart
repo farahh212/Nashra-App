@@ -1,44 +1,89 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'signup.dart'; // You must have a signup.dart file
+import 'providers/authProvider.dart' as my_auth;
+import 'package:provider/provider.dart';
+import 'CitizenPages/announcements.dart'; // Ensure this exists
 
 class LoginPage extends StatefulWidget {
+  final int authenticationMode; // 0 for login, 1 for signup
+
+  LoginPage({Key? key, this.authenticationMode = 0}) : super(key: key);
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late int authenticationMode;
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController(); // For signup only
+  final _nameController = TextEditingController(); // For signup only
 
-  // Function to handle login
-  Future<void> _login() async {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login Successful!')),
-      );
-      // TODO: Navigate to home page after successful login
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
+  @override
+  void initState() {
+    super.initState();
+    authenticationMode = widget.authenticationMode;
+  }
+
+  Future<void> loginORsignup() async {
+    //Signup mode
+    if (authenticationMode == 1){
+
+      var successOrError = await Provider.of<my_auth.AuthProvider>(context, listen: false).signup(
+      em: _emailController.text.trim(),
+      pass: _passwordController.text,
+    );
+
+    if(successOrError == "Signup successful!"){
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)), // Pass authenticationMode as 0 for login
       );
     }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(successOrError)),
+      );
+    }
+    }
+    // Login mode
+    else{
+      var successOrError = await Provider.of<my_auth.AuthProvider>(context, listen: false).login(
+      em: _emailController.text.trim(),
+      pass: _passwordController.text,
+    );
+    if(successOrError == "Login successful!"){
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => Announcements()), // Pass authenticationMode as 0 for login
+      );
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(successOrError)),
+      );
+      
+    }
+    
+  }
+  }
+
+  void toggleAuthMode() {
+    setState(() {
+      authenticationMode = authenticationMode == 0 ? 1 : 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xFFFFFEF5),      body: SafeArea(
+      backgroundColor: Color(0xFFFFFEF5),
+      body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 36),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo or App Name
               Center(
                 child: Text(
                   'NASHRA',
@@ -51,10 +96,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 40),
-
-              // Title
               Text(
-                'Welcome Back,',
+                authenticationMode == 0 ? 'Welcome Back,' : 'Create an Account',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -63,15 +106,27 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 8),
               Text(
-                'Login to your account',
+                authenticationMode == 0
+                    ? 'Login to your account'
+                    : 'Sign up to get started',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
                 ),
               ),
               SizedBox(height: 32),
-
-              // Email Field
+              if (authenticationMode == 1)
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    hintText: 'ex: Ali Ahmed',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              if (authenticationMode == 1) SizedBox(height: 20),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -83,8 +138,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 20),
-
-              // Password Field
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -96,13 +149,24 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 30),
-
-              // Login Button
+              SizedBox(height: 20),
+              if (authenticationMode == 1)
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    hintText: '********',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              if (authenticationMode == 1) SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: loginORsignup,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[700],
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -111,35 +175,28 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: Text(
-                    'LOGIN',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    authenticationMode == 0 ? 'LOGIN' : 'SIGN UP',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
-
-              // Signup redirect
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignUpPage()),
-                    );
-                  },
-                  child: RichText(
-                  text: TextSpan(
-                    text: 'Dont have an account? ',
-                    style: TextStyle(color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'SIGN UP',
-                        style: TextStyle(color: Color(0xFF4F8A10), fontWeight: FontWeight.bold),
-                      ),
-                    ],
+              TextButton(
+                onPressed: toggleAuthMode,
+                child: Center(
+                  child: Text(
+                    authenticationMode == 0
+                        ? 'Don\'t have an account? Sign up instead'
+                        : 'Already have an account? Login instead',
+                    style: TextStyle(
+                      color: Colors.green[700],
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
                 ),
               ),
             ],
@@ -149,3 +206,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

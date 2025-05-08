@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">563873780602-6ecubggk113l4lenrq6g2s855ja7e4nr.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">563873780602</string>
+    <string name="google_api_key" translatable="false">AIzaSyCmyeVEm8IQmTzz8vhYyXYmI6LyGR5Du_w</string>
+    <string name="google_app_id" translatable="false">1:563873780602:android:5138ad021a5afff696fcc3</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCmyeVEm8IQmTzz8vhYyXYmI6LyGR5Du_w</string>
+    <string name="google_storage_bucket" translatable="false">nahra-316ee.firebasestorage.app</string>
+    <string name="project_id" translatable="false">nahra-316ee</string>
+</resources>
