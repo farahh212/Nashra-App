@@ -35,7 +35,7 @@ class Event {
       description: map['description'],
       date: DateTime.parse(map['date']),
       location: map['location'],
-      attendees: List<String>.from(map['attendees'] ?? []),
+      // attendees: List<String>.from(map['attendees'] ?? []),
     );
   }
 } 
