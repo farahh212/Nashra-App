@@ -50,7 +50,7 @@ class StartUp extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)), // Pass authenticationMode as 1 for sign up
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -77,7 +77,7 @@ class StartUp extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)), // Pass authenticationMode as 0 for login
                     );
                   },
                   style: ElevatedButton.styleFrom(
