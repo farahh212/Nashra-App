@@ -33,7 +33,7 @@ class Poll {
       id: id,
       question: map['question'],
       options: List<String>.from(map['options']),
-      votes: Map<String, int>.from(map['votes'] ?? {}),
+      // votes: Map<String, int>.from(map['votes'] ?? {}),
       createdAt: DateTime.parse(map['createdAt']),
       endDate: DateTime.parse(map['endDate']),
     );

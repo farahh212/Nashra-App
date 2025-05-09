@@ -9,7 +9,7 @@ class AppConstants {
   static const String pollsCollection = 'polls';
   static const String messagesCollection = 'messages';
   static const String chatsCollection = 'chats';
-  static const String advertisementsCollection = 'advertisements';
+  static const String advertisementsCollection = 'advertisement';
   static const String reportsCollection = 'reports';
   static const String emergencyNumbersCollection = 'emergency_numbers';
   static const String commentsCollection = 'comments';
