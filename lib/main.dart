@@ -7,6 +7,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'login.dart'; // Ensure this exists
 import 'signup.dart'; // Ensure this exists
 import 'startup.dart'; // Ensure this exists
+import 'chat/ChatsPage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Nashra Project',
-      home: StartUp(), // Change to SignUpPage to test Sign Up
+      home: ChatsPage(), // Change to SignUpPage to test Sign Up
     );
   }
 }

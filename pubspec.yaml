@@ -33,6 +33,7 @@ dependencies:
   firebase_core: ^2.24.2 # Use the latest version
   firebase_auth: ^4.17.4 # Use the latest version
   firebase_app_check: ^0.2.1+6 # Use the latest version
+  
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -40,6 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   cloud_firestore: ^4.17.5
   provider: ^6.1.4
+  badges: ^3.1.2
 
 dev_dependencies:
   flutter_test:
