@@ -16,7 +16,8 @@ class Event {
     required this.description,
     required this.date,
     required this.location,
-  }) : attendees = [], comments = [];
+    List<String>? attendees,
+  }) : attendees = attendees ?? [], comments = [];
 
   Map<String, dynamic> toMap() {
     return {

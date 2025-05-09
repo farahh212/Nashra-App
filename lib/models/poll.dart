@@ -16,7 +16,8 @@ class Poll {
     required this.options,
     required this.createdAt,
     required this.endDate,
-  }) : votes = {}, comments = [];
+    Map<String, int>? votes,
+  }) : votes = votes ?? {}, comments = [];
 
   Map<String, dynamic> toMap() {
     return {
