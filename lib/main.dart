@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:nashra_project2/providers/advertisementProvider.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
 import 'firebase_options.dart';
 
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => my_auth.AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
