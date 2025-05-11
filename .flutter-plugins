@@ -1,7 +1,9 @@
 # This is a generated file; do not edit or check into version control.
-firebase_app_check=C:\\Users\\farah\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_app_check-0.2.2+7\\
-firebase_app_check_web=C:\\Users\\farah\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_app_check_web-0.1.2+7\\
-firebase_auth=C:\\Users\\farah\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_auth-4.20.0\\
-firebase_auth_web=C:\\Users\\farah\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_auth_web-5.12.0\\
-firebase_core=C:\\Users\\farah\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_core-2.32.0\\
-firebase_core_web=C:\\Users\\farah\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_core_web-2.17.5\\
+cloud_firestore=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\cloud_firestore-4.17.5\\
+cloud_firestore_web=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\cloud_firestore_web-3.12.5\\
+firebase_app_check=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_app_check-0.2.2+7\\
+firebase_app_check_web=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_app_check_web-0.1.2+7\\
+firebase_auth=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_auth-4.20.0\\
+firebase_auth_web=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_auth_web-5.12.0\\
+firebase_core=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_core-2.32.0\\
+firebase_core_web=C:\\Users\\farid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_core_web-2.17.5\\

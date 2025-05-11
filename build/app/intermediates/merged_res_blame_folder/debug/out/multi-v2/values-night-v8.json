@@ -4,7 +4,7 @@
             "outputFile": "com.example.nashra_project2.app-mergeDebugResources-30:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\farah\\StudioProjects\\nashra_project2\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "C:\\Users\\farid\\Desktop\\nashra_project\\Nashra-App\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
