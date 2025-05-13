@@ -5,6 +5,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:nashra_project2/providers/advertisementProvider.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
 import 'firebase_options.dart';
+import 'screens/notifications_screen.dart';
 
 import 'login.dart';
 import 'startup.dart';
@@ -12,7 +13,7 @@ import 'screens/announcements.dart';
 
 import 'package:nashra_project2/providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
-import 'chat/ChatsPage.dart';
+import 'chat/ChatsPage.dart'; // Ensure this file contains the ChatPage class
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.green,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: StartUp(), // Initial route logic
+        
+        home:StartUp(), // Initial route logic
         routes: {
           '/advertisement': (context) => AdvertisementScreen(),
           '/announcements': (context) => Announcements(),
