@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Notification {
   String id;
@@ -6,12 +7,15 @@ class Notification {
   String description;
   DateTime createdAt;
   bool isRead;
+  String userEmail;
 
   Notification({
     required this.id,
     required this.title,
     required this.description,
     required this.createdAt,
+    required this.userEmail,
+    
     this.isRead = false,
   });
 
@@ -21,6 +25,7 @@ class Notification {
       'description': description,
       'createdAt': createdAt.toIso8601String(),
       'isRead': isRead,
+      'userEmail': userEmail,
     };
   }
 
@@ -29,8 +34,9 @@ class Notification {
       id: id,
       title: map['title'],
       description: map['description'],
-      createdAt: DateTime.parse(map['createdAt']),
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
       isRead: map['isRead'] ?? false,
+      userEmail: map['userEmail'] ?? '',
     );
   }
 } 
