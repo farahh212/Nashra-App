@@ -35,7 +35,7 @@ class GovSidebar extends StatelessWidget {
             DrawerItem(
               title: "Manage Advertisements",
               onTap: () {
-                Navigator.pushNamed(context, '/advertisement');
+                Navigator.pushNamed(context, '/gov_advertisement');
               },
             ),
             const SizedBox(height: 30),
