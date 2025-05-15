@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/emergency_number.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
@@ -12,6 +13,7 @@ import '../Sidebars/govSidebar.dart';
 import '../providers/emergencyProvider.dart';
 import '../providers/authProvider.dart' as my_auth;
 import '../widgets/emergency_widget.dart';
+import '../widgets/bottom_navigation_bar.dart';
 
 class EmergencyNumbersScreen extends StatefulWidget {
   const EmergencyNumbersScreen({Key? key}) : super(key: key);
@@ -45,160 +47,6 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
     }
   }
 
-  Future<void> _showAddDialog() async {
-    _titleController.clear();
-    _numberController.clear();
-    
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Emergency Number'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title (e.g., Police, Ambulance)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _numberController,
-              decoration: const InputDecoration(
-                labelText: 'Emergency Number',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (_titleController.text.isEmpty || _numberController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill in all fields')),
-                );
-                return;
-              }
-
-              try {
-                final number = int.tryParse(_numberController.text);
-                if (number == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a valid number')),
-                  );
-                  return;
-                }
-
-                final provider = Provider.of<EmergencyProvider>(context, listen: false);
-                await provider.addEmergencyNumber(_titleController.text, number);
-                
-                if (mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Emergency number added successfully')),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error adding contact: $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _editContact(String id, String currentTitle, int currentNumber) async {
-    _titleController.text = currentTitle;
-    _numberController.text = currentNumber.toString();
-
-    if (!mounted) return;
-
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Emergency Number'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title (e.g., Police, Ambulance)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _numberController,
-              decoration: const InputDecoration(
-                labelText: 'Emergency Number',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (_titleController.text.isEmpty || _numberController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill in all fields')),
-                );
-                return;
-              }
-
-              try {
-                final number = int.tryParse(_numberController.text);
-                if (number == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a valid number')),
-                  );
-                  return;
-                }
-
-                final provider = Provider.of<EmergencyProvider>(context, listen: false);
-                await provider.updateEmergencyNumber(id, _titleController.text, number);
-                
-                if (mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Emergency number updated successfully')),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error updating contact: $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Update'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -208,13 +56,14 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       drawer: _isAdmin ? const GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceColor,
         elevation: 0,
         title: Text(
-          _isAdmin ? 'Manage Emergency Numbers' : 'Emergency Numbers',
+          _isAdmin ? l10n.manageEmergencyNumbers : l10n.emergencyNumbers,
           style: TextStyle(
             color: AppTheme.primaryColor,
             fontWeight: FontWeight.bold,
@@ -235,7 +84,7 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                   Row(
                     children: [
                       Text(
-                        'Emergency Numbers',
+                        l10n.emergencyNumbers,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -259,7 +108,7 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                         }
 
                         if (provider.emergencyNumbers.isEmpty) {
-                          return const Center(child: Text('No emergency numbers found'));
+                          return Center(child: Text(l10n.noEmergencyNumbers));
                         }
 
                         return ListView.builder(
@@ -275,13 +124,13 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                                     await provider.deleteEmergencyNumber(contact.id);
                                     if (mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Emergency number deleted successfully')),
+                                        SnackBar(content: Text(l10n.emergencyNumberDeleted)),
                                       );
                                     }
                                   } catch (e) {
                                     if (mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Error deleting contact: $e')),
+                                        SnackBar(content: Text(l10n.errorDeletingContact(e.toString()))),
                                       );
                                     }
                                   }
@@ -312,26 +161,169 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                 onPressed: _showAddDialog,
               ),
             ),
-          Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppTheme.backgroundColor,
-              border: Border(
-                top: BorderSide(color: AppTheme.dividerColor, width: 1),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(Icons.home, color: AppTheme.primaryColor, size: 28),
-                Icon(Icons.notifications_outlined, color: AppTheme.primaryColor, size: 28),
-                Icon(Icons.language, color: AppTheme.primaryColor, size: 28),
-                Icon(Icons.person, color: AppTheme.primaryColor, size: 28),
-              ],
-            ),
-          ),
+          const CustomBottomNavigationBar(),
         ],
       ),
+    );
+  }
+
+  Future<void> _showAddDialog() async {
+    _titleController.clear();
+    _numberController.clear();
+    
+    return showDialog(
+      context: context,
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l10n.addEmergencyNumber),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: l10n.title,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _numberController,
+                decoration: InputDecoration(
+                  labelText: l10n.emergencyNumber,
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (_titleController.text.isEmpty || _numberController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.pleaseFillAllFields)),
+                  );
+                  return;
+                }
+
+                try {
+                  final number = int.tryParse(_numberController.text);
+                  if (number == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.pleaseEnterValidNumber)),
+                    );
+                    return;
+                  }
+
+                  final provider = Provider.of<EmergencyProvider>(context, listen: false);
+                  await provider.addEmergencyNumber(_titleController.text, number);
+                  
+                  if (mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.emergencyNumberAdded)),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.errorAddingContact(e.toString()))),
+                    );
+                  }
+                }
+              },
+              child: Text(l10n.add),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _editContact(String id, String currentTitle, int currentNumber) async {
+    _titleController.text = currentTitle;
+    _numberController.text = currentNumber.toString();
+
+    if (!mounted) return;
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l10n.editEmergencyNumber),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: l10n.title,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _numberController,
+                decoration: InputDecoration(
+                  labelText: l10n.emergencyNumber,
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (_titleController.text.isEmpty || _numberController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.pleaseFillAllFields)),
+                  );
+                  return;
+                }
+
+                try {
+                  final number = int.tryParse(_numberController.text);
+                  if (number == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.pleaseEnterValidNumber)),
+                    );
+                    return;
+                  }
+
+                  final provider = Provider.of<EmergencyProvider>(context, listen: false);
+                  await provider.updateEmergencyNumber(id, _titleController.text, number);
+                  
+                  if (mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.emergencyNumberUpdated)),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.errorUpdatingContact(e.toString()))),
+                    );
+                  }
+                }
+              },
+              child: Text(l10n.update),
+            ),
+          ],
+        );
+      },
     );
   }
 }

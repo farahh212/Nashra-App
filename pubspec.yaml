@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.0
   firebase_core: ^2.24.2 # Use the latest version
   firebase_auth: ^4.17.4 # Use the latest version
   firebase_app_check: ^0.2.1+6 # Use the latest version
@@ -61,6 +64,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true  # Add this line to enable code generation
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

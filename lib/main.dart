@@ -7,6 +7,9 @@ import 'package:nashra_project2/providers/emergencyProvider.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
 import 'package:nashra_project2/screens/home.dart';
 import 'firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 import 'login.dart';
 import 'startup.dart';
@@ -49,6 +52,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.green,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
+        localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
+        supportedLocales: AppLocalizationsSetup.supportedLocales,
         home: StartUp(), // Initial route logic
         routes: {
           '/advertisement': (context) => AdvertisementScreen(),
