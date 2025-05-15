@@ -5,6 +5,7 @@ import '../Sidebars/govSidebar.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 import '../providers/authProvider.dart' as my_auth;
+import '../screens/announcementCitizens/announcements.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,13 +15,27 @@ class HomeScreen extends StatelessWidget {
     final authProvider = Provider.of<my_auth.AuthProvider>(context);
     final isAdmin = authProvider.isAdmin;
 
+    // Redirect non-admin users to announcements page
+    if (!isAdmin) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Announcements()),
+        );
+      });
+      
+      // Return empty container while redirecting
+      return Container(color: AppTheme.surfaceColor);
+    }
+
+    // Admin UI remains the same
     return Scaffold(
-      drawer: isAdmin ? const GovSidebar() : const CitizenSidebar(),
+      drawer: const GovSidebar(),
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceColor,
         elevation: 0,
         title: Text(
-          isAdmin ? 'Government Dashboard' : AppConstants.appName,
+          'Government Dashboard',
           style: TextStyle(
             color: AppTheme.primaryColor,
             fontWeight: FontWeight.bold,
@@ -39,6 +54,7 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
+                  // ignore: deprecated_member_use
                   color: AppTheme.primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -55,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Your one-stop platform for community services',
+                      'Government Administration Portal',
                       style: TextStyle(
                         fontSize: 16,
                         color: AppTheme.textSecondaryColor,
@@ -99,14 +115,13 @@ class HomeScreen extends StatelessWidget {
                     context,
                     'Advertisements',
                     Icons.campaign,
-                    () => Navigator.pushNamed(context, '/advertisement'),
-                  ),
+                    () => Navigator.pushNamed(context, '/advertisement')),
                   _buildActionCard(
                     context,
-                    'Contact Government',
+                    'Contact Support',
                     Icons.contact_support,
                     () {
-                      // TODO: Implement contact government functionality
+                      // TODO: Implement contact support functionality
                     },
                   ),
                 ],
@@ -118,6 +133,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // Keep the existing _buildActionCard method
   Widget _buildActionCard(
     BuildContext context,
     String title,
@@ -162,4 +178,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:nashra_project2/models/citizen.dart';
 import 'comment.dart';
 
 class Announcement {
@@ -8,7 +9,10 @@ class Announcement {
   String? imageUrl;
   String? fileUrl;
   DateTime createdAt;
+  int likes;
   List<Comment> comments;
+  List<String> likedByUser =[];
+  // List<Citizen> likedByUser;
 
   Announcement({
     required this.id,
@@ -17,6 +21,10 @@ class Announcement {
     this.imageUrl,
     this.fileUrl,
     required this.createdAt,
+   required this.likes,
+   required this.likedByUser,
+   
+    
   }) : comments = [];
 
   Map<String, dynamic> toMap() {
@@ -26,6 +34,7 @@ class Announcement {
       'imageUrl': imageUrl,
       'fileUrl': fileUrl,
       'createdAt': createdAt.toIso8601String(),
+
     };
   }
 
@@ -37,6 +46,8 @@ class Announcement {
       imageUrl: map['imageUrl'],
       fileUrl: map['fileUrl'],
       createdAt: DateTime.parse(map['createdAt']),
+      likes: map['likes'] ?? 0,
+      likedByUser: List<String>.from(map['likedByUser'] ?? []),
     );
   }
 } 

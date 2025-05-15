@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nashra_project2/screens/announcements.dart';
+import 'package:nashra_project2/screens/announcementCitizens/announcements.dart';
 import 'package:nashra_project2/screens/home.dart';
 import 'providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
