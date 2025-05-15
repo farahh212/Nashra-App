@@ -44,6 +44,7 @@ dependencies:
   provider: ^6.1.5 # Use the latest version
   http: ^1.4.0
   firebase_database: ^10.5.7
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flutter_test:
