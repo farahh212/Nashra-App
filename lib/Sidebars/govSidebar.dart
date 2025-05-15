@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/emergency_screen.dart';
-import '../screens/announcements.dart';
+import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
 
 class GovSidebar extends StatelessWidget {

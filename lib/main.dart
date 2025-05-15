@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:nashra_project2/providers/advertisementProvider.dart';
+import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/emergencyProvider.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
 import 'package:nashra_project2/screens/home.dart';
@@ -11,7 +12,7 @@ import 'screens/notifications_screen.dart';
 
 import 'login.dart';
 import 'startup.dart';
-import 'screens/announcements.dart';
+import 'screens/announcementCitizens/announcements.dart';
 
 import 'package:nashra_project2/providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => my_auth.AuthProvider()),
         ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
+        ChangeNotifierProvider(create: (_) => Announcementsprovider()),
         ChangeNotifierProvider(create: (_) => EmergencyProvider()),
       ],
       child: MaterialApp(
@@ -53,6 +55,7 @@ class MyApp extends StatelessWidget {
         
         home:StartUp(), // Initial route logic
         routes: {
+          
           '/advertisement': (context) => AdvertisementScreen(),
           '/announcements': (context) => Announcements(),
           '/login': (context) => LoginPage(),
