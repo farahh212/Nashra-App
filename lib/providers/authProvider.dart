@@ -7,11 +7,14 @@ class AuthProvider with ChangeNotifier {
     DateTime _expiryDate = DateTime.utc(1970); // Set to a date in the past to indicate no token is available as a default value
     String _userId = '';
     bool _authenticated = false;
+    bool _isAdmin = false; // Add admin flag
 
 //this is used to check if the user is authenticated or not
     bool isAuthenticated() {
         return _authenticated;
     }
+
+    bool get isAdmin => _isAdmin; // Add admin getter
 
     String get token{
         if(_expiryDate!=DateTime.utc(1970) && _expiryDate.isAfter(DateTime.now()) && _token != '')
@@ -29,6 +32,7 @@ class AuthProvider with ChangeNotifier {
     void logout(){
         _authenticated = false;
         _expiryDate = DateTime.now();
+        _isAdmin = false; // Reset admin status on logout
     }
  
 //possible errors: EMAIL_EXISTS, OPERATION_NOT_ALLOWED, TOO_MANY_ATTEMPTS_TRY_LATER, EMAIL_NOT_FOUND, INVALID_PASSWORD, USER_DISABLED, WEAK_PASSWORD, INVALID_EMAIL
@@ -111,6 +115,9 @@ Future<String> login({required String em, required String pass}) async {
         _token = responseData['idToken'];
         _expiryDate = DateTime.now().add(Duration(seconds: int.parse(responseData['expiresIn'])));
         _userId = responseData['localId'];
+        // Set admin status based on government email
+        _isAdmin = em.toLowerCase() == 'government@nashra.com';
+        notifyListeners();
       return 'Login successful!';
     }
       

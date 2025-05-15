@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nashra_project2/screens/announcements.dart';
+import 'package:nashra_project2/screens/home.dart';
 import 'providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     );
     if(successOrError == "Login successful!"){
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => Announcements()), // Pass authenticationMode as 0 for login
+        MaterialPageRoute(builder: (context) => HomeScreen()), // Changed to HomeScreen
       );
     }
     else{

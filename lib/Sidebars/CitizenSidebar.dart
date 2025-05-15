@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/emergency_screen.dart';
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
@@ -37,7 +38,10 @@ class CitizenSidebar extends StatelessWidget {
             DrawerItem(
               title: "Check Emergency numbers",
               onTap: () {
-                // Navigate to Emergency Numbers page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EmergencyNumbersScreen()),
+                );
               },
             ),
           ],
