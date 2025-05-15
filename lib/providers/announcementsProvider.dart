@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:nashra_project2/models/comment.dart';
+import 'package:nashra_project2/providers/authProvider.dart';
 
 import '../models/announcement.dart';
 import 'dart:convert';
@@ -9,33 +10,10 @@ import 'package:http/http.dart' as http;
 
 class Announcementsprovider with ChangeNotifier {
   List<Announcement> announcements = [
-    // Announcement(createdAt: DateTime(2023, 10, 1), description: "This is a test announcement", id: "1", title: "Test Announcement", imageUrl: 'https://cu.edu.eg/ar/news/images/HdMjX1RKikA9hO2.jpg'),
-    // Announcement(createdAt: DateTime(2023, 10, 2), description: "This is another test announcement", id: "2", title: "Another Test Announcement"),
-    // Announcement(createdAt: DateTime(2023, 10, 3), description: "This is yet another test announcement", id: "3", title: "Yet Another Test Announcement"),
+  
   ];
 
-  // List<Announcement> get getAnnouncements {
-  //   return announcements;
-  // }
-
-  // void addcommentToAnnouncement(String id, Comment comment){
-  //   for (var announcement in announcements) {
-  //     if (announcement.id == id) {
-  //       announcement.comments.add(comment);
-  //       notifyListeners();
-  //       break;
-  //     }
-  //   }
-
-  // }
-
-  // List<Comment> getCommentByAnnouncementId(String id){
-  //   return announcements.firstWhere((announcement) => announcement.id == id).comments;
-  // } //list of comments of announcement
-
-  // Announcement getAnnouncementById(String id) {
-  //   return announcements.firstWhere((announcement) => announcement.id == id);
-  // } // Get announcement by ID
+  
 
   Future<void> addAnnouncement(Announcement announcement, String token){
     var announcementsURL = Uri.parse('https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB.json?auth=$token');
@@ -53,6 +31,8 @@ class Announcementsprovider with ChangeNotifier {
         description: announcement.description,
         createdAt: DateTime.now(),
         imageUrl: announcement.imageUrl,
+        likes: 0,
+        likedByUser: [],
       ));
    }).catchError((error) {
       print("Failed to add announcement: $error");
@@ -76,6 +56,8 @@ class Announcementsprovider with ChangeNotifier {
           description: value['description'],
           createdAt: DateTime.parse(value['createdAt']),
           imageUrl: value['imageUrl'],
+          likes: value['likes'] ?? 0,
+          likedByUser: List<String>.from(value['likedByUser'] ?? []),
         ));
       });
     } catch (error) {
@@ -129,6 +111,103 @@ class Announcementsprovider with ChangeNotifier {
       throw e;
     }
   }
+
+  // Future<void> addLikeToAnnouncement(String announcementId, String token) async {
+  //   final announcement = announcements.firstWhere((a) => a.id == announcementId);
+  //   final newLikeCount = announcement.likes + 1;
+  
+
+  //   final url = Uri.parse(
+  //     'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId.json?auth=$token',
+  //   );
+
+  //   try {
+  //   if(announcement.likedByUser!.contains(token)){
+  //     await http.patch(url, body: json.encode({'likes': newLikeCount}));
+  //     announcement.likedByUser.add(token);
+  //     announcement.likes = newLikeCount;
+  //   }
+  //   else{
+  //     return;
+  //   }
+       
+  //     notifyListeners();
+  //   } catch (e) {
+  //     // Use debugPrint for logging in Flutter
+  //     debugPrint('Error adding like: $e');
+  //     rethrow;
+  //   }
+  // }
+
+  Future<void> addLikeToAnnouncement(String announcementId, String token, String userId) async {
+  final announcement = announcements.firstWhere((a) => a.id == announcementId);
+  
+  // Check if user already liked this
+  if (announcement.likedByUser.contains(userId)) {
+    return; // User already liked this, do nothing
+  }
+
+  final newLikeCount = announcement.likes + 1;
+  final url = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId.json?auth=$token',
+  );
+
+  try {
+    await http.patch(url, body: json.encode({
+      'likes': newLikeCount,
+      'likedByUser': [...announcement.likedByUser, userId] // Add user to likedBy
+    }));
+    
+    // Update local state
+    announcement.likes = newLikeCount;
+    announcement.likedByUser.add(userId);
+    notifyListeners();
+    
+  } catch (e) {
+    debugPrint('Error adding like: $e');
+    rethrow;
+  }
+}
+
+  Future<void> removeLikeFromAnnouncement(String announcementId, String token, String userId) async {
+    final announcement = announcements.firstWhere((a) => a.id == announcementId);
+    final newLikeCount = (announcement.likes ?? 0) - 1;
+
+    final url = Uri.parse(
+      'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId.json?auth=$token',
+    );
+
+    try {
+      await http.patch(url, body: json.encode({'likes': newLikeCount}));
+      
+      
+      // announcement.likes--;
+      announcement.likes = newLikeCount;
+      announcement.likedByUser.remove(userId); // Assuming token is the user ID
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error removing like: $e');
+      throw e;
+    }
+  }
+
+
+  // Future<void> addToLikedByUsers(String announcementId, String userId, String token) async {
+  //   final url = Uri.parse(
+  //     'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId/likedByUsers.json?auth=$token',
+  //   );
+
+  //   try {
+  //     await http.patch(url, body: json.encode({'likedByUsers': userId}));
+  //     notifyListeners();
+  //   } catch (e) {
+  //     print('Error adding to likedByUsers: $e');
+  //     throw e;
+  //   }
+  // }
+
+  
 
 
 
