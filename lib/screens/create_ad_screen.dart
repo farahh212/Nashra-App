@@ -13,6 +13,7 @@ class CreateAdScreen  extends StatefulWidget {
   _CreateAdScreenState createState() => _CreateAdScreenState();
 }
 class _CreateAdScreenState extends State<CreateAdScreen> {
+  
   final _formKey = GlobalKey<FormState>();
   String _title = '';
   String _description = '';
@@ -40,6 +41,7 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
       description: _description,
       imageUrl: _imageFile != null ? _imageFile!.path : null,
       status: AdvertisementStatus.pending,
+      ownerId: Provider.of<AuthProvider>(context, listen: false).userId,
     );
     try{
       final token = Provider.of<AuthProvider>(context, listen: false).token;
