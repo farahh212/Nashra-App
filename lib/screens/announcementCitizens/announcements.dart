@@ -66,7 +66,7 @@ class _AnnouncementsState extends State<Announcements> {
   SizedBox(width: 16),
 TextButton(onPressed: () {
                       setState(() {
-                       
+                        Navigator.pushNamed(context, '/polls');
                 selectedButton = 'Polls';
               });
 },style: TextButton.styleFrom(
