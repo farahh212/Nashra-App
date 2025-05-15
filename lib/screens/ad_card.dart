@@ -13,8 +13,8 @@ class AdCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ad.imageUrl != ''
-              ? Image.network(ad.imageUrl)
+          ad.imageUrl != null && ad.imageUrl != ''
+              ? Image.network(ad.imageUrl!)
               : Placeholder(fallbackHeight: 200),
           Padding(
             padding: const EdgeInsets.all(12.0),

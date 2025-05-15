@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.nashra_project2"
-    compileSdkVersion 34  // Or the latest version you want to target
+    compileSdkVersion 35  // Or the latest version you want to target
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
