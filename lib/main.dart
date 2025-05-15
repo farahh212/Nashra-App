@@ -3,7 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:nashra_project2/providers/advertisementProvider.dart';
+import 'package:nashra_project2/providers/emergencyProvider.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
+import 'package:nashra_project2/screens/home.dart';
 import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
 
@@ -39,6 +41,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => my_auth.AuthProvider()),
         ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
+        ChangeNotifierProvider(create: (_) => EmergencyProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -53,6 +56,7 @@ class MyApp extends StatelessWidget {
           '/advertisement': (context) => AdvertisementScreen(),
           '/announcements': (context) => Announcements(),
           '/login': (context) => LoginPage(),
+          '/home': (context) => HomeScreen(),
           // Add more routes as needed
         },
       ),
