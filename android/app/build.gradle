@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.nashra_project2"
-    compileSdkVersion 34  // Or the latest version you want to target
+    compileSdkVersion 35  // Or the latest version you want to target
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -45,6 +45,9 @@ android {
 }
 
 dependencies {
+     implementation platform('com.google.firebase:firebase-bom:33.13.0')
+    implementation 'com.google.firebase:firebase-analytics'
+
     // Add this line to include the reCAPTCHA dependency
     implementation 'com.google.android.recaptcha:recaptcha:18.5.1'
 

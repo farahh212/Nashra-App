@@ -1,8 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class AuthProvider with ChangeNotifier {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
     String _token = '';
     DateTime _expiryDate = DateTime.utc(1970); // Set to a date in the past to indicate no token is available as a default value
     String _userId = '';
@@ -13,6 +18,68 @@ class AuthProvider with ChangeNotifier {
     bool isAuthenticated() {
         return _authenticated;
     }
+
+Future<UserCredential?> signInWithGoogle() async {
+  try {
+    // ✅ Skip sign-in if already authenticated
+    if (_auth.currentUser != null) {
+      
+      _userId = _auth.currentUser!.uid;
+      final idTokenResult = await _auth.currentUser!.getIdTokenResult();
+      _token = idTokenResult.token ?? '';
+      _expiryDate = idTokenResult.expirationTime ?? DateTime.now().add(Duration(hours: 1));
+      _authenticated = true;
+      _isAdmin = _auth.currentUser!.email?.toLowerCase() == 'government@nashra.com';
+      notifyListeners();
+      //print(_auth.currentUser);
+      return null; 
+    }
+
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) return null;
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final user = (await _auth.signInWithCredential(credential)).user;
+    if (user != null) {
+      final idTokenResult = await user.getIdTokenResult();
+      _token = idTokenResult.token ?? '';
+      _expiryDate = idTokenResult.expirationTime ?? DateTime.now().add(Duration(hours: 1));
+      _userId = user.uid;
+      _authenticated = true;
+      _isAdmin = user.email?.toLowerCase() == 'government@nashra.com';
+
+      final usersRef = FirebaseFirestore.instance.collection('users');
+      final userDoc = await usersRef.doc(user.uid).get();
+      if (!userDoc.exists) {
+        await usersRef.doc(user.uid).set({
+          'id': user.uid,
+          'name': user.displayName ?? '',
+          'email': user.email ?? '',
+          'password': '', // Password not available from Google Sign-In
+          'ads': [],
+          'notifications': [],
+          'reports': [],
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+
+      notifyListeners();
+    }
+  } catch (e) {
+    print('Google Sign-In Error: $e');
+    return null;
+  }
+
+  return null;
+}
+
+
 
     bool get isAdmin => _isAdmin; // Add admin getter
 
@@ -28,12 +95,18 @@ class AuthProvider with ChangeNotifier {
         return _userId;
     }
 
-    //log out
-    void logout(){
-        _authenticated = false;
-        _expiryDate = DateTime.now();
-        _isAdmin = false; // Reset admin status on logout
-    }
+
+  Future<void> logout() async {
+  await _auth.signOut();
+  await GoogleSignIn().signOut(); // <-- Add this line
+  _authenticated = false;
+  _expiryDate = DateTime.now();
+  _isAdmin = false;
+  _token = '';
+  _userId = '';
+  notifyListeners();
+}
+
  
 //possible errors: EMAIL_EXISTS, OPERATION_NOT_ALLOWED, TOO_MANY_ATTEMPTS_TRY_LATER, EMAIL_NOT_FOUND, INVALID_PASSWORD, USER_DISABLED, WEAK_PASSWORD, INVALID_EMAIL
 //error can be found in the response body of the request in the message
@@ -45,7 +118,7 @@ class AuthProvider with ChangeNotifier {
 
 //GOAL: SUCCES/FAILURE MESSAGE TO UI
 
-  Future<String> signup({required String em, required String pass}) async {
+  Future<String> signup({required String em, required String pass, required String name}) async {
     final url = Uri.parse(
         'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDCWaN2gvhvrDdKOsd4Gjvr9ve6_6lG-NI');
 
@@ -79,6 +152,23 @@ class AuthProvider with ChangeNotifier {
         _token = responseData['idToken'];
         _expiryDate = DateTime.now().add(Duration(seconds: int.parse(responseData['expiresIn'])));
         _userId = responseData['localId'];
+        // Create user in Firestore (like Google sign-in)
+        final usersRef = FirebaseFirestore.instance.collection('users');
+        final userDoc = await usersRef.doc(_userId).get();
+        if (!userDoc.exists) {
+          await usersRef.doc(_userId).set({
+            'id': _userId,
+            'name': name, // No display name from email/password signup
+            'email': em,
+            'password': pass, // Storing plain password is NOT recommended in production
+            'ads': [],
+            'notifications': [],
+            'reports': [],
+            'createdAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+        }
+        notifyListeners();
+
       return 'Signup successful!';
     }
 
