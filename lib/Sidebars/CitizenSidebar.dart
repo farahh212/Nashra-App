@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../screens/emergency_screen.dart';
+import '../providers/authProvider.dart' as my_auth; // Import your AuthProvider
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
@@ -7,13 +9,12 @@ class CitizenSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFFFFFEF5), // Match background color
+      backgroundColor: const Color(0xFFFFFEF5),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Add items with spacing between them
             DrawerItem(
               title: "Post Advertisement",
               onTap: () {
@@ -42,6 +43,14 @@ class CitizenSidebar extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (context) => const EmergencyNumbersScreen()),
                 );
+              },
+            ),
+            const SizedBox(height: 30),
+            DrawerItem(
+              title: "Logout",
+              onTap: () async {
+                await Provider.of<my_auth.AuthProvider>(context, listen: false).logout();
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
