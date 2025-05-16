@@ -19,7 +19,8 @@ import 'screens/announcementCitizens/announcements.dart';
 import 'package:nashra_project2/providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
 import './providers/pollsProvider.dart';
-import 'chat/ChatsPage.dart'; // Ensure this file contains the ChatPage class
+import 'chat/ChatsPage.dart'; 
+import'firebase_api.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+await FirebaseAPi().iniNotifications();
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.debug,
