@@ -14,6 +14,7 @@ import '../providers/emergencyProvider.dart';
 import '../providers/authProvider.dart' as my_auth;
 import '../widgets/emergency_widget.dart';
 import '../widgets/bottom_navigation_bar.dart';
+import '../providers/languageProvider.dart';
 
 class EmergencyNumbersScreen extends StatefulWidget {
   const EmergencyNumbersScreen({Key? key}) : super(key: key);
@@ -71,6 +72,12 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
             letterSpacing: 1.5,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showAddDialog,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -175,6 +182,9 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
       context: context,
       builder: (context) {
         final l10n = AppLocalizations.of(context)!;
+        final languageProvider = Provider.of<LanguageProvider>(context);
+        final isArabic = languageProvider.currentLocale.languageCode == 'ar';
+        
         return AlertDialog(
           title: Text(l10n.addEmergencyNumber),
           content: Column(
@@ -183,7 +193,7 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
               TextField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  labelText: l10n.title,
+                  labelText: isArabic ? 'العنوان بالعربية' : l10n.title,
                   border: const OutlineInputBorder(),
                 ),
               ),
@@ -222,7 +232,11 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                   }
 
                   final provider = Provider.of<EmergencyProvider>(context, listen: false);
-                  await provider.addEmergencyNumber(_titleController.text, number);
+                  await provider.addEmergencyNumber(
+                    isArabic ? '' : _titleController.text,
+                    number,
+                    titleAr: isArabic ? _titleController.text : '',
+                  );
                   
                   if (mounted) {
                     Navigator.pop(context);

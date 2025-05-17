@@ -17,5 +17,13 @@
     "errorAddingContact": "خطأ في إضافة جهة الاتصال: {error}",
     "errorUpdatingContact": "خطأ في تحديث جهة الاتصال: {error}",
     "errorDeletingContact": "خطأ في حذف جهة الاتصال: {error}",
-    "noEmergencyNumbers": "لم يتم العثور على أرقام طوارئ"
+    "noEmergencyNumbers": "لم يتم العثور على أرقام طوارئ",
+    
+    "governmentDashboard": "لوحة تحكم الحكومة",
+    "welcomeToNashra": "مرحباً بك في نشرة",
+    "governmentAdminPortal": "بوابة الإدارة الحكومية",
+    "quickActions": "إجراءات سريعة",
+    "announcements": "الإعلانات",
+    "advertisements": "الإعلانات التجارية",
+    "contactSupport": "اتصل بالدعم"
 } 

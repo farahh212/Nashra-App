@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../Sidebars/CitizenSidebar.dart';
 import '../Sidebars/govSidebar.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 import '../providers/authProvider.dart' as my_auth;
 import '../screens/announcementCitizens/announcements.dart';
+import '../widgets/bottom_navigation_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,6 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<my_auth.AuthProvider>(context);
     final isAdmin = authProvider.isAdmin;
+    final l10n = AppLocalizations.of(context)!;
 
     // Redirect non-admin users to announcements page
     if (!isAdmin) {
@@ -35,7 +38,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: AppTheme.surfaceColor,
         elevation: 0,
         title: Text(
-          'Government Dashboard',
+          l10n.governmentDashboard,
           style: TextStyle(
             color: AppTheme.primaryColor,
             fontWeight: FontWeight.bold,
@@ -44,91 +47,98 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Section
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  // ignore: deprecated_member_use
-                  color: AppTheme.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Welcome Section
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        // ignore: deprecated_member_use
+                        color: AppTheme.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.welcomeToNashra,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            l10n.governmentAdminPortal,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppTheme.textSecondaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // Quick Actions Section
                     Text(
-                      'Welcome to Nashra',
+                      l10n.quickActions,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.primaryColor,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Government Administration Portal',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.textSecondaryColor,
-                      ),
+                    const SizedBox(height: 20),
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 15,
+                      crossAxisSpacing: 15,
+                      children: [
+                        _buildActionCard(
+                          context,
+                          l10n.emergencyNumbers,
+                          Icons.phone,
+                          () => Navigator.pushNamed(context, '/emergency'),
+                        ),
+                        _buildActionCard(
+                          context,
+                          l10n.announcements,
+                          Icons.announcement,
+                          () => Navigator.pushNamed(context, '/announcements'),
+                        ),
+                        _buildActionCard(
+                          context,
+                          l10n.advertisements,
+                          Icons.campaign,
+                          () => Navigator.pushNamed(context, '/advertisement')),
+                        _buildActionCard(
+                          context,
+                          l10n.contactSupport,
+                          Icons.contact_support,
+                          () {
+                            // TODO: Implement contact support functionality
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
-
-              // Quick Actions Section
-              Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryColor,
-                ),
-              ),
-              const SizedBox(height: 20),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 15,
-                crossAxisSpacing: 15,
-                children: [
-                  _buildActionCard(
-                    context,
-                    'Emergency Numbers',
-                    Icons.phone,
-                    () => Navigator.pushNamed(context, '/emergency'),
-                  ),
-                  _buildActionCard(
-                    context,
-                    'Announcements',
-                    Icons.announcement,
-                    () => Navigator.pushNamed(context, '/announcements'),
-                  ),
-                  _buildActionCard(
-                    context,
-                    'Advertisements',
-                    Icons.campaign,
-                    () => Navigator.pushNamed(context, '/advertisement')),
-                  _buildActionCard(
-                    context,
-                    'Contact Support',
-                    Icons.contact_support,
-                    () {
-                      // TODO: Implement contact support functionality
-                    },
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          const CustomBottomNavigationBar(),
+        ],
       ),
     );
   }
