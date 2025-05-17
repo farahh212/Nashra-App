@@ -9,6 +9,15 @@ class AuthProvider with ChangeNotifier {
     bool _authenticated = false;
     bool _isAdmin = false; // Add admin flag
 
+     dynamic _user;
+  dynamic get user => _user;
+
+  // Optionally, add a setter or method to update _user
+  set user(dynamic value) {
+    _user = value;
+    notifyListeners();
+  }
+
 //this is used to check if the user is authenticated or not
     bool isAuthenticated() {
         return _authenticated;
