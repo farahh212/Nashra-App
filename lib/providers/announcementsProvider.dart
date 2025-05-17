@@ -196,6 +196,73 @@ class Announcementsprovider with ChangeNotifier {
     }
   }
 
+Future<void> removeAnnouncement(String announcementId, String token, String userId) async {
+  final url = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId.json?auth=$token',
+  );
+
+  try {
+    // Send DELETE request to Firebase
+   
+    final response = await http.delete(url);
+
+    // Check for errors
+    if (response.statusCode >= 400) {
+      throw Exception('Failed to delete announcement.');
+    }
+
+    // Remove from local list
+    announcements.removeWhere((a) => a.id == announcementId);
+    notifyListeners(); // If this is inside a ChangeNotifier class
+
+  } catch (e) {
+    print('Error removing announcement: $e');
+    rethrow;
+  }
+}
+
+Future<void> editAnnouncement(
+  String announcementId,
+  String token,
+  String userId, {
+  required String newTitle,
+  required String newDescription,
+  String? newImageUrl,
+  String? newFileUrl,
+}) async {
+  final url = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId.json?auth=$token',
+  );
+
+  try {
+    // Build the update data map
+    final updatedData = {
+      'title': newTitle,
+      'description': newDescription,
+      'imageUrl': newImageUrl,
+      'fileUrl': newFileUrl,
+      'userId': userId, // If needed to verify user
+    };
+
+    final response = await http.patch(
+      url,
+      body: json.encode(updatedData),
+    );
+
+    if (response.statusCode >= 400) {
+      throw Exception('Failed to edit announcement.');
+    }
+
+   notifyListeners();
+  } catch (e) {
+    print('Error editing announcement: $e');
+    rethrow;
+  }
+}
+
+
+
+
 
   // Future<void> addToLikedByUsers(String announcementId, String userId, String token) async {
   //   final url = Uri.parse(
@@ -217,18 +284,3 @@ class Announcementsprovider with ChangeNotifier {
 
 
 }
-
-// Future<void> fetchIdeasFromServer(String token) async {
-// var ideasURL = Uri.parse(‘ourDBURL/IdeasDB.json?auth=$token');
-// try {
-// var response = await http.get(ideasURL);
-
-// var fetchedData = json.decode(response.body) as Map<String, dynamic>;
-// _ideas.clear();
-// fetchedData.forEach((key, value) {
-// _ideas.add(Idea(
-// id: key, ideaTitle: value['ideaTitle’], ideaBody: value['ideaBody’], userId: value['userId'])
-// );});
-// notifyListeners();
-// } catch (err) {}
-// }

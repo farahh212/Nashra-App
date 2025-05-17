@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:nashra_project2/screens/announcement&pollGovernment/EditButtomSheetAnnouncement.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 // import 'package:nashra_project2/CitizenPages/commentSection.dart';
 // import 'package:nashra_project2/CitizenPages/commentsFetched.dart';
@@ -46,6 +47,23 @@ class _AnnouncementcardState extends State<Announcementcard> {
         child: Column(
           children: [
             Text(widget.announcement.title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            if(isAdmin)
+            IconButton(onPressed: (){
+              announcementsProvider.removeAnnouncement(widget.announcement.id, auth.token, auth.userId);
+
+            }, icon: Icon(Icons.delete)),
+            IconButton(onPressed: (){
+               showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Allows the sheet to take full height
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.50,
+        child: Editbuttomsheetannouncement(announcement: widget.announcement), // Make sure this class/widget exists and is correctly named
+      ),
+    );
+              
+            }, icon: Icon(Icons.edit)),
+            
             Text(widget.announcement.createdAt.toString(), style: TextStyle(fontSize: 14, color: Colors.grey)),
             SizedBox(height: 10),
             widget.announcement.fileUrl != null && widget.announcement.fileUrl!.isNotEmpty
