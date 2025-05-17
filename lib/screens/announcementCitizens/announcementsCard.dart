@@ -52,17 +52,20 @@ class _AnnouncementcardState extends State<Announcementcard> {
               announcementsProvider.removeAnnouncement(widget.announcement.id, auth.token, auth.userId);
 
             }, icon: Icon(Icons.delete)),
-            IconButton(onPressed: (){
-               showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // Allows the sheet to take full height
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.50,
-        child: Editbuttomsheetannouncement(announcement: widget.announcement), // Make sure this class/widget exists and is correctly named
+    if (isAdmin)
+      IconButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true, // Allows the sheet to take full height
+            builder: (context) => Container(
+              height: MediaQuery.of(context).size.height * 0.50,
+              child: Editbuttomsheetannouncement(announcement: widget.announcement), // Make sure this class/widget exists and is correctly named
+            ),
+          );
+        },
+        icon: Icon(Icons.edit),
       ),
-    );
-              
-            }, icon: Icon(Icons.edit)),
             
             Text(widget.announcement.createdAt.toString(), style: TextStyle(fontSize: 14, color: Colors.grey)),
             SizedBox(height: 10),
