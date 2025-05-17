@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:nashra_project2/Sidebars/govSidebar.dart';
 // import 'package:nashra_project2/CitizenPages/announcementCard.dart' ;
 import './announcements.dart';
 import 'package:nashra_project2/models/announcement.dart';
 import './announcementsCard.dart';
+import 'package:nashra_project2/screens/announcement&pollGovernment/ButtomSheetAnnouncement.dart';
 
 import 'package:nashra_project2/Sidebars/citizenSidebar.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
@@ -31,15 +33,33 @@ class _AnnouncementsState extends State<Announcements> {
   Widget build(BuildContext context) {
     final announcementsProvider = Provider.of<Announcementsprovider>(context);
     final announcements = announcementsProvider.announcements;
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final isAdmin = auth.isAdmin;
+
 
     return Scaffold(
       backgroundColor: Color(0xFFFEFFF3),
       appBar: AppBar(
         title: Text('NASHRA', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: Color(0xFFFEFFF3),
-        
+        actions: [
+          if(isAdmin)
+IconButton(
+  onPressed: () {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Allows the sheet to take full height
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.50,
+        child: Buttomsheetannouncement(), // Make sure this class/widget exists and is correctly named
       ),
-      drawer: CitizenSidebar(), 
+    );
+  },
+  icon: Icon(Icons.add, color: Colors.black),
+)
+        ],
+      ),
+      drawer:isAdmin? GovSidebar():CitizenSidebar(), 
       body: FutureBuilder(
         future: _announcementsFuture,
         builder: (ctx, snapshot) {
