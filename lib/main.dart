@@ -8,6 +8,7 @@ import 'package:nashra_project2/providers/emergencyProvider.dart';
 import 'package:nashra_project2/providers/pollsProvider.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
+import 'package:nashra_project2/screens/gov_advertisments.dart';
 import 'package:nashra_project2/screens/home.dart';
 import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
           '/polls':(context) => pollScreen(),
           '/login': (context) => LoginPage(),
           '/home': (context) => HomeScreen(),
+          '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
           // Add more routes as needed
         },
       ),
