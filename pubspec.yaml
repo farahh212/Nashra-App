@@ -36,6 +36,7 @@ dependencies:
   firebase_core: ^2.32.0 # Use the latest version
   firebase_auth: ^4.17.4 # Use the latest version
   firebase_app_check: ^0.2.1+6 # Use the latest version
+  fl_chart: ^0.66.2
   
   
 
