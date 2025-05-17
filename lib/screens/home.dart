@@ -12,167 +12,200 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final authProvider = Provider.of<my_auth.AuthProvider>(context);
     final isAdmin = authProvider.isAdmin;
 
-    // Redirect non-admin users to announcements page
-    if (!isAdmin) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Announcements()),
-        );
-      });
-      
-      // Return empty container while redirecting
-      return Container(color: AppTheme.surfaceColor);
-    }
-
-    // Admin UI remains the same
     return Scaffold(
-      drawer: const GovSidebar(),
+      drawer: isAdmin ? const GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceColor,
+        backgroundColor: AppTheme.primaryColor,
         elevation: 0,
         title: Text(
-          'Government Dashboard',
+          'Welcome to Nashra',
           style: TextStyle(
-            color: AppTheme.primaryColor,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 24,
-            letterSpacing: 1.5,
+            fontSize: 20,
           ),
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Section
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  // ignore: deprecated_member_use
-                  color: AppTheme.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome to Nashra',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Government Administration Portal',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.textSecondaryColor,
-                      ),
-                    ),
-                  ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
               ),
-              const SizedBox(height: 30),
-
-              // Quick Actions Section
-              Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryColor,
-                ),
-              ),
-              const SizedBox(height: 20),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 15,
-                crossAxisSpacing: 15,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildActionCard(
-                    context,
-                    'Emergency Numbers',
-                    Icons.phone,
-                    () => Navigator.pushNamed(context, '/emergency'),
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, color: AppTheme.primaryColor),
                   ),
-                  _buildActionCard(
-                    context,
-                    'Announcements',
-                    Icons.announcement,
-                    () => Navigator.pushNamed(context, '/announcements'),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Hi, User',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                  _buildActionCard(
-                    context,
-                    'Advertisements',
-                    Icons.campaign,
-                    () => Navigator.pushNamed(context, '/advertisement')),
-                  _buildActionCard(
-                    context,
-                    'Contact Support',
-                    Icons.contact_support,
-                    () {
-                      // TODO: Implement contact support functionality
-                    },
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Welcome to Nashra E-Office Services',
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  children: [
+                    _buildFeatureTile(context, Icons.announcement, 'Announcements', '/announcements'),
+                    _buildFeatureTile(context, Icons.poll, 'Polls', '/polls'),
+                    _buildFeatureTile(context, Icons.campaign, 'Ads', '/advertisement'),
+                    _buildFeatureTile(context, Icons.report_problem, 'Report Issue', '/report'),
+                    _buildFeatureTile(context, Icons.phone, 'Emergency', '/emergency'),
+                    // _buildFeatureTile(context, Icons.phone_in_talk, 'Hotline', '/emergency'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Highlights',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildHighlightCard(
+                    context,
+                    title: 'New Announcement',
+                    subtitle: 'Check out the latest updates from the city council.',
+                    onTap: () => Navigator.pushNamed(context, '/announcements'),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildHighlightCard(
+                    context,
+                    title: 'Ongoing Poll',
+                    subtitle: 'Your feedback matters! Cast your vote now.',
+                    onTap: () => Navigator.pushNamed(context, '/polls'),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildHighlightCard(
+                    context,
+                    title: 'Featured Ad',
+                    subtitle: 'Don’t miss our latest government announcements.',
+                    onTap: () => Navigator.pushNamed(context, '/advertisement'),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildHighlightCard(
+                    context,
+                    title: 'Emergency Info',
+                    subtitle: 'Access contacts and services for urgent help.',
+                    onTap: () => Navigator.pushNamed(context, '/emergency'),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: AppTheme.primaryColor,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.language), label: 'language'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications_outlined), label: 'notofications'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }
 
-  // Keep the existing _buildActionCard method
-  Widget _buildActionCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
+  Widget _buildFeatureTile(BuildContext context, IconData icon, String label, String route) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, route),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+            child: Icon(icon, color: AppTheme.primaryColor),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.textPrimaryColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHighlightCard(BuildContext context, {required String title, required String subtitle, required VoidCallback onTap}) {
+    return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(15),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 2),
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 3),
             ),
           ],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              size: 40,
-              color: AppTheme.primaryColor,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.textPrimaryColor,
-              ),
-            ),
+            Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+            const SizedBox(height: 4),
+            Text(subtitle, style: TextStyle(color: Colors.grey[700])),
           ],
         ),
       ),
