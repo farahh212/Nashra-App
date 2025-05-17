@@ -23,6 +23,8 @@ class Announcementsprovider with ChangeNotifier {
       'title': announcement.title,
       'description': announcement.description,
       'createdAt': DateTime.now().toIso8601String(),
+      'fileUrl': announcement.fileUrl,
+       'likes': 0,
       'imageUrl': announcement.imageUrl,
    })).then((response) {
       announcements.add(Announcement(
@@ -31,6 +33,7 @@ class Announcementsprovider with ChangeNotifier {
         description: announcement.description,
         createdAt: DateTime.now(),
         imageUrl: announcement.imageUrl,
+        fileUrl: announcement.fileUrl,
         likes: 0,
         likedByUser: [],
       ));
@@ -56,6 +59,7 @@ class Announcementsprovider with ChangeNotifier {
           description: value['description'],
           createdAt: DateTime.parse(value['createdAt']),
           imageUrl: value['imageUrl'],
+          fileUrl: value['fileUrl'],
           likes: value['likes'] ?? 0,
           likedByUser: List<String>.from(value['likedByUser'] ?? []),
         ));
