@@ -3,8 +3,10 @@ import 'package:nashra_project2/models/index.dart';
 import 'package:nashra_project2/providers/advertisementProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/screens/ad_card.dart';
-import 'package:provider/provider.dart';
+import 'package:nashra_project2/screens/create_ad_screen.dart';
+import 'package:nashra_project2/screens/myAdvertisementScreen.dart';
 
+import 'package:provider/provider.dart';
 class AdvertisementScreen extends StatefulWidget {
   @override
   _AdvertisementScreenState createState() => _AdvertisementScreenState();
@@ -16,8 +18,6 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Delaying to ensure context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = Provider.of<AuthProvider>(context, listen: false);
       final token = auth.token;
@@ -35,25 +35,57 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
   @override
   Widget build(BuildContext context) {
     final ads = Provider.of<AdvertisementProvider>(context)
-        .advertisements // ✅ use a getter
+        .advertisements
         .where((ad) => ad.status == AdvertisementStatus.approved)
         .toList();
 
     return Scaffold(
       appBar: AppBar(title: Text("Advertisement")),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ads.isEmpty
-              ? Center(child: Text("No ads available."))
-              : ListView.builder(
-                  itemCount: ads.length,
-                  itemBuilder: (context, index) => AdCard(ad: ads[index]),
-                ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to ad submission form
-        },
-        child: Icon(Icons.add),
+      body: Stack(
+        children: [
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : ads.isEmpty
+                  ? Center(child: Text("No ads available."))
+                  : ListView.builder(
+                      padding: EdgeInsets.only(bottom: 100),
+                      itemCount: ads.length,
+                      itemBuilder: (context, index) => AdCard(ad: ads[index]),
+                    ),
+          Positioned(
+            bottom: 20,
+            left: 30,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyAdvertisementsScreen()),
+                );
+              },
+              icon: Icon(Icons.list, color: Colors.green.shade800),
+              label: Text("My Ads", style: TextStyle(color: Colors.green.shade800)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                side: BorderSide(color: Colors.green.shade800, width: 1.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 30,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateAdScreen()),
+                );
+              },
+              backgroundColor: Colors.green.shade800,
+              child: Icon(Icons.add, color: Colors.white),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [

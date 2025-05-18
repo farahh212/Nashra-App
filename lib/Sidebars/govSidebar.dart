@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/emergency_screen.dart';
 import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
+import '../screens/analytics_screen.dart';
 
 class GovSidebar extends StatelessWidget {
   const GovSidebar({super.key});
@@ -35,7 +36,17 @@ class GovSidebar extends StatelessWidget {
             DrawerItem(
               title: "Manage Advertisements",
               onTap: () {
-                Navigator.pushNamed(context, '/advertisement');
+                Navigator.pushNamed(context, '/gov_advertisement');
+              },
+            ),
+            const SizedBox(height: 30),
+            DrawerItem(
+              title: "Analytics Dashboard",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
+                );
               },
             ),
             const SizedBox(height: 30),
