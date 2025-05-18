@@ -8,7 +8,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-
 class LoginPage extends StatefulWidget {
   final int authenticationMode; // 0 for login, 1 for signup
 
@@ -39,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       var successOrError = await Provider.of<my_auth.AuthProvider>(context, listen: false).signup(
       em: _emailController.text.trim(),
       pass: _passwordController.text,
+      name: _nameController.text,
     );
 
     if(successOrError == "Signup successful!"){
@@ -113,119 +113,159 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Text(
-                  'NASHRA',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green[900],
-                    letterSpacing: 2,
-                  ),
+              child: Text(
+                'NASHRA',
+                style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+                letterSpacing: 2,
                 ),
+              ),
               ),
               SizedBox(height: 40),
               Text(
-                authenticationMode == 0 ? 'Welcome Back,' : 'Create an Account',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[900],
-                ),
+              authenticationMode == 0 ? 'Welcome Back,' : 'Create an Account',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+              ),
               ),
               SizedBox(height: 8),
               Text(
-                authenticationMode == 0
-                    ? 'Login to your account'
-                    : 'Sign up to get started',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+              authenticationMode == 0
+                ? 'Login to your account'
+                : 'Sign up to get started',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
               ),
               SizedBox(height: 32),
               if (authenticationMode == 1)
-                TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'ex: Ali Ahmed',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                labelText: 'Name',
+                hintText: 'ex: Ali Ahmed',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                ),
+              ),
               if (authenticationMode == 1) SizedBox(height: 20),
               TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'ex: ali.ahmed123@email.com',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'ex: ali.ahmed123@email.com',
+                border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
                 ),
+              ),
               ),
               SizedBox(height: 20),
               TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: '********',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                hintText: '********',
+                border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
                 ),
+              ),
               ),
               SizedBox(height: 20),
               if (authenticationMode == 1)
-                TextField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    hintText: '********',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+              TextField(
+                controller: _confirmPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                hintText: '********',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                ),
+              ),
               if (authenticationMode == 1) SizedBox(height: 30),
               SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: loginORsignup,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[700],
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    authenticationMode == 0 ? 'LOGIN' : 'SIGN UP',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: loginORsignup,
+                style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[700],
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                ),
+                child: Text(
+                authenticationMode == 0 ? 'LOGIN' : 'SIGN UP',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                ),
+              ),
               ),
               SizedBox(height: 20),
               TextButton(
-                onPressed: toggleAuthMode,
-                child: Center(
-                  child: Text(
-                    authenticationMode == 0
-                        ? 'Don\'t have an account? Sign up instead'
-                        : 'Already have an account? Login instead',
-                    style: TextStyle(
-                      color: Colors.green[700],
-                      fontWeight: FontWeight.bold,
-                    ),
+              onPressed: toggleAuthMode,
+              child: Center(
+                child: Text(
+                authenticationMode == 0
+                  ? 'Don\'t have an account? Sign up instead'
+                  : 'Already have an account? Login instead',
+                style: TextStyle(
+                  color: Colors.green[700],
+                  fontWeight: FontWeight.bold,
+                ),
+                ),
+              ),
+              ),
+              // Google login button
+              TextButton(
+              onPressed: () async {
+              final authProvider = Provider.of<my_auth.AuthProvider>(context, listen: false);
+              final result = await authProvider.signInWithGoogle();
+
+              // Whether a new sign-in occurred or user was already signed in, check current user
+              final user = FirebaseAuth.instance.currentUser;
+              print(user);
+
+              if (user != null) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Google sign-in failed. Please try again.')),
+                );
+              }
+            },
+
+              child: Center(child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                Image.asset(
+                  'assets/google_logo.png',
+                  height: 24,
+                  width: 24,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Sign in with Google',
+                  style: TextStyle(
+                  color: Colors.green[700],
+                  fontWeight: FontWeight.bold,
                   ),
                 ),
+                ],
+              ),),
               ),
             ],
           ),

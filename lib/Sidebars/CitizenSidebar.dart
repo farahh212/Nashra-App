@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../screens/emergency_screen.dart';
+import '../providers/authProvider.dart' as my_auth;
+import '../chat/messagePage_citiz.dart';
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
@@ -7,51 +10,81 @@ class CitizenSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFFFFFEF5), // Match background color
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
+          child: ListView(
+            children: [
+              const _UserProfileCard(),
+              const SizedBox(height: 20),
+              _DrawerSection(
+                title: "Navigation",
+                items: [
+                  _DrawerItem(icon: Icons.post_add, title: "Post Advertisement", onTap: () {
+                    Navigator.pushNamed(context, '/advertisement');
+                  }),
+                  _DrawerItem(icon: Icons.chat, title: "Contact Government", onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const CitizenMessageWrapper()));
+                  }),
+                  _DrawerItem(icon: Icons.report_problem, title: "Report a Problem", onTap: () {
+                    // Your logic
+                  }),
+                  _DrawerItem(icon: Icons.local_phone, title: "Emergency Numbers", onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EmergencyNumbersScreen()));
+                  }),
+                  _DrawerItem(icon: Icons.announcement, title: "Check Announcements", onTap: () {
+                    Navigator.pushNamed(context, '/announcements');
+                  }),
+                   _DrawerItem(icon: Icons.poll, title: "Polls", onTap: () {
+                    Navigator.pushNamed(context, '/polls');
+                  }),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _DrawerSection(
+                title: "Settings",
+                items: [
+                  _DrawerItem(icon: Icons.logout, title: "Logout", onTap: () async {
+                    await Provider.of<my_auth.AuthProvider>(context, listen: false).logout();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  }),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UserProfileCard extends StatelessWidget {
+  const _UserProfileCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Add items with spacing between them
-            DrawerItem(
-              title: "Post Advertisement",
-              onTap: () {
-                Navigator.pushNamed(context, '/advertisement');
-              },
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: const [
+            CircleAvatar(
+              radius: 24,
+              backgroundImage: AssetImage('assets/images/profile_placeholder.png'), // change to your asset
             ),
-            const SizedBox(height: 30),
-            DrawerItem(
-              title: "Contact Government",
-              onTap: () {
-                // Navigate to Contact Government page
-              },
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                
+                ],
+              ),
             ),
-            const SizedBox(height: 30),
-            DrawerItem(
-              title: "Report a Problem",
-              onTap: () {
-                // Navigate to Report a Problem page
-              },
-            ),
-            const SizedBox(height: 30),
-            DrawerItem(
-              title: "Check Emergency numbers",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EmergencyNumbersScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 30),
-             DrawerItem(
-              title: "Check Announcements",
-              onTap: () {
-                Navigator.pushNamed(context, '/announcements');
-                // Navigate to Contact Government page
-              },
-            ),
+            Icon(Icons.more_vert)
           ],
         ),
       ),
@@ -59,31 +92,54 @@ class CitizenSidebar extends StatelessWidget {
   }
 }
 
-class DrawerItem extends StatelessWidget {
+class _DrawerSection extends StatelessWidget {
+  final String title;
+  final List<Widget> items;
+
+  const _DrawerSection({required this.title, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 1.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 10),
+            ...items
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
   final String title;
   final VoidCallback onTap;
 
-  const DrawerItem({
+  const _DrawerItem({
+    required this.icon,
     required this.title,
     required this.onTap,
-    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: Colors.green[900]),
+      title: Text(title, style: TextStyle(fontSize: 16, color: Colors.green[900])),
       onTap: () {
-        Navigator.pop(context); // Close drawer
+        Navigator.pop(context);
         onTap();
       },
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.green[900],
-        ),
-      ),
     );
   }
 }

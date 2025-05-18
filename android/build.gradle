@@ -6,11 +6,16 @@ buildscript {
         mavenCentral()  // Maven Central repository for other dependencies
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'  // Android Gradle plugin version
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22'  // Kotlin plugin version
+    //    classpath 'com.android.tools.build:gradle:7.0.4'  // Android Gradle plugin version
+        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.21"
+     //   classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22'  // Kotlin plugin version
         classpath 'com.google.gms:google-services:4.3.15'  // Firebase services plugin version
+        
     }
 }
+
+
 
 allprojects {
     repositories {

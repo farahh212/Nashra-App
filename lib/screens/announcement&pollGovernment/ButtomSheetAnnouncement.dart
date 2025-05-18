@@ -44,6 +44,7 @@ class ButtomsheetannouncementState extends State<Buttomsheetannouncement> {
         createdAt: DateTime.now(),
         imageUrl: _imageFile != null ? _imageFile!.path : null,
         fileUrl: fileUrlController.text.trim().isEmpty ? null : fileUrlController.text.trim(),
+        commentsNo: 0,
       );
 
       await announcementsProvider.addAnnouncement(newAnnouncement, auth.token);
