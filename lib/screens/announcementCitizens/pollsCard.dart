@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nashra_project2/models/poll.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/providers/pollsProvider.dart';
+import 'package:nashra_project2/screens/announcementCitizens/pollsComments.dart';
 import 'package:provider/provider.dart';
 
 class PollCard extends StatefulWidget {
@@ -153,9 +154,31 @@ class _PollCardState extends State<PollCard> {
                   ],
                 ),
               ),
-          ],
+      // Move these widgets inside the Column's children list
+      IconButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true, // Allows the sheet to take full height
+            builder: (context) => Container(
+              height: MediaQuery.of(context).size.height * 0.50,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom, // Account for keyboard
+                ),
+                child: Pollscomments(poll: widget.poll),
+              ),
+            ),
+          );
+        },
+        icon: Icon(Icons.mode_comment_rounded),
+      ),
+      SizedBox(height: 10),
+      Text('${widget.poll.commentsNo ?? 0}'),
+    ],
         ),
       ),
+
     );
   }
 }

@@ -35,6 +35,7 @@ class _AnnouncementsState extends State<Announcements> {
     final announcements = announcementsProvider.announcements;
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin = auth.isAdmin;
+    
 
 
     return Scaffold(

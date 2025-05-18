@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -55,6 +56,8 @@ dependencies:
   http: ^1.4.0
   firebase_database: ^10.5.7
   firebase_messaging: ^14.9.4
+  file_picker: ^8.0.7
+  open_filex:  ^4.0.0
 
   image_picker: ^1.0.4
   google_maps_flutter: ^2.2.3

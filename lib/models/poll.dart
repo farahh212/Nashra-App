@@ -11,6 +11,7 @@ class Poll {
   List<Comment> comments;
   String? imageUrl;
   Map<String, String> voterToOption = {};
+   int ? commentsNo;
 
   Poll({
     required this.id,
@@ -21,6 +22,7 @@ class Poll {
     Map<String, int>? votes,
     this.imageUrl,
     Map<String, String>? voterToOption,
+    required this.commentsNo,
   })  : voterToOption = voterToOption ?? {},
         votes = votes ?? {},
         comments = [];
@@ -38,6 +40,7 @@ class Poll {
     imageUrl: imageUrl ?? this.imageUrl,
     votes: votes ?? this.votes,
     voterToOption: voterToOption ?? this.voterToOption,
+    commentsNo: commentsNo,
     
 
   );
@@ -51,6 +54,7 @@ class Poll {
       'createdAt': createdAt.toIso8601String(),
       'endDate': endDate.toIso8601String(),
         'imageUrl': imageUrl,
+        'commentsNo':commentsNo,
         
     };
   }
@@ -65,6 +69,7 @@ class Poll {
     createdAt: DateTime.parse(map['createdAt']),
     endDate: DateTime.parse(map['endDate']),
     imageUrl: map['imageUrl'],
+    commentsNo: map['coomentsNo']?? 0,
     );
   }
 } 
