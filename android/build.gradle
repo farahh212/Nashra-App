@@ -6,7 +6,10 @@ buildscript {
         mavenCentral()  // Maven Central repository for other dependencies
     }
     dependencies {
+
     //    classpath 'com.android.tools.build:gradle:7.0.4'  // Android Gradle plugin version
+        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+
         classpath 'com.android.tools.build:gradle:8.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.21"
      //   classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22'  // Kotlin plugin version
@@ -14,6 +17,9 @@ buildscript {
         
     }
 }
+
+
+
 
 
 

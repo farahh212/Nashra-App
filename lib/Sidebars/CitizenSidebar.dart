@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/emergency_screen.dart';
 import '../providers/authProvider.dart' as my_auth;
+import '../chat/messagePage_citiz.dart';
+import '../providers/authProvider.dart' as my_auth; // Import your AuthProvider
+import '../screens/reports/reports_screen.dart';
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
@@ -24,7 +27,7 @@ class CitizenSidebar extends StatelessWidget {
                     Navigator.pushNamed(context, '/advertisement');
                   }),
                   _DrawerItem(icon: Icons.chat, title: "Contact Government", onTap: () {
-                    // Your logic
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const CitizenMessageWrapper()));
                   }),
                   _DrawerItem(icon: Icons.report_problem, title: "Report a Problem", onTap: () {
                     // Your logic
@@ -110,7 +113,7 @@ class _DrawerSection extends StatelessWidget {
             Text(title,
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
-            ...items
+            ...items,
           ],
         ),
       ),
