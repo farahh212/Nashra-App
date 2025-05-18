@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _startAnimation() async {
     for (int i = 1; i <= _letters.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 2000));
       setState(() => _step = i);
     }
 

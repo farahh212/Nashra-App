@@ -87,9 +87,12 @@ class MyApp extends StatelessWidget {
               '/home': (context) => HomeScreen(),
               '/message': (context) => CitizenMessageWrapper(),
               '/notifications': (context) => NotificationPage(),
-              //'/notifications': (context) => NotificationsScreen(),
                '/home': (context) => HomeScreen(),
                '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
+               '/reports': (context) => AllReports(),
+               '/chats': (context) => CitizenMessageWrapper(),
+               '/gov_chats': (context) => ChatsPage(),
+
             },
           );
         },
