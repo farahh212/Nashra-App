@@ -59,9 +59,9 @@ class _GovernmentAdvertisementsScreenState
         });
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.green : Colors.white,
-        foregroundColor: isSelected ? Colors.white : Colors.green,
-        side: BorderSide(color: Colors.green, width: 2),
+        backgroundColor: isSelected ?Color(0xFF1B5E20) : Colors.white,
+        foregroundColor: isSelected ? Colors.white : Color(0xFF1B5E20),
+        side: BorderSide(color:Color(0xFF1B5E20), width: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(label),
@@ -126,7 +126,7 @@ class _GovernmentAdvertisementsScreenState
                                           ad.id, AdvertisementStatus.approved),
                                       child: Text('Approve'),
                                       style: TextButton.styleFrom(
-                                          foregroundColor: Colors.green),
+                                          foregroundColor: Color(0xFF1B5E20)),
                                     ),
                                     TextButton(
                                       onPressed: () => _updateStatus(

@@ -4,9 +4,6 @@ import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/providers/pollsProvider.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsComments.dart';
 import 'package:provider/provider.dart';
-// import '../models/poll.dart';
-// import '../providers/authProvider.dart';
-// import '../providers/pollsProvider.dart';
 
 class PollCard extends StatefulWidget {
   final Poll poll;
@@ -23,19 +20,15 @@ class _PollCardState extends State<PollCard> {
   @override
   void initState() {
     super.initState();
-    // Check if user has already voted
     final auth = Provider.of<AuthProvider>(context, listen: false);
-      final isAdmin = auth.isAdmin;
-
     _selectedOption = widget.poll.voterToOption[auth.userId];
   }
 
   Future<void> _submitVote(String option) async {
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    if (_selectedOption != null) return;// Prevent multiple votes
+    if (_selectedOption != null) return;
 
     setState(() => _isSubmitting = true);
-    
     final pollsProvider = Provider.of<Pollsprovider>(context, listen: false);
 
     try {
@@ -63,124 +56,126 @@ class _PollCardState extends State<PollCard> {
 
   @override
   Widget build(BuildContext context) {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin = auth.isAdmin;
+    final totalVotes = widget.poll.votes.values.fold(0, (sum, count) => sum + count);
+
     return Card(
-      margin: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(12.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
+      elevation: 3,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.poll.imageUrl != null) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  widget.poll.imageUrl!,
-                  width: double.infinity,
-                  height: 150,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
             Text(
               widget.poll.question,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF1B5E20),
               ),
             ),
             const SizedBox(height: 16),
             ...widget.poll.options.map((option) {
               final isSelected = _selectedOption == option;
               final percentage = _getOptionPercentage(option);
-              
+              final showResults = _selectedOption != null || isAdmin;
+              final background = showResults ? Colors.grey[100] : Colors.grey[200];
+              final progressColor = isSelected ? Color(0xFF1B5E20) : Colors.grey[400];
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
                 child: InkWell(
                   onTap: (_selectedOption == null && !_isSubmitting && !isAdmin)
-    ? () => _submitVote(option)
-    : null,
+                      ? () => _submitVote(option)
+                      : null,
                   borderRadius: BorderRadius.circular(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: background,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
                               option,
                               style: TextStyle(
                                 fontSize: 16,
-                                color: isSelected ? Colors.green : null,
-                                fontWeight: isSelected ? FontWeight.bold : null,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? Color(0xFF1B5E20) : Colors.black,
                               ),
                             ),
-                          ),
-                          if (_selectedOption != null || isAdmin)
-                            Text(
-                              '${(percentage * 100).toStringAsFixed(1)}%',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                     
-                      LinearProgressIndicator(
-                        value: percentage,
-                        backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          isSelected ? Colors.green : Colors.blue,
+                            if (showResults)
+                              Text(
+                                '${(percentage * 100).toStringAsFixed(0)}%',
+                                style: const TextStyle(fontSize: 14, color: Colors.black),
+                              ),
+                          ],
                         ),
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      if (_selectedOption != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2.0),
-                          child: Text(
-                            '${widget.poll.votes[option] ?? 0} votes',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: showResults ? percentage : 0,
+                            minHeight: 8,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: AlwaysStoppedAnimation<Color>(progressColor!),
                           ),
                         ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
-            }),
+            }).toList(),
+            const SizedBox(height: 8),
             if (_selectedOption == null && _isSubmitting)
               const Center(child: CircularProgressIndicator()),
-
-            IconButton(onPressed: (){
-               showModalBottomSheet(
-          
-          
-      context: context,
-      isScrollControlled: true, // Allows the sheet to take full height
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.50,
-        child: Padding(
-          
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom, // Account for keyboard
-          ),
-          child: Pollscomments(poll: widget.poll),
-        ),
+            if (_selectedOption != null || isAdmin)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.circle, size: 8, color: Color(0xFF1B5E20)),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Live  |  $totalVotes votes',
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+      // Move these widgets inside the Column's children list
+      IconButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true, // Allows the sheet to take full height
+            builder: (context) => Container(
+              height: MediaQuery.of(context).size.height * 0.50,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom, // Account for keyboard
+                ),
+                child: Pollscomments(poll: widget.poll),
+              ),
+            ),
+          );
+        },
+        icon: Icon(Icons.mode_comment_rounded),
       ),
-    );
-            }, icon: Icon(Icons.mode_comment_rounded)),
-             SizedBox(height:10),
-          Text('${widget.poll.commentsNo?? 0 }'),
-            
-          ],
+      SizedBox(height: 10),
+      Text('${widget.poll.commentsNo ?? 0}'),
+    ],
         ),
       ),
 
