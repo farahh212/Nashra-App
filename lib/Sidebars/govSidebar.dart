@@ -3,6 +3,7 @@ import '../screens/emergency_screen.dart';
 import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
 import '../screens/analytics_screen.dart';
+import '../screens/reports/gov_reports_screen.dart';
 
 class GovSidebar extends StatelessWidget {
   const GovSidebar({super.key});
@@ -53,7 +54,10 @@ class GovSidebar extends StatelessWidget {
             DrawerItem(
               title: "View Reports",
               onTap: () {
-                // Navigate to Reports page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  ViewReportsPage()),
+                );
               },
             ),
           ],

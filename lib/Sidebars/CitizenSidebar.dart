@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/emergency_screen.dart';
 import '../providers/authProvider.dart' as my_auth; // Import your AuthProvider
+import '../screens/reports/reports_screen.dart';
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
@@ -32,7 +33,10 @@ class CitizenSidebar extends StatelessWidget {
             DrawerItem(
               title: "Report a Problem",
               onTap: () {
-                // Navigate to Report a Problem page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  AllReports()),
+                );
               },
             ),
             const SizedBox(height: 30),

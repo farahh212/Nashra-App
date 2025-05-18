@@ -17,6 +17,7 @@ import 'screens/notifications_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'l10n/app_localizations.dart';
+import 'package:nashra_project2/screens/reports/reports_screen.dart';
 
 import 'login.dart';
 import 'startup.dart';
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
             supportedLocales: AppLocalizationsSetup.supportedLocales,
             home: StartUp(),
             routes: {
+              '/reports': (context) => AllReports(),
               '/advertisement': (context) => AdvertisementScreen(),
               '/announcements': (context) => Announcements(),
               '/polls': (context) => pollScreen(),
