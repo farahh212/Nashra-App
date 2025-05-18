@@ -17,6 +17,8 @@ import 'screens/notifications_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'l10n/app_localizations.dart';
+import 'chat/messagePage_citiz.dart';
+
 
 import 'login.dart';
 import 'startup.dart';
@@ -27,6 +29,7 @@ import 'package:provider/provider.dart';
 import './providers/pollsProvider.dart';
 import 'chat/ChatsPage.dart'; 
 import'firebase_api.dart';
+import 'screens/notifications_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,6 +81,8 @@ class MyApp extends StatelessWidget {
               '/polls': (context) => pollScreen(),
               '/login': (context) => LoginPage(),
               '/home': (context) => HomeScreen(),
+              '/message': (context) => CitizenMessageWrapper(),
+              '/notifications': (context) => NotificationPage(),
               //'/notifications': (context) => NotificationsScreen(),
                '/home': (context) => HomeScreen(),
                '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),

@@ -3,6 +3,7 @@ import '../screens/emergency_screen.dart';
 import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
 import '../screens/analytics_screen.dart';
+import '../chat/ChatsPage.dart';
 
 class GovSidebar extends StatelessWidget {
   const GovSidebar({super.key});
@@ -56,6 +57,19 @@ class GovSidebar extends StatelessWidget {
                 // Navigate to Reports page
               },
             ),
+            const SizedBox(height: 30),
+      DrawerItem(
+        title: "View Messages",
+        onTap: () {
+          
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChatsPage(),
+            ),
+          );
+        },
+      ),
           ],
         ),
       ),
