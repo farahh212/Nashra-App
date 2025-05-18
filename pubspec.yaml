@@ -33,6 +33,7 @@ dependencies:
   firebase_core: ^2.32.0 # Use the latest version
   firebase_auth: ^4.17.4 # Use the latest version
   firebase_app_check: ^0.2.1+6 # Use the latest version
+  url_launcher: ^6.1.7 
   
   
 
@@ -48,8 +49,9 @@ dependencies:
 
   image_picker: ^1.0.4
   firebase_storage: ^11.0.0
-  file_picker: ^6.0.0
-  syncfusion_flutter_pdfviewer: ^24.2.6
+  syncfusion_flutter_pdfviewer: ^27.2.5
+
+  
 
 dev_dependencies:
   flutter_test:

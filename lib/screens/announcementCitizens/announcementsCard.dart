@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:nashra_project2/CitizenPages/commentSection.dart';
 // import 'package:nashra_project2/CitizenPages/commentsFetched.dart';
 import './commentsFetched.dart';
@@ -9,7 +9,7 @@ import 'package:nashra_project2/models/announcement.dart';
 import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class Announcementcard extends StatefulWidget{
   final Announcement announcement;
