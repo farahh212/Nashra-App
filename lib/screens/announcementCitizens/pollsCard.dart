@@ -24,15 +24,17 @@ class _PollCardState extends State<PollCard> {
     super.initState();
     // Check if user has already voted
     final auth = Provider.of<AuthProvider>(context, listen: false);
+      final isAdmin = auth.isAdmin;
+
     _selectedOption = widget.poll.voterToOption[auth.userId];
   }
 
   Future<void> _submitVote(String option) async {
-    if (_selectedOption != null) return; // Prevent multiple votes
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (_selectedOption != null) return;// Prevent multiple votes
 
     setState(() => _isSubmitting = true);
     
-    final auth = Provider.of<AuthProvider>(context, listen: false);
     final pollsProvider = Provider.of<Pollsprovider>(context, listen: false);
 
     try {
@@ -60,6 +62,8 @@ class _PollCardState extends State<PollCard> {
 
   @override
   Widget build(BuildContext context) {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+    final isAdmin = auth.isAdmin;
     return Card(
       margin: const EdgeInsets.all(8.0),
       shape: RoundedRectangleBorder(
@@ -97,9 +101,9 @@ class _PollCardState extends State<PollCard> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
                 child: InkWell(
-                  onTap: _selectedOption == null && !_isSubmitting
-                      ? () => _submitVote(option)
-                      : null,
+                  onTap: (_selectedOption == null && !_isSubmitting && !isAdmin)
+    ? () => _submitVote(option)
+    : null,
                   borderRadius: BorderRadius.circular(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +121,7 @@ class _PollCardState extends State<PollCard> {
                               ),
                             ),
                           ),
-                          if (_selectedOption != null)
+                          if (_selectedOption != null || isAdmin)
                             Text(
                               '${(percentage * 100).toStringAsFixed(1)}%',
                               style: const TextStyle(fontSize: 14),
@@ -125,6 +129,7 @@ class _PollCardState extends State<PollCard> {
                         ],
                       ),
                       const SizedBox(height: 4),
+                     
                       LinearProgressIndicator(
                         value: percentage,
                         backgroundColor: Colors.grey[200],
