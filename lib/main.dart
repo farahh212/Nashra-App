@@ -20,6 +20,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'chat/messagePage_citiz.dart';
 
+import 'package:nashra_project2/screens/reports/reports_screen.dart';
 
 import 'login.dart';
 import 'startup.dart';
@@ -78,6 +79,7 @@ class MyApp extends StatelessWidget {
             home: SplashScreen(),
             routes: {
               '/startup': (context) => StartUp(),
+              '/reports': (context) => AllReports(),
               '/advertisement': (context) => AdvertisementScreen(),
               '/announcements': (context) => Announcements(),
               '/polls': (context) => pollScreen(),
