@@ -43,10 +43,10 @@ class _pollScreenState extends State<pollScreen> {
 
 
     return Scaffold(
-      backgroundColor: Color(0xFFFEFFF3),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: Text('NASHRA', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        backgroundColor: Color(0xFFFEFFF3),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
 
                 actions: [
           if(isAdmin)
@@ -64,15 +64,15 @@ IconButton(
   icon: Icon(Icons.add, color: Colors.black),
   
 ),
-TextButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
-    );
-  },
-  child: Text('View results'),
-)
+// TextButton(
+//   onPressed: () {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
+//     );
+//   },
+//   child: Text('View results', style: TextStyle(color: Color(0xFF1B5E20))),
+// )
         ],
 
         
@@ -88,32 +88,6 @@ TextButton(
           } else {
             return Column(
               children: [
-                SizedBox(height: 20),
-                Container(
-                   child:  Row(children: [
-  SizedBox(width: 60),
-                    TextButton(onPressed: () {
-                      setState(() {
-                         Navigator.pushNamed(context, '/announcements');
-                selectedButton = 'Announcements';
-              });
-                    },style: TextButton.styleFrom(
-    backgroundColor: selectedButton == 'Announcements' ? Colors.green :const Color.fromARGB(255, 106, 106, 106),
-    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Optional padding
-  ), child: Text('Announcements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 247, 253, 248)))),
-  SizedBox(width: 16),
-TextButton(onPressed: () {
-                      setState(() {
-                        Navigator.pushNamed(context, '/polls');
-                selectedButton = 'Polls';
-              });
-},style: TextButton.styleFrom(
-    backgroundColor: selectedButton == 'Polls' ? Colors.green : const Color.fromARGB(255, 106, 106, 106), // Set background color here
-    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Optional padding
-  ), child: Text('Polls', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 247, 253, 248)))),
-
-                   ],)
-                ),
                 SizedBox(height: 30),
                 Expanded(
                   child: ListView.builder(

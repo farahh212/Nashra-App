@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:nashra_project2/models/comment.dart';
 import '../models/poll.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,6 +26,7 @@ class Pollsprovider with ChangeNotifier{
         options: poll.options,
         createdAt: DateTime.now(),
         endDate: poll.endDate,
+        commentsNo: 0,
       ));
     }).catchError((error) {
       print("Failed to add poll: $error");
@@ -73,11 +75,70 @@ class Pollsprovider with ChangeNotifier{
         'createdAt': value['createdAt'],
         'endDate': value['endDate'],
         'imageUrl': value['imageUrl'],
+        'commentsNo':value['commentsNo'],
       }));
     });
   } catch (error) {
     print("Failed to fetch polls: $error");
     throw error;
+  }
+}
+
+Future<void> addCommentToPoll(String pollId, Comment comment, String token) async {
+  final commentUrl = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/PollsDB/$pollId/comments.json?auth=$token',
+  );
+  final countUrl = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/PollsDB/$pollId.json?auth=$token',
+  );
+
+  try {
+    // Add comment to Firebase
+    final response = await http.post(commentUrl, body: json.encode(comment.toMap()));
+    final newComment = Comment.fromMap(json.decode(response.body)['name'], comment.toMap());
+
+    // Update local data
+    final poll = polls.firstWhere((a) => a.id == pollId);
+    poll.comments.add(newComment);
+    poll.commentsNo = (poll.commentsNo ?? 0) + 1;
+
+    // Persist updated comment count in Firebase
+    await http.patch(
+      countUrl,
+      body: json.encode({'commentsNo': poll.commentsNo}),
+    );
+
+    notifyListeners();
+  } catch (e) {
+    print('Error adding comment: $e');
+    throw e;
+  }
+}
+
+  Future<void> fetchCommentsForPoll(String pollId, String token) async {
+  final url = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/PollsDB/$pollId/comments.json?auth=$token',
+  );
+
+  try {
+    final response = await http.get(url);
+    final data = json.decode(response.body) as Map<String, dynamic>?;
+
+    if (data == null) return;
+
+    // Find the matching announcement
+    final poll = polls.firstWhere((a) => a.id == pollId);
+
+    // Clear and load new comments
+    poll.comments.clear();
+    data.forEach((commentId, commentData) {
+      poll.comments.add(Comment.fromMap(commentId, commentData));
+    });
+
+    notifyListeners();
+  } catch (e) {
+    print('Error fetching comments: $e');
+    throw e;
   }
 }
 

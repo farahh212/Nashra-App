@@ -7,11 +7,14 @@ import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/emergencyProvider.dart';
 import 'package:nashra_project2/providers/pollsProvider.dart';
 import 'package:nashra_project2/providers/languageProvider.dart';
+import 'package:nashra_project2/screens/SplashScreen.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
+import 'package:nashra_project2/screens/analytics_screen.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
 import 'package:nashra_project2/screens/emergency_screen.dart';
 import 'package:nashra_project2/screens/gov_advertisments.dart';
 import 'package:nashra_project2/screens/home.dart';
+import 'package:nashra_project2/screens/reports/gov_reports_screen.dart';
 import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,6 +22,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'chat/messagePage_citiz.dart';
 
+import 'package:nashra_project2/screens/reports/reports_screen.dart';
 
 import 'login.dart';
 import 'startup.dart';
@@ -74,8 +78,10 @@ class MyApp extends StatelessWidget {
             locale: languageProvider.currentLocale,
             localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
             supportedLocales: AppLocalizationsSetup.supportedLocales,
-            home: StartUp(),
+            home: SplashScreen(),
             routes: {
+              '/startup': (context) => StartUp(),
+              '/reports': (context) => AllReports(),
               '/advertisement': (context) => AdvertisementScreen(),
               '/announcements': (context) => Announcements(),
               '/polls': (context) => pollScreen(),
@@ -83,9 +89,15 @@ class MyApp extends StatelessWidget {
               '/home': (context) => HomeScreen(),
               '/message': (context) => CitizenMessageWrapper(),
               '/notifications': (context) => NotificationPage(),
-              //'/notifications': (context) => NotificationsScreen(),
                '/home': (context) => HomeScreen(),
                '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
+               '/reports': (context) => AllReports(),
+               '/chats': (context) => CitizenMessageWrapper(),
+               '/gov_chats': (context) => ChatsPage(),
+               '/emergency': (context) => EmergencyNumbersScreen(),
+               '/analytics': (context) => AnalyticsScreen(),
+               '/report_gov': (context)=> ViewReportsPage(),
+
             },
           );
         },
