@@ -10,6 +10,7 @@ class Announcement {
   String? fileUrl;
   DateTime createdAt;
   int likes;
+  int ? commentsNo;
   List<Comment> comments;
   List<String> likedByUser =[];
   // List<Citizen> likedByUser;
@@ -23,6 +24,7 @@ class Announcement {
     required this.createdAt,
    required this.likes,
    required this.likedByUser,
+    required this.commentsNo,
    
     
   }) : comments = [];
@@ -34,6 +36,7 @@ class Announcement {
       'imageUrl': imageUrl,
       'fileUrl': fileUrl,
       'createdAt': createdAt.toIso8601String(),
+      'commentsNo':commentsNo,
 
     };
   }
@@ -47,6 +50,7 @@ class Announcement {
       fileUrl: map['fileUrl'],
       createdAt: DateTime.parse(map['createdAt']),
       likes: map['likes'] ?? 0,
+      commentsNo: map['coomentsNo']?? 0,
       likedByUser: List<String>.from(map['likedByUser'] ?? []),
     );
   }

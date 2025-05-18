@@ -1,0 +1,2 @@
+C:/Users/farah/StudioProjects/nashra_project2/Nashra-App/android/app/.cxx/Debug/23e5h552/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/farah/StudioProjects/nashra_project2/Nashra-App/android/app/.cxx/Debug/23e5h552/x86_64/CMakeFiles/rebuild_cache.dir
