@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "563873780602",
+    "project_id": "nahra-316ee",
+    "storage_bucket": "nahra-316ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563873780602:android:5138ad021a5afff696fcc3",
+        "android_client_info": {
+          "package_name": "com.example.nashra_project2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "563873780602-6ecubggk113l4lenrq6g2s855ja7e4nr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmyeVEm8IQmTzz8vhYyXYmI6LyGR5Du_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "563873780602-6ecubggk113l4lenrq6g2s855ja7e4nr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
