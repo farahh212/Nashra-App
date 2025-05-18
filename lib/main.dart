@@ -7,6 +7,7 @@ import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/emergencyProvider.dart';
 import 'package:nashra_project2/providers/pollsProvider.dart';
 import 'package:nashra_project2/providers/languageProvider.dart';
+import 'package:nashra_project2/screens/SplashScreen.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
 import 'package:nashra_project2/screens/emergency_screen.dart';
@@ -74,8 +75,9 @@ class MyApp extends StatelessWidget {
             locale: languageProvider.currentLocale,
             localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
             supportedLocales: AppLocalizationsSetup.supportedLocales,
-            home: StartUp(),
+            home: SplashScreen(),
             routes: {
+              '/startup': (context) => StartUp(),
               '/advertisement': (context) => AdvertisementScreen(),
               '/announcements': (context) => Announcements(),
               '/polls': (context) => pollScreen(),

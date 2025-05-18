@@ -118,7 +118,8 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[900],
+                color: Color(0xFF1B5E20),
+
                 letterSpacing: 2,
                 ),
               ),
@@ -129,7 +130,8 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[900],
+                color: Color(0xFF1B5E20),
+
               ),
               ),
               SizedBox(height: 8),
@@ -196,7 +198,8 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: loginORsignup,
                 style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
+                backgroundColor: Color(0xFF1B5E20),
+
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -221,7 +224,8 @@ class _LoginPageState extends State<LoginPage> {
                   ? 'Don\'t have an account? Sign up instead'
                   : 'Already have an account? Login instead',
                 style: TextStyle(
-                  color: Colors.green[700],
+                  color: Color(0xFF1B5E20),
+
                   fontWeight: FontWeight.bold,
                 ),
                 ),
@@ -260,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'Sign in with Google',
                   style: TextStyle(
-                  color: Colors.green[700],
+                  color: Color(0xFF1B5E20),
                   fontWeight: FontWeight.bold,
                   ),
                 ),
