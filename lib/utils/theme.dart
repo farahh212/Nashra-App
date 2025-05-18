@@ -20,7 +20,7 @@ class AppTheme {
   static const Color textHintColor = Color(0xFFBDBDBD);
 
   // Background Colors
-  static const Color backgroundColor = Color(0xFFFEFFF3);  // Very light yellow
+  static const Color backgroundColor = Color.fromARGB(255, 255, 255, 255);  // Very light yellow
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color dividerColor = Color(0xFFBDBDBD);
 

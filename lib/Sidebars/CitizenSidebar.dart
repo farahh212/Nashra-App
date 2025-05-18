@@ -46,6 +46,14 @@ class CitizenSidebar extends StatelessWidget {
               },
             ),
             const SizedBox(height: 30),
+             DrawerItem(
+              title: "Check Announcements",
+              onTap: () {
+                Navigator.pushNamed(context, '/announcements');
+                // Navigate to Contact Government page
+              },
+            ),
+            const SizedBox(height: 30),
             DrawerItem(
               title: "Logout",
               onTap: () async {
