@@ -1,12 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:http/http.dart' as http;
 import '../models/emergency_number.dart';
 
 class EmergencyProvider with ChangeNotifier {
-  final DatabaseReference _emergencyNumbersRef = FirebaseDatabase.instanceFor(
-    app: FirebaseDatabase.instance.app,
-    databaseURL: 'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/'
-  ).ref().child('emergency_numbers');
+  static const _baseUrl = 'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/emergency_numbers';
+
   List<EmergencyNumber> _emergencyNumbers = [];
   bool _isLoading = false;
   String? _error;
@@ -15,47 +14,53 @@ class EmergencyProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  EmergencyProvider() {
-    _loadEmergencyNumbers();
-  }
+  // ✅ FETCH (GET)
+  Future<void> fetchEmergencyNumbers(String token) async {
+    final url = Uri.parse('$_baseUrl.json?auth=$token');
 
-  Future<void> _loadEmergencyNumbers() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _emergencyNumbersRef.onValue.listen((event) {
-        if (event.snapshot.value != null) {
-          final data = event.snapshot.value as Map<dynamic, dynamic>;
-          _emergencyNumbers = data.entries.map((entry) {
-            return EmergencyNumber.fromMap(
-              entry.key.toString(),
-              Map<String, dynamic>.from(entry.value as Map),
-            );
-          }).toList();
-        } else {
-          _emergencyNumbers = [];
-        }
+      final response = await http.get(url);
+      final extractedData = json.decode(response.body) as Map<String, dynamic>?;
+
+      if (extractedData == null) {
+        _emergencyNumbers = [];
         _isLoading = false;
         notifyListeners();
+        return;
+      }
+
+      final List<EmergencyNumber> loaded = [];
+      extractedData.forEach((id, data) {
+        loaded.add(EmergencyNumber.fromMap(id, data));
       });
+
+      _emergencyNumbers = loaded;
     } catch (e) {
       _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  Future<void> addEmergencyNumber(String title, int number, {String titleAr = ''}) async {
+  // ✅ ADD (POST)
+  Future<void> addEmergencyNumber(String token, String title, int number, {String titleAr = ''}) async {
+    final url = Uri.parse('$_baseUrl.json?auth=$token');
+
     try {
-      final newRef = _emergencyNumbersRef.push();
-      await newRef.set({
+      final response = await http.post(url, body: json.encode({
         'title': title,
         'titleAr': titleAr,
         'number': number,
-      });
-      _error = null;
+      }));
+
+      if (response.statusCode >= 400) throw Exception('Failed to add number');
+
+      await fetchEmergencyNumbers(token);
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -63,14 +68,20 @@ class EmergencyProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateEmergencyNumber(String id, String title, int number, {String titleAr = ''}) async {
+  // ✅ UPDATE (PATCH)
+  Future<void> updateEmergencyNumber(String token, String id, String title, int number, {String titleAr = ''}) async {
+    final url = Uri.parse('$_baseUrl/$id.json?auth=$token');
+
     try {
-      await _emergencyNumbersRef.child(id).update({
+      final response = await http.patch(url, body: json.encode({
         'title': title,
         'titleAr': titleAr,
         'number': number,
-      });
-      _error = null;
+      }));
+
+      if (response.statusCode >= 400) throw Exception('Failed to update number');
+
+      await fetchEmergencyNumbers(token);
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -78,14 +89,19 @@ class EmergencyProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteEmergencyNumber(String id) async {
+  // ✅ DELETE
+  Future<void> deleteEmergencyNumber(String token, String id) async {
+    final url = Uri.parse('$_baseUrl/$id.json?auth=$token');
+
     try {
-      await _emergencyNumbersRef.child(id).remove();
-      _error = null;
+      final response = await http.delete(url);
+      if (response.statusCode >= 400) throw Exception('Failed to delete number');
+
+      await fetchEmergencyNumbers(token);
     } catch (e) {
       _error = e.toString();
       notifyListeners();
       throw e;
     }
   }
-} 
+}

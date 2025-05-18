@@ -19,11 +19,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _startAnimation() async {
     for (int i = 1; i <= _letters.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 3000));
       setState(() => _step = i);
     }
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 1000));
     Navigator.pushReplacementNamed(context, '/startup'); // 👈 Transition to StartUp
   }
 
@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: const Color(0xFFFFFEF5),
       body: Center(
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 2000),
           transitionBuilder: (child, animation) =>
               FadeTransition(opacity: animation, child: child),
           child: Text(
