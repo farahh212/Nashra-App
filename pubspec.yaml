@@ -36,8 +36,13 @@ dependencies:
   firebase_core: ^2.32.0 # Use the latest version
   firebase_auth: ^4.17.4 # Use the latest version
   firebase_app_check: ^0.2.1+6 # Use the latest version
+
   google_sign_in: ^6.2.1
+  firebase_storage: ^11.6.0
+  geolocator: ^11.0.0
+
  
+
   url_launcher: ^6.1.7 
   
   
@@ -55,13 +60,12 @@ dependencies:
   open_filex:  ^4.0.0
 
   image_picker: ^1.0.4
-  
- 
-  firebase_storage: ^11.0.0
+  google_maps_flutter: ^2.2.3
   syncfusion_flutter_pdfviewer: ^27.2.5
   fl_chart: ^1.0.0
   pie_chart: ^5.4.0
-  
+
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -118,3 +122,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  

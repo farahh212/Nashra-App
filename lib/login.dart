@@ -4,6 +4,9 @@ import 'package:nashra_project2/screens/announcementCitizens/announcements.dart'
 import 'package:nashra_project2/screens/home.dart';
 import 'providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class LoginPage extends StatefulWidget {
   final int authenticationMode; // 0 for login, 1 for signup
@@ -39,6 +42,8 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     if(successOrError == "Signup successful!"){
+      // Step 1: Get FCM token
+    
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)), // Pass authenticationMode as 0 for login
       );
@@ -56,6 +61,27 @@ class _LoginPageState extends State<LoginPage> {
       pass: _passwordController.text,
     );
     if(successOrError == "Login successful!"){
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+    print("FCM Token: $fcmToken");
+
+    // Step 2: Update Firestore user's fcmToken
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      final email = _emailController.text.trim();
+      final userQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) {
+        final docId = userQuery.docs.first.id;
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(docId)
+            .update({'fcmToken': fcmToken});
+      }
+    }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => HomeScreen()), // Changed to HomeScreen
       );
@@ -92,7 +118,8 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[900],
+                color: Color(0xFF1B5E20),
+
                 letterSpacing: 2,
                 ),
               ),
@@ -103,7 +130,8 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[900],
+                color: Color(0xFF1B5E20),
+
               ),
               ),
               SizedBox(height: 8),
@@ -170,7 +198,8 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: loginORsignup,
                 style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
+                backgroundColor: Color(0xFF1B5E20),
+
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -195,7 +224,8 @@ class _LoginPageState extends State<LoginPage> {
                   ? 'Don\'t have an account? Sign up instead'
                   : 'Already have an account? Login instead',
                 style: TextStyle(
-                  color: Colors.green[700],
+                  color: Color(0xFF1B5E20),
+
                   fontWeight: FontWeight.bold,
                 ),
                 ),
@@ -234,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'Sign in with Google',
                   style: TextStyle(
-                  color: Colors.green[700],
+                  color: Color(0xFF1B5E20),
                   fontWeight: FontWeight.bold,
                   ),
                 ),

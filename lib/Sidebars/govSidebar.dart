@@ -4,6 +4,8 @@ import '../screens/emergency_screen.dart';
 import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
 import '../screens/analytics_screen.dart';
+import '../chat/ChatsPage.dart';
+import '../screens/reports/gov_reports_screen.dart';
 
 class GovSidebar extends StatelessWidget {
   const GovSidebar({super.key});
@@ -60,14 +62,30 @@ class GovSidebar extends StatelessWidget {
                     icon: Icons.report,
                     title: "View Reports",
                     onTap: () {
-                      // Add your navigation logic
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ViewReportsPage()),
+                      );
                     },
                   ),
-                     _DrawerItem(
-                    icon: Icons.report,
-                    title: "Poll results",
+                  _DrawerItem(
+                    icon: Icons.message,
+                    title: "View Messages",
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalyticsScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ChatsPage()),
+                      );
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.poll,
+                    title: "Poll Results",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+                      );
                     },
                   ),
                 ],
@@ -94,7 +112,7 @@ class _GovProfileCard extends StatelessWidget {
           children: const [
             CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage('assets/images/admin_avatar.png'), // replace with your admin image
+              backgroundImage: AssetImage('assets/images/admin_avatar.png'),
             ),
             SizedBox(width: 12),
             Expanded(
@@ -106,7 +124,7 @@ class _GovProfileCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.settings)
+            Icon(Icons.settings),
           ],
         ),
       ),
@@ -156,7 +174,7 @@ class _DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, size: 28, color: Colors.green[900]), // 👈 Larger icon size
+      leading: Icon(icon, size: 28, color: Colors.green[900]),
       title: Text(
         title,
         style: TextStyle(fontSize: 16, color: Colors.green[900]),
