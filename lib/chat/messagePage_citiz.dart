@@ -136,7 +136,13 @@ return null;
           'userEmail1': userEmail,
           'userEmail2': governmentEmail,
           'createdAt': Timestamp.now(),
+           'name': userEmail,
+          //  'id': query.docs.first.id
         });
+        // Now update the chat document to include its own ID
+await FirebaseFirestore.instance.collection('chats').doc(chatDoc.id).update({
+  'id': chatDoc.id,
+});
         chatId = chatDoc.id;
       }
 
