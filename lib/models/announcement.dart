@@ -37,6 +37,7 @@ class Announcement {
       'fileUrl': fileUrl,
       'createdAt': createdAt.toIso8601String(),
       'commentsNo':commentsNo,
+      'likedByUser': likedByUser,
 
     };
   }
