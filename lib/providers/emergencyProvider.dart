@@ -47,11 +47,12 @@ class EmergencyProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addEmergencyNumber(String title, int number) async {
+  Future<void> addEmergencyNumber(String title, int number, {String titleAr = ''}) async {
     try {
       final newRef = _emergencyNumbersRef.push();
       await newRef.set({
         'title': title,
+        'titleAr': titleAr,
         'number': number,
       });
       _error = null;
@@ -62,10 +63,11 @@ class EmergencyProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateEmergencyNumber(String id, String title, int number) async {
+  Future<void> updateEmergencyNumber(String id, String title, int number, {String titleAr = ''}) async {
     try {
       await _emergencyNumbersRef.child(id).update({
         'title': title,
+        'titleAr': titleAr,
         'number': number,
       });
       _error = null;
