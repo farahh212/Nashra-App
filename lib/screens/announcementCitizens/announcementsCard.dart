@@ -39,6 +39,10 @@ class _AnnouncementcardState extends State<Announcementcard> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin =auth.isAdmin;
     
+
+   
+
+    
     return Card(
       margin: const EdgeInsets.all(3.0),
       shape: RoundedRectangleBorder(
@@ -122,7 +126,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom, // Account for keyboard
           ),
-          child: Commentsfetched(announcement: widget.announcement),
+          child: CommentsFetched(announcement: widget.announcement),
         ),
       ),
     );
@@ -130,6 +134,9 @@ class _AnnouncementcardState extends State<Announcementcard> {
        
       },
     ),
+      SizedBox(height:10),
+          Text('${widget.announcement.commentsNo?? 0 }'),
+    
     
   if (!isAdmin)
     IconButton(

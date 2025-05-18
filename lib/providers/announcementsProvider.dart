@@ -36,6 +36,7 @@ class Announcementsprovider with ChangeNotifier {
         fileUrl: announcement.fileUrl,
         likes: 0,
         likedByUser: [],
+        commentsNo: 0,
       ));
    }).catchError((error) {
       print("Failed to add announcement: $error");
@@ -62,6 +63,7 @@ class Announcementsprovider with ChangeNotifier {
           fileUrl: value['fileUrl'],
           likes: value['likes'] ?? 0,
           likedByUser: List<String>.from(value['likedByUser'] ?? []),
+          commentsNo: value['commentsNo'],
         ));
       });
     } catch (error) {
@@ -96,25 +98,37 @@ class Announcementsprovider with ChangeNotifier {
   }
 }
 
-  Future<void> addCommentToAnnouncement(String announcementId, Comment comment, String token) async {
-    final url = Uri.parse(
-      'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId/comments.json?auth=$token',
+ Future<void> addCommentToAnnouncement(String announcementId, Comment comment, String token) async {
+  final commentUrl = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId/comments.json?auth=$token',
+  );
+  final countUrl = Uri.parse(
+    'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AnnouncementDB/$announcementId.json?auth=$token',
+  );
+
+  try {
+    // Add comment to Firebase
+    final response = await http.post(commentUrl, body: json.encode(comment.toMap()));
+    final newComment = Comment.fromMap(json.decode(response.body)['name'], comment.toMap());
+
+    // Update local data
+    final announcement = announcements.firstWhere((a) => a.id == announcementId);
+    announcement.comments.add(newComment);
+    announcement.commentsNo = (announcement.commentsNo ?? 0) + 1;
+
+    // Persist updated comment count in Firebase
+    await http.patch(
+      countUrl,
+      body: json.encode({'commentsNo': announcement.commentsNo}),
     );
 
-    try {
-      final response = await http.post(url, body: json.encode(comment.toMap()));
-      final newComment = Comment.fromMap(json.decode(response.body)['name'], comment.toMap());
-
-      // Find the matching announcement
-      final announcement = announcements.firstWhere((a) => a.id == announcementId);
-      announcement.comments.add(newComment);
-
-      notifyListeners();
-    } catch (e) {
-      print('Error adding comment: $e');
-      throw e;
-    }
+    notifyListeners();
+  } catch (e) {
+    print('Error adding comment: $e');
+    throw e;
   }
+}
+
 
   // Future<void> addLikeToAnnouncement(String announcementId, String token) async {
   //   final announcement = announcements.firstWhere((a) => a.id == announcementId);
