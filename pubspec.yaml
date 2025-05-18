@@ -37,6 +37,7 @@ dependencies:
   firebase_auth: ^4.17.4 # Use the latest version
   firebase_app_check: ^0.2.1+6 # Use the latest version
   fl_chart: ^0.66.2
+  url_launcher: ^6.1.7
   
   
 
@@ -51,6 +52,7 @@ dependencies:
   firebase_messaging: ^14.9.4
 
   image_picker: ^1.0.4
+  pie_chart: ^5.4.0
 
 dev_dependencies:
   flutter_test:
