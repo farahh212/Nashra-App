@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
     final authProvider = Provider.of<my_auth.AuthProvider>(context);
     final isAdmin = authProvider.isAdmin;
 
-    final green = const Color(0xFF1B5E20);
+    final green =   Color(0xFF002B5B);
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 254, 254, 254),
@@ -122,7 +122,7 @@ class HomeScreen extends StatelessWidget {
         _buildFeatureTile(context, Icons.announcement, 'Announcements', '/announcements'),
         _buildFeatureTile(context, Icons.campaign, 'Ads', '/gov_advertisement'),
         _buildFeatureTile(context, Icons.poll, 'Polls', '/polls'),
-        _buildFeatureTile(context, Icons.report, 'Reports', '/reports'),
+        _buildFeatureTile(context, Icons.report, 'Reports', '/gov_reports'),
         _buildFeatureTile(context, Icons.analytics, 'Analytics', '/analytics'),
         _buildFeatureTile(context, Icons.chat, 'Messages', '/gov_chats'),
       ];
