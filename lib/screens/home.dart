@@ -97,6 +97,7 @@ class HomeScreen extends StatelessWidget {
                     _buildFeatureTile(context, Icons.campaign, 'Ads', '/advertisement'),
                     _buildFeatureTile(context, Icons.report_problem, 'Report Issue', '/report'),
                     _buildFeatureTile(context, Icons.phone, 'Emergency', '/emergency'),
+                    _buildFeatureTile(context, Icons.phone, 'Contact government', '/message'),
                     // _buildFeatureTile(context, Icons.phone_in_talk, 'Hotline', '/emergency'),
                   ],
                 ),

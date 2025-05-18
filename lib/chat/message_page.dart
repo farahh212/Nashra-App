@@ -9,12 +9,14 @@ import '../services/notificationService.dart';
 class MessagePage extends StatefulWidget {
   final String chatId;
   final String chatName;
+  final String senderemail;
   //final String receiverEmail; // Add receiver's email
 
   const MessagePage({
     Key? key,
     required this.chatId,
     required this.chatName,
+    required this.senderemail
     //required this.receiverEmail, // Include receiver's email
   }) : super(key: key);
 
@@ -25,7 +27,7 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   final TextEditingController _messageController = TextEditingController();
   final String currentUserId = 'your_user_id'; // Replace with actual user logic
-  final String currentUserEmail = 'habiba@gmail.com'; // Replace with actual email
+  late final String currentUserEmail = widget.senderemail; // Use senderemail from widget
 
   Stream<List<Message>> getMessages(String chatId) {
     return FirebaseFirestore.instance
@@ -44,10 +46,25 @@ class _MessagePageState extends State<MessagePage> {
     // Step 1: Send message to Firestore
     final messageRef = await FirebaseFirestore.instance.collection('messages').add({
       'chatId': widget.chatId,
-      'senderId': currentUserId,
+      'senderId': currentUserEmail,
       'content': content,
       'createdAt': Timestamp.now(),
     });
+
+  
+    Future<String?> getFcmTokenByEmail(String email) async {
+  final querySnapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .where('email', isEqualTo: email)
+      .limit(1)
+      .get();
+
+  if (querySnapshot.docs.isNotEmpty) {
+    final userDoc = querySnapshot.docs.first;
+    return userDoc.data()['fcmToken'] as String?;
+  }
+  return null;
+}
 
     // Step 2: Get the chat document to retrieve user emails
     final chatSnapshot = await FirebaseFirestore.instance
@@ -70,7 +87,17 @@ class _MessagePageState extends State<MessagePage> {
     } else if (userEmail2 != currentUserEmail) {
       recipientEmail = userEmail2;
     }
-  final String? fcmToken = "dzB--nJkT7OlphzZfkykw4:APA91bFo4NY5-UWRC4QGzPOROIze6lCeH9m0nQuRZEsTnsCy7i7ZOInx0a8f2BKCQY87J7y3SWBLDS3U9WC0vGPAtepyHJaY90vc4HIAIfpqO32vllyeROY";
+
+    await FirebaseFirestore.instance.collection('notifications').add({
+    'title': 'New Message',
+    'description': 'You have a new message from $currentUserEmail',
+    'userEmail': recipientEmail,
+    'isRead': false,
+    'createdAt': Timestamp.now(),
+  });
+    
+  final fcm = await getFcmTokenByEmail(recipientEmail);
+  final String? fcmToken = fcm;
   if (fcmToken != null && fcmToken.isNotEmpty) {
     await sendPushNotification(
       fcmToken,
@@ -127,7 +154,7 @@ class _MessagePageState extends State<MessagePage> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isSender = message.senderId == currentUserId;
+                      final isSender = message.senderId == currentUserEmail;
 
                       return Align(
                         alignment: isSender
