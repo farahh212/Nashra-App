@@ -158,7 +158,7 @@ class HomeScreen extends StatelessWidget {
           CircleAvatar(
             radius: 28,
             backgroundColor: const Color(0xFFE8F5E9),
-            child: Icon(icon, size: 30, color: const Color(0xFF1B5E20)),
+            child: Icon(icon, size: 25, color: const Color(0xFF1B5E20)),
           ),
           const SizedBox(height: 8),
           Text(
