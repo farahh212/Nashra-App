@@ -32,22 +32,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Image.asset(
-          'assets/nashra_logo.png',
-          height: 40,
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.black),
             onPressed: () {
               final authProvider = Provider.of<AuthProvider>(context, listen: false);
               Provider.of<Pollsprovider>(context, listen: false).fetchPollsFromServer(authProvider.token);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () {
-              Scaffold.of(context).openEndDrawer();
             },
           ),
         ],
@@ -228,7 +218,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 200,
+            height: 180,
             child: Row(
               children: [
                 Expanded(
@@ -236,7 +226,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   child: PieChart(
                     PieChartData(
                       sections: sections,
-                      centerSpaceRadius: 40,
+                      centerSpaceRadius: 30,
                       sectionsSpace: 2,
                       startDegreeOffset: -90,
                     ),
@@ -301,9 +291,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         color: colors[index % colors.length],
         value: percentage,
         title: '${percentage.toStringAsFixed(1)}%',
-        radius: 100,
+        radius: 80,
         titleStyle: const TextStyle(
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
