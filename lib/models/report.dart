@@ -8,6 +8,7 @@ class Report {
   double latitude;
   double longitude;
   DateTime createdAt;
+ // String createdBy;
 
   Report({
     required this.id,
@@ -17,6 +18,7 @@ class Report {
     required this.latitude,
     required this.longitude,
     required this.createdAt,
+   // required this.createdBy,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,6 +29,7 @@ class Report {
       'latitude': latitude,
       'longitude': longitude,
       'createdAt': createdAt.toIso8601String(),
+   //   'createdBy': createdBy,
     };
   }
 
@@ -39,6 +42,7 @@ class Report {
       latitude: map['latitude'],
       longitude: map['longitude'],
       createdAt: DateTime.parse(map['createdAt']),
+   //   createBy: map['createdBy'],
     );
   }
 } 

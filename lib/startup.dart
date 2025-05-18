@@ -17,7 +17,7 @@ class StartUp extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF00291A), // Dark green color
+                  color: Color(0xFF1B5E20), // Dark green color
                   letterSpacing: 2,
                 ),
               ),
@@ -81,7 +81,7 @@ class StartUp extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4F8A10), // Green color for sign in
+                    backgroundColor: Color(0xFF1B5E20), // Green color for sign in
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

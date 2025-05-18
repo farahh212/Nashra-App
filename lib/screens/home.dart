@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
     final authProvider = Provider.of<my_auth.AuthProvider>(context);
     final isAdmin = authProvider.isAdmin;
 
-    final green = const Color(0xFF1B5E20);
+    final green =   Color(0xFF002B5B);
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 254, 254, 254),
@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Feature Cards
+          // Feature Cards (Wrap version to prevent overflow)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
@@ -81,12 +81,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 12,
                 children: isAdmin ? _adminFeatures(context) : _citizenFeatures(context),
               ),
             ),
@@ -124,17 +122,18 @@ class HomeScreen extends StatelessWidget {
         _buildFeatureTile(context, Icons.announcement, 'Announcements', '/announcements'),
         _buildFeatureTile(context, Icons.campaign, 'Ads', '/gov_advertisement'),
         _buildFeatureTile(context, Icons.poll, 'Polls', '/polls'),
-        _buildFeatureTile(context, Icons.report, 'Reports', '/reports'),
+        _buildFeatureTile(context, Icons.report, 'Reports', '/gov_reports'),
         _buildFeatureTile(context, Icons.analytics, 'Analytics', '/analytics'),
+        _buildFeatureTile(context, Icons.chat, 'Messages', '/gov_chats'),
       ];
 
   List<Widget> _citizenFeatures(BuildContext context) => [
         _buildFeatureTile(context, Icons.announcement, 'Announcements', '/announcements'),
         _buildFeatureTile(context, Icons.poll, 'Polls', '/polls'),
         _buildFeatureTile(context, Icons.campaign, 'Ads', '/advertisement'),
-        _buildFeatureTile(context, Icons.report_problem, 'Report Issue', '/report'),
+        _buildFeatureTile(context, Icons.chat, 'Contact', '/chats'),
         _buildFeatureTile(context, Icons.phone, 'Emergency', '/emergency'),
-        _buildFeatureTile(context, Icons.report, 'Report', '/report'),
+        _buildFeatureTile(context, Icons.report, 'Report', '/reports'),
       ];
 
   List<Widget> _buildHighlights(BuildContext context, bool isAdmin) => isAdmin
@@ -152,21 +151,24 @@ class HomeScreen extends StatelessWidget {
   Widget _buildFeatureTile(BuildContext context, IconData icon, String label, String route) {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, route),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: const Color(0xFFE8F5E9),
-            child: Icon(icon, size: 30, color: const Color(0xFF1B5E20)),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13),
-          ),
-        ],
+      child: SizedBox(
+        width: 80,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: const Color(0xFFE8F5E9),
+              child: Icon(icon, size: 25, color: const Color(0xFF1B5E20)),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 13),
+            ),
+          ],
+        ),
       ),
     );
   }

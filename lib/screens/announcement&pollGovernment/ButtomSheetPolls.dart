@@ -62,6 +62,7 @@ List<String> optionsList = optionControllers
       createdAt: DateTime.now(),
       endDate: DateTime.now().add(Duration(days: 7)), // example end date, adjust as needed
       imageUrl: _imageFile != null ? _imageFile!.path : null,
+      commentsNo: 0,
     );
 
     await pollsProvider.addPoll(newPoll, auth.token);
