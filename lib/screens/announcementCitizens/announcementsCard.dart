@@ -122,7 +122,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom, // Account for keyboard
           ),
-          child: Commentsfetched(announcement: widget.announcement),
+          child: CommentsFetched(announcement: widget.announcement),
         ),
       ),
     );
