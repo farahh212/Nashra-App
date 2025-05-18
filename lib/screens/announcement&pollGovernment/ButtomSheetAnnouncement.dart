@@ -22,6 +22,8 @@ class ButtomsheetannouncementState extends State<Buttomsheetannouncement> {
   final fileUrlController = TextEditingController();
 
   File? _imageFile;
+  String? _imageUrl; // Add this to your state
+
 
   final ImagePicker _imagePicker = ImagePicker();
   List<String>? _pickedFilePaths;
@@ -55,6 +57,7 @@ Future<void> _pickFiles() async {
   }
 }
 
+
 Future<void> _uploadPickedFiles() async {
   if (_pickedFilePaths == null || _pickedFilePaths!.isEmpty) return;
 
@@ -82,6 +85,7 @@ Future<void> _uploadPickedFiles() async {
   // Now set the URLs for use in your announcement
   setState(() {
     _pickedFilePaths = uploadedUrls;
+    
   });
 }
 
@@ -97,14 +101,37 @@ void openFile(String url) async {
 }
 
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
+Future<void> _pickImages() async {
+  final pickedFiles = await _imagePicker.pickMultiImage();
+  if (pickedFiles != null && pickedFiles.isNotEmpty) {
+    List<String> uploadedUrls = [];
+
+    for (var pickedFile in pickedFiles) {
+      File image = File(pickedFile.path);
+
+      // Upload to Firebase Storage
+      String fileName = pickedFile.path.split('/').last;
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('images')
+          .child('${DateTime.now().millisecondsSinceEpoch}_$fileName');
+
+      UploadTask uploadTask = ref.putFile(image);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      uploadedUrls.add(downloadUrl);
     }
+
+    setState(() {
+      // If you want to keep the local File(s), you may need a list of Files as well
+      // But for the frontend image displaying, you mainly need URLs:
+      _imageUrl = uploadedUrls.join(','); // or keep as List<String> if preferred
+    });
   }
+}
+
+
 
 Future<void> postAnnouncement() async {
   final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
@@ -128,7 +155,9 @@ Future<void> postAnnouncement() async {
       likes: 0,
       likedByUser: [],
       createdAt: DateTime.now(),
-      imageUrl: _imageFile != null ? _imageFile!.path : null, // (You can also upload this image similarly)
+      imageUrl: _imageUrl,
+
+ // (You can also upload this image similarly)
       fileUrl: combinedFilePaths,
       commentsNo: 0,
     );
@@ -222,7 +251,7 @@ GestureDetector(
           SizedBox(height: 10),
           Text('Add Image:'),
           GestureDetector(
-            onTap: _pickImage,
+            onTap: _pickImages,
             child: Container(
               height: 120,
               decoration: BoxDecoration(
