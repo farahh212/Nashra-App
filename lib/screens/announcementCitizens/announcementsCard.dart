@@ -39,6 +39,10 @@ class _AnnouncementcardState extends State<Announcementcard> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin =auth.isAdmin;
     
+
+   
+
+    
     return Card(
       margin: const EdgeInsets.all(3.0),
       shape: RoundedRectangleBorder(
@@ -130,6 +134,9 @@ class _AnnouncementcardState extends State<Announcementcard> {
        
       },
     ),
+      SizedBox(height:10),
+          Text('${widget.announcement.commentsNo?? 0 }'),
+    
     
   if (!isAdmin)
     IconButton(

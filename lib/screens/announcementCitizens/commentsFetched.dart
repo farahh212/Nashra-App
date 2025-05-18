@@ -77,6 +77,13 @@ class _CommentsFetchedState extends State<CommentsFetched> {
       // Refresh comments after posting
       await announcementsProvider.fetchCommentsForAnnouncement(
           widget.announcement.id, auth.token);
+          final announcementIndex = announcementsProvider.announcements.indexWhere(
+  (a) => a.id == widget.announcement.id,
+);
+final currentAnnouncement = announcementsProvider.announcements.firstWhere(
+  (a) => a.id == widget.announcement.id,
+  orElse: () => widget.announcement,
+);
 
       _commentController.clear();
     } catch (e) {
@@ -183,8 +190,9 @@ class _CommentsFetchedState extends State<CommentsFetched> {
               const Text("Anonymous"),
             ],
           ),
-            SizedBox(height:10),
+          SizedBox(height:10),
 
+          
           // Comment input field
           Row(
             children: [
