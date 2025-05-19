@@ -9,10 +9,12 @@ import 'package:nashra_project2/providers/pollsProvider.dart';
 import 'package:nashra_project2/providers/languageProvider.dart';
 import 'package:nashra_project2/screens/SplashScreen.dart';
 import 'package:nashra_project2/screens/advertisement_screen.dart';
+import 'package:nashra_project2/screens/analytics_screen.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
 import 'package:nashra_project2/screens/emergency_screen.dart';
 import 'package:nashra_project2/screens/gov_advertisments.dart';
 import 'package:nashra_project2/screens/home.dart';
+import 'package:nashra_project2/screens/reports/gov_reports_screen.dart';
 import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -81,9 +83,15 @@ Future<void> main() async {
               '/home': (context) => HomeScreen(),
               '/message': (context) => CitizenMessageWrapper(),
               '/notifications': (context) => NotificationPage(),
-              '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
-              '/chats': (context) => CitizenMessageWrapper(),
-              '/gov_chats': (context) => ChatsPage(),
+               '/home': (context) => HomeScreen(),
+               '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
+               '/reports': (context) => AllReports(),
+               '/chats': (context) => CitizenMessageWrapper(),
+               '/gov_chats': (context) => ChatsPage(),
+               '/emergency': (context) => EmergencyNumbersScreen(),
+               '/analytics': (context) => AnalyticsScreen(),
+               '/report_gov': (context)=> ViewReportsPage(),
+
             },
           );
         },

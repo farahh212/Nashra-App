@@ -1,17 +1,13 @@
-// Emergency Screen
-// This file will contain emergency-related screens and UI components 
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/emergency_number.dart';
-import '../utils/theme.dart';
-import '../utils/constants.dart';
 import '../Sidebars/CitizenSidebar.dart';
 import '../Sidebars/govSidebar.dart';
 import '../providers/emergencyProvider.dart';
 import '../providers/authProvider.dart' as my_auth;
-import '../widgets/emergency_widget.dart';
+import '../utils/theme.dart';
 
 class EmergencyNumbersScreen extends StatefulWidget {
   const EmergencyNumbersScreen({Key? key}) : super(key: key);
@@ -29,170 +25,89 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
   void initState() {
     super.initState();
     _checkAdminStatus();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<my_auth.AuthProvider>(context, listen: false);
+      final token = authProvider.token;
+      Provider.of<EmergencyProvider>(context, listen: false).fetchEmergencyNumbers(token);
+    });
   }
 
   Future<void> _checkAdminStatus() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final authProvider = Provider.of<my_auth.AuthProvider>(context, listen: false);
-        setState(() {
-          _isAdmin = authProvider.isAdmin;
-        });
-      }
+      final authProvider = Provider.of<my_auth.AuthProvider>(context, listen: false);
+      setState(() {
+        _isAdmin = authProvider.isAdmin;
+      });
     } catch (e) {
       print('Error checking admin status: $e');
     }
   }
 
-  Future<void> _showAddDialog() async {
-    _titleController.clear();
-    _numberController.clear();
-    
+  Future<void> _showAddOrEditDialog({
+    String? id,
+    String? currentTitle,
+    int? currentNumber,
+  }) async {
+    if (id == null) {
+      _titleController.clear();
+      _numberController.clear();
+    } else {
+      _titleController.text = currentTitle ?? '';
+      _numberController.text = currentNumber?.toString() ?? '';
+    }
+
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Emergency Number'),
+        title: Text(id == null ? 'Add Emergency Number' : 'Edit Emergency Number'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title (e.g., Police, Ambulance)',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'Title'),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             TextField(
               controller: _numberController,
-              decoration: const InputDecoration(
-                labelText: 'Emergency Number',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Number'),
+              keyboardType: TextInputType.phone,
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
-              if (_titleController.text.isEmpty || _numberController.text.isEmpty) {
+              final title = _titleController.text.trim();
+              final number = int.tryParse(_numberController.text.trim());
+
+              if (title.isEmpty || number == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill in all fields')),
+                  const SnackBar(content: Text('Please enter valid title and number')),
                 );
                 return;
               }
 
+              final auth = Provider.of<my_auth.AuthProvider>(context, listen: false);
+              final provider = Provider.of<EmergencyProvider>(context, listen: false);
+              final token = auth.token;
+
               try {
-                final number = int.tryParse(_numberController.text);
-                if (number == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a valid number')),
-                  );
-                  return;
+                if (id == null) {
+                  await provider.addEmergencyNumber(token, title, number);
+                } else {
+                  await provider.updateEmergencyNumber(token, id, title, number);
                 }
-
-                final provider = Provider.of<EmergencyProvider>(context, listen: false);
-                await provider.addEmergencyNumber(_titleController.text, number);
-                
-                if (mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Emergency number added successfully')),
-                  );
-                }
+                Navigator.pop(context);
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error adding contact: $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _editContact(String id, String currentTitle, int currentNumber) async {
-    _titleController.text = currentTitle;
-    _numberController.text = currentNumber.toString();
-
-    if (!mounted) return;
-
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Emergency Number'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title (e.g., Police, Ambulance)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _numberController,
-              decoration: const InputDecoration(
-                labelText: 'Emergency Number',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (_titleController.text.isEmpty || _numberController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill in all fields')),
+                  SnackBar(content: Text('Error: $e')),
                 );
-                return;
-              }
-
-              try {
-                final number = int.tryParse(_numberController.text);
-                if (number == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a valid number')),
-                  );
-                  return;
-                }
-
-                final provider = Provider.of<EmergencyProvider>(context, listen: false);
-                await provider.updateEmergencyNumber(id, _titleController.text, number);
-                
-                if (mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Emergency number updated successfully')),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error updating contact: $e')),
-                  );
-                }
               }
             },
-            child: const Text('Update'),
+            child: Text(id == null ? 'Add' : 'Update'),
           ),
         ],
       ),
@@ -211,187 +126,100 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
     return Scaffold(
       drawer: _isAdmin ? const GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceColor,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
           _isAdmin ? 'Manage Emergency Numbers' : 'Emergency Numbers',
-          style: TextStyle(
-            color: AppTheme.primaryColor,
+          style: const TextStyle(
+            color: Color(0xFF1B5E20),
             fontWeight: FontWeight.bold,
             fontSize: 24,
-            letterSpacing: 1.5,
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Text(
-                        'Emergency Numbers',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Icon(Icons.phone, color: AppTheme.primaryColor, size: 24),
+      body: Consumer<EmergencyProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (provider.error != null) {
+            return Center(child: Text('Error: ${provider.error}'));
+          }
+
+          final items = provider.emergencyNumbers;
+          if (items.isEmpty) {
+            return const Center(child: Text('No emergency numbers found'));
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (ctx, i) {
+                final contact = items[i];
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      )
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: Consumer<EmergencyProvider>(
-                      builder: (context, provider, child) {
-                        if (provider.isLoading) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-
-                        if (provider.error != null) {
-                          return Center(child: Text('Error: ${provider.error}'));
-                        }
-
-                        if (provider.emergencyNumbers.isEmpty) {
-                          return const Center(child: Text('No emergency numbers found'));
-                        }
-
-                        return ListView.builder(
-                          itemCount: provider.emergencyNumbers.length,
-                          itemBuilder: (context, index) {
-                            final contact = provider.emergencyNumbers[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: EmergencyContactTile(
-                                contact: contact,
-                                onDelete: _isAdmin ? () async {
-                                  try {
-                                    await provider.deleteEmergencyNumber(contact.id);
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Emergency number deleted successfully')),
-                                      );
-                                    }
-                                  } catch (e) {
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Error deleting contact: $e')),
-                                      );
-                                    }
-                                  }
-                                } : null,
-                                onEdit: _isAdmin ? () => _editContact(
-                                  contact.id,
-                                  contact.title,
-                                  contact.number,
-                                ) : null,
+                  child: ListTile(
+                    leading: const Icon(Icons.phone, color:  Color(0xFF1B5E20)),
+                    title: Text('${contact.title} - ${contact.number}'),
+                    trailing: _isAdmin
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _showAddOrEditDialog(
+                                  id: contact.id,
+                                  currentTitle: contact.title,
+                                  currentNumber: contact.number,
+                                ),
                               ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async {
+                                  final auth = Provider.of<my_auth.AuthProvider>(context, listen: false);
+                                  final token = auth.token;
+                                  try {
+                                    await provider.deleteEmergencyNumber(token, contact.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Deleted successfully')),
+                                    );
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: $e')),
+                                    );
+                                  }
+                                },
+                              )
+                            ],
+                          )
+                        : null,
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          ),
-          if (_isAdmin)
-            Container(
-              alignment: Alignment.bottomRight,
-              padding: const EdgeInsets.only(right: 20, bottom: 20),
-              child: FloatingActionButton(
-                backgroundColor: AppTheme.primaryColor,
-                child: const Icon(Icons.add, size: 30),
-                onPressed: _showAddDialog,
-              ),
-            ),
-          Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppTheme.backgroundColor,
-              border: Border(
-                top: BorderSide(color: AppTheme.dividerColor, width: 1),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(Icons.home, color: AppTheme.primaryColor, size: 28),
-                Icon(Icons.notifications_outlined, color: AppTheme.primaryColor, size: 28),
-                Icon(Icons.language, color: AppTheme.primaryColor, size: 28),
-                Icon(Icons.person, color: AppTheme.primaryColor, size: 28),
-              ],
-            ),
-          ),
-        ],
+          );
+        },
       ),
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              backgroundColor: Color.fromARGB(255, 248, 249, 248),
+              onPressed: () => _showAddOrEditDialog(),
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
-
-class EmergencyContactTile extends StatelessWidget {
-  final EmergencyNumber contact;
-  final VoidCallback? onDelete;
-  final VoidCallback? onEdit;
-
-  const EmergencyContactTile({
-    Key? key,
-    required this.contact,
-    required this.onDelete,
-    required this.onEdit,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: Text(
-                '${contact.title}  ${contact.number}',
-                style: TextStyle(
-                  color: AppTheme.textPrimaryColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          if (onDelete != null)
-            IconButton(
-              icon: Icon(Icons.delete, color: AppTheme.errorColor),
-              onPressed: onDelete,
-            ),
-          if (onEdit != null)
-            IconButton(
-              icon: Icon(Icons.edit, color: AppTheme.primaryColor),
-              onPressed: onEdit,
-            ),
-          const SizedBox(width: 8),
-        ],
-      ),
-    );
-  }
-} 

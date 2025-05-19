@@ -21,6 +21,11 @@ class _AnnouncementcardState extends State<Announcementcard> {
   late Future<void> _announcementsFuture;
   bool isLiked = false;
 
+  bool isImageUrl(String url) {
+    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    return imageExtensions.any((ext) => url.toLowerCase().endsWith(ext));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -65,7 +70,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                         auth.userId,
                       );
                     },
-                    icon: Icon(Icons.delete, color:  Colors.grey),
+                    icon: Icon(Icons.delete, color: Colors.grey),
                     tooltip: 'Delete Announcement',
                   ),
                   IconButton(
@@ -94,24 +99,43 @@ class _AnnouncementcardState extends State<Announcementcard> {
             ),
 
             const SizedBox(height: 12),
+if (widget.announcement.imageUrl != null &&
+    widget.announcement.imageUrl!.isNotEmpty &&
+    isImageUrl(widget.announcement.imageUrl!))
+  Padding(
+    padding: const EdgeInsets.only(top: 8.0, bottom: 12.0),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.network(
+        widget.announcement.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: 200,
+        errorBuilder: (context, error, stackTrace) =>
+            const Text("Failed to load image"),
+      ),
+    ),
+  ),
 
-            // Attached file button
-            if (widget.announcement.fileUrl != null && widget.announcement.fileUrl!.isNotEmpty)
+
+            // If the file is not an image (e.g., PDF), show a button to open it
+            if (widget.announcement.fileUrl != null &&
+                widget.announcement.fileUrl!.isNotEmpty &&
+                !isImageUrl(widget.announcement.fileUrl!))
               Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
                 child: ElevatedButton.icon(
                   onPressed: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => Scaffold(
-        appBar: AppBar(title: Text('View Attachment')),
-        body: SfPdfViewer.network(widget.announcement.fileUrl!),
-      ),
-    ),
-  );
-},
-
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: AppBar(title: Text('View Attachment')),
+                          body: SfPdfViewer.network(widget.announcement.fileUrl!),
+                        ),
+                      ),
+                    );
+                  },
                   icon: Icon(Icons.attach_file, color: Colors.white),
                   label: const Text("View Attached File"),
                   style: ElevatedButton.styleFrom(
@@ -122,15 +146,6 @@ class _AnnouncementcardState extends State<Announcementcard> {
                   ),
                 ),
               ),
-
-            // PDF viewer if fileUrl exists
-            if (widget.announcement.fileUrl != null)
-              SizedBox(
-                height: 200,
-                child: SfPdfViewer.network(widget.announcement.fileUrl!),
-              ),
-
-            const SizedBox(height: 12),
 
             Text(
               widget.announcement.description,
