@@ -11,20 +11,25 @@ class CustomBottomNavigationBar extends StatelessWidget {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = isDark ? Color(0xFF64B5F6) : Colors.white;
+    final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+    
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          top: BorderSide(color: primaryColor, width: 1),
-        ),
+        color: isDark ? theme.colorScheme.surface : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, -1),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(
-            icon: Icon(Icons.home, color: primaryColor, size: 28),
+            icon: Icon(Icons.home, color:  Color(0xFF1976D2), size: 28),
             onPressed: () {
               Navigator.pushNamed(context, '/home');
             },
