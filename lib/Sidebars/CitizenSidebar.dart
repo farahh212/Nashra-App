@@ -3,22 +3,25 @@ import 'package:provider/provider.dart';
 import '../screens/emergency_screen.dart';
 import '../providers/authProvider.dart' as my_auth;
 import '../chat/messagePage_citiz.dart';
-import '../providers/authProvider.dart' as my_auth; // Import your AuthProvider
 import '../screens/reports/reports_screen.dart';
+import '../utils/theme.dart';
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Drawer(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: theme.scaffoldBackgroundColor,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
           child: ListView(
             children: [
-              const _UserProfileCard(),
+              _UserProfileCard(),
               const SizedBox(height: 20),
               _DrawerSection(
                 title: "Navigation",
@@ -38,7 +41,7 @@ class CitizenSidebar extends StatelessWidget {
                   _DrawerItem(icon: Icons.announcement, title: "Check Announcements", onTap: () {
                     Navigator.pushNamed(context, '/announcements');
                   }),
-                   _DrawerItem(icon: Icons.poll, title: "Polls", onTap: () {
+                  _DrawerItem(icon: Icons.poll, title: "Polls", onTap: () {
                     Navigator.pushNamed(context, '/polls');
                   }),
                 ],
@@ -62,32 +65,49 @@ class CitizenSidebar extends StatelessWidget {
 }
 
 class _UserProfileCard extends StatelessWidget {
-  const _UserProfileCard();
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
+      color: isDark ? theme.cardTheme.color : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
-          children: const [
+          children: [
             CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+              backgroundColor: isDark ? Color(0xFF1976D2) : Color(0xFF2196F3),
+              child: Icon(Icons.person, color: Colors.white),
             ),
             SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("User", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2196F3))),
-                  Text("Citizen Portal", style: TextStyle(color: Colors.grey)),
+                  Text(
+                    "User",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                    ),
+                  ),
+                  Text(
+                    "Citizen Portal",
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
                 ],
               ),
             ),
-            Icon(Icons.more_vert, color: Color(0xFF2196F3))
+            Icon(
+              Icons.more_vert,
+              color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+            )
           ],
         ),
       ),
@@ -103,16 +123,26 @@ class _DrawerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
       elevation: 1.5,
+      color: isDark ? theme.cardTheme.color : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+              ),
+            ),
             const SizedBox(height: 10),
             ...items,
           ],
@@ -135,10 +165,22 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: Color(0xFF2196F3)),
-      title: Text(title, style: TextStyle(fontSize: 16, color: Color(0xFF2196F3))),
+      leading: Icon(
+        icon,
+        color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+        ),
+      ),
       onTap: () {
         Navigator.pop(context);
         onTap();
