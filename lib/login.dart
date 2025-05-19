@@ -6,7 +6,7 @@ import 'providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'utils/theme.dart';
 
 class LoginPage extends StatefulWidget {
   final int authenticationMode; // 0 for login, 1 for signup
@@ -104,8 +104,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Color(0xFFFFFEF5),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 36),
@@ -113,36 +116,36 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-              child: Text(
-                'NASHRA',
-                style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1B5E20),
-
-                letterSpacing: 2,
+                child: ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: isDark 
+                      ? [Color(0xFF64B5F6), Color(0xFF2196F3), Color(0xFF1976D2)]
+                      : [Color(0xFF1976D2), Color(0xFF2196F3), Color(0xFF64B5F6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(bounds),
+                  child: Text(
+                    'NASHRA',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 2,
+                    ),
+                  ),
                 ),
-              ),
               ),
               SizedBox(height: 40),
               Text(
-              authenticationMode == 0 ? 'Welcome Back,' : 'Create an Account',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1B5E20),
-
-              ),
+                authenticationMode == 0 ? 'Welcome Back,' : 'Create an Account',
+                style: theme.textTheme.headlineMedium,
               ),
               SizedBox(height: 8),
               Text(
-              authenticationMode == 0
-                ? 'Login to your account'
-                : 'Sign up to get started',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+                authenticationMode == 0
+                  ? 'Login to your account'
+                  : 'Sign up to get started',
+                style: theme.textTheme.bodyMedium,
               ),
               SizedBox(height: 32),
               if (authenticationMode == 1)
@@ -198,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: loginORsignup,
                 style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF1B5E20),
+                backgroundColor: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
 
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -224,8 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                   ? 'Don\'t have an account? Sign up instead'
                   : 'Already have an account? Login instead',
                 style: TextStyle(
-                  color: Color(0xFF1B5E20),
-
+                  color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
                   fontWeight: FontWeight.bold,
                 ),
                 ),
@@ -264,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'Sign in with Google',
                   style: TextStyle(
-                  color: Color(0xFF1B5E20),
+                  color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
                   fontWeight: FontWeight.bold,
                   ),
                 ),

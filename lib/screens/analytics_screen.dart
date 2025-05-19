@@ -226,7 +226,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   child: PieChart(
                     PieChartData(
                       sections: sections,
-                      centerSpaceRadius: 30,
+                      centerSpaceRadius: 20,
                       sectionsSpace: 2,
                       startDegreeOffset: -90,
                     ),
@@ -291,7 +291,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         color: colors[index % colors.length],
         value: percentage,
         title: '${percentage.toStringAsFixed(1)}%',
-        radius: 80,
+        radius: 50,
         titleStyle: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.bold,

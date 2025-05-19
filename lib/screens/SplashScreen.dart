@@ -19,31 +19,42 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _startAnimation() async {
     for (int i = 1; i <= _letters.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 3000));
+      await Future.delayed(const Duration(milliseconds: 200));
       setState(() => _step = i);
     }
 
-    await Future.delayed(const Duration(milliseconds: 1000));
-    Navigator.pushReplacementNamed(context, '/startup'); // 👈 Transition to StartUp
+    await Future.delayed(const Duration(milliseconds: 300));
+    Navigator.pushReplacementNamed(context, '/startup');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFEF5),
+      backgroundColor: Colors.white,
       body: Center(
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 2000),
+          duration: const Duration(milliseconds: 200),
           transitionBuilder: (child, animation) =>
               FadeTransition(opacity: animation, child: child),
-          child: Text(
-            _letters[_step - 1],
-            key: ValueKey(_letters[_step - 1]),
-            style: const TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1B5E20), // dark government green
-              letterSpacing: 6,
+          child: ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: [
+                Color(0xFF1976D2),
+                Color(0xFF2196F3),
+                Color(0xFF64B5F6),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds),
+            child: Text(
+              _letters[_step - 1],
+              key: ValueKey(_letters[_step - 1]),
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 8,
+              ),
             ),
           ),
         ),

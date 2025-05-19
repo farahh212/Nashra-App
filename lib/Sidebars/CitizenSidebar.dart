@@ -12,7 +12,7 @@ class CitizenSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color(0xFFF5F5F5),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
@@ -75,18 +75,19 @@ class _UserProfileCard extends StatelessWidget {
           children: const [
             CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'), // change to your asset
+              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
             ),
             SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                
+                  Text("User", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2196F3))),
+                  Text("Citizen Portal", style: TextStyle(color: Colors.grey)),
                 ],
               ),
             ),
-            Icon(Icons.more_vert)
+            Icon(Icons.more_vert, color: Color(0xFF2196F3))
           ],
         ),
       ),
@@ -111,7 +112,7 @@ class _DrawerSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
             const SizedBox(height: 10),
             ...items,
           ],
@@ -136,8 +137,8 @@ class _DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: Colors.green[900]),
-      title: Text(title, style: TextStyle(fontSize: 16, color: Colors.green[900])),
+      leading: Icon(icon, color: Color(0xFF2196F3)),
+      title: Text(title, style: TextStyle(fontSize: 16, color: Color(0xFF2196F3))),
       onTap: () {
         Navigator.pop(context);
         onTap();
