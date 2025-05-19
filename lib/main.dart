@@ -41,6 +41,7 @@ Future<void> main() async {
   await FirebaseAPi().iniNotifications();
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.debug,
+    androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.debug,
   );
 
