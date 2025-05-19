@@ -4,7 +4,7 @@ import '../Sidebars/CitizenSidebar.dart';
 import '../Sidebars/govSidebar.dart';
 import '../utils/theme.dart';
 import '../providers/authProvider.dart' as my_auth;
-
+import '../widgets/bottom_navigation_bar.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -119,17 +119,7 @@ class HomeScreen extends StatelessWidget {
           ..._buildHighlights(context, isAdmin),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: theme.colorScheme.primary,
-        unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor,
-        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.language), label: 'Language'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'More'),
-        ],
-      ),
+      bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
 
