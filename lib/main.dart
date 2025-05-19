@@ -17,47 +17,36 @@ import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'l10n/app_localizations.dart';
 import 'chat/messagePage_citiz.dart';
-
 import 'package:nashra_project2/screens/reports/reports_screen.dart';
-
 import 'login.dart';
 import 'startup.dart';
 import 'screens/announcementCitizens/announcements.dart';
-
 import 'package:nashra_project2/providers/authProvider.dart' as my_auth;
 import 'package:provider/provider.dart';
 import './providers/pollsProvider.dart';
 import 'chat/ChatsPage.dart'; 
-import'firebase_api.dart';
-import 'screens/notifications_screen.dart';
+import 'firebase_api.dart';
+import 'utils/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-await FirebaseAPi().iniNotifications();
+  await FirebaseAPi().iniNotifications();
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.debug,
   );
 
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => my_auth.AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
         ChangeNotifierProvider(create: (_) => Announcementsprovider()),
         ChangeNotifierProvider(create: (_) => Pollsprovider()),
@@ -69,13 +58,18 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Nashra Project',
-            theme: ThemeData(
-              primarySwatch: Colors.green,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
+            theme: Provider.of<ThemeProvider>(context).currentTheme,
             locale: languageProvider.currentLocale,
-            localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-            supportedLocales: AppLocalizationsSetup.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'), // English
+              Locale('ar'), // Arabic
+            ],
             home: SplashScreen(),
             routes: {
               '/startup': (context) => StartUp(),
@@ -87,16 +81,13 @@ class MyApp extends StatelessWidget {
               '/home': (context) => HomeScreen(),
               '/message': (context) => CitizenMessageWrapper(),
               '/notifications': (context) => NotificationPage(),
-               '/home': (context) => HomeScreen(),
-               '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
-               '/reports': (context) => AllReports(),
-               '/chats': (context) => CitizenMessageWrapper(),
-               '/gov_chats': (context) => ChatsPage(),
-
+              '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
+              '/chats': (context) => CitizenMessageWrapper(),
+              '/gov_chats': (context) => ChatsPage(),
             },
           );
         },
       ),
-    );
-  }
+    ),
+  );
 }
