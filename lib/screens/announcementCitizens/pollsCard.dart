@@ -59,13 +59,17 @@ class _PollCardState extends State<PollCard> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin = auth.isAdmin;
     final totalVotes = widget.poll.votes.values.fold(0, (sum, count) => sum + count);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
 
     return Card(
       margin: const EdgeInsets.all(12.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-      elevation: 3,
+      color: isDark ? Colors.grey[850] : Colors.white,
+      elevation: isDark ? 2 : 3,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -73,10 +77,10 @@ class _PollCardState extends State<PollCard> {
           children: [
             Text(
               widget.poll.question,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1B5E20),
+                color: isDark ? Colors.white : Colors.black87,
               ),
             ),
             const SizedBox(height: 16),
@@ -84,8 +88,10 @@ class _PollCardState extends State<PollCard> {
               final isSelected = _selectedOption == option;
               final percentage = _getOptionPercentage(option);
               final showResults = _selectedOption != null || isAdmin;
-              final background = showResults ? Colors.grey[100] : Colors.grey[200];
-              final progressColor = isSelected ? Color(0xFF1B5E20) : Colors.grey[400];
+              final background = isDark 
+                ? (showResults ? Colors.grey[800] : Colors.grey[900])
+                : (showResults ? Colors.grey[100] : Colors.grey[50]);
+              final progressColor = isSelected ? primaryColor : (isDark ? Colors.grey[700] : Colors.grey[400]);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
@@ -94,10 +100,17 @@ class _PollCardState extends State<PollCard> {
                       ? () => _submitVote(option)
                       : null,
                   borderRadius: BorderRadius.circular(8.0),
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: background,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected 
+                          ? primaryColor 
+                          : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                        width: isSelected ? 2 : 1,
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child: Column(
@@ -111,13 +124,19 @@ class _PollCardState extends State<PollCard> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected ? Color(0xFF1B5E20) : Colors.black,
+                                color: isSelected 
+                                  ? primaryColor 
+                                  : (isDark ? Colors.white : Colors.black87),
                               ),
                             ),
                             if (showResults)
                               Text(
                                 '${(percentage * 100).toStringAsFixed(0)}%',
-                                style: const TextStyle(fontSize: 14, color: Colors.black),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                           ],
                         ),
@@ -127,7 +146,7 @@ class _PollCardState extends State<PollCard> {
                           child: LinearProgressIndicator(
                             value: showResults ? percentage : 0,
                             minHeight: 8,
-                            backgroundColor: Colors.grey[300],
+                            backgroundColor: isDark ? Colors.grey[900] : Colors.grey[200],
                             valueColor: AlwaysStoppedAnimation<Color>(progressColor!),
                           ),
                         ),
@@ -137,48 +156,70 @@ class _PollCardState extends State<PollCard> {
                 ),
               );
             }).toList(),
-            const SizedBox(height: 8),
             if (_selectedOption == null && _isSubmitting)
-              const Center(child: CircularProgressIndicator()),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                  ),
+                ),
+              ),
             if (_selectedOption != null || isAdmin)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.circle, size: 8, color: Color(0xFF1B5E20)),
+                    Icon(Icons.circle, size: 8, color: primaryColor),
                     const SizedBox(width: 6),
                     Text(
                       'Live  |  $totalVotes votes',
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
               ),
-      // Move these widgets inside the Column's children list
-      IconButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true, // Allows the sheet to take full height
-            builder: (context) => Container(
-              height: MediaQuery.of(context).size.height * 0.50,
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom, // Account for keyboard
+            Divider(color: isDark ? Colors.grey[700] : Colors.grey[300]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => Container(
+                        height: MediaQuery.of(context).size.height * 0.50,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                          ),
+                          child: Pollscomments(poll: widget.poll),
+                        ),
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.mode_comment_rounded,
+                    color: primaryColor,
+                  ),
                 ),
-                child: Pollscomments(poll: widget.poll),
-              ),
+                const SizedBox(width: 4),
+                Text(
+                  '${widget.poll.commentsNo ?? 0}',
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          );
-        },
-        icon: Icon(Icons.mode_comment_rounded),
-      ),
-      SizedBox(height: 10),
-      Text('${widget.poll.commentsNo ?? 0}'),
-    ],
+          ],
         ),
       ),
-
     );
   }
 }
