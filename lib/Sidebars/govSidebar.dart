@@ -6,14 +6,16 @@ import '../screens/advertisement_screen.dart';
 import '../screens/analytics_screen.dart';
 import '../chat/ChatsPage.dart';
 import '../screens/reports/gov_reports_screen.dart';
+import '../utils/theme.dart';
 
 class GovSidebar extends StatelessWidget {
   const GovSidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: theme.scaffoldBackgroundColor,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
@@ -103,28 +105,45 @@ class _GovProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 2,
+      color: theme.cardTheme.color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
-          children: const [
+          children: [
             CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage('assets/images/admin_avatar.png'),
+              backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+              child: Icon(Icons.admin_panel_settings, color: theme.colorScheme.primary),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Admin", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text("Government Portal", style: TextStyle(color: Colors.grey)),
+                  Text(
+                    "Admin",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
+                  ),
+                  Text(
+                    "Government Portal",
+                    style: TextStyle(
+                      color: theme.textTheme.bodyMedium?.color,
+                    ),
+                  ),
                 ],
               ),
             ),
-            Icon(Icons.settings),
+            Icon(
+              Icons.settings,
+              color: theme.colorScheme.primary,
+            ),
           ],
         ),
       ),
@@ -140,16 +159,24 @@ class _DrawerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 1.5,
+      color: theme.cardTheme.color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: theme.textTheme.titleLarge?.color,
+              ),
+            ),
             const SizedBox(height: 10),
             ...items,
           ],
@@ -172,12 +199,20 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, size: 28, color: Colors.green[900]),
+      leading: Icon(
+        icon,
+        size: 28,
+        color: theme.colorScheme.primary,
+      ),
       title: Text(
         title,
-        style: TextStyle(fontSize: 16, color: Colors.green[900]),
+        style: TextStyle(
+          fontSize: 16,
+          color: theme.textTheme.bodyLarge?.color,
+        ),
       ),
       onTap: () {
         Navigator.pop(context);

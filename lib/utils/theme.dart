@@ -5,55 +5,55 @@ import 'package:flutter/material.dart';
 //all i did was start up i am not sure if this is correct or match the theme
 
 class AppTheme {
-  // Colors (matching Nashra style)
-  static const Color primaryColor = Color(0xFF4D861F);     // Green
-  static const Color secondaryColor = Color(0xFF4D861F);   // Same as primary for harmony
-  static const Color accentColor = Color(0xFF4D861F);
+  // Colors (Modern Blue Theme)
+  static const Color primaryColor = Color(0xFF1A237E);     // Deep Indigo
+  static const Color secondaryColor = Color(0xFF0D47A1);   // Dark Blue
+  static const Color accentColor = Color(0xFF64B5F6);      // Light Blue
   static const Color errorColor = Color(0xFFD32F2F);
   static const Color successColor = Color(0xFF388E3C);
   static const Color warningColor = Color(0xFFF57C00);
   static const Color infoColor = Color(0xFF1976D2);
 
   // Text Colors
-  static const Color textPrimaryColor = Color(0xFF00291A);       // Dark green
-  static const Color textSecondaryColor = Color(0xFF162113);     // Softer dark
+  static const Color textPrimaryColor = Color(0xFF1A237E);       // Deep Indigo
+  static const Color textSecondaryColor = Color(0xFF0D47A1);     // Dark Blue
   static const Color textHintColor = Color(0xFFBDBDBD);
 
   // Background Colors
-  static const Color backgroundColor = Color.fromARGB(255, 255, 255, 255);  // Very light yellow
+  static const Color backgroundColor = Color(0xFFF5F7FA);  // Light Gray Blue
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color dividerColor = Color(0xFFBDBDBD);
 
   static const Color deepCharcoal = Color(0xFF121212);
   static const Color darkSlate = Color(0xFF1E1E1E);
-  static const Color electricPurple = Color(0xFF7F5AF0);
-  static const Color softCyanBlue = Color(0xFF2CB67D);
+  static const Color electricBlue = Color(0xFF2962FF);    // Changed from purple
+  static const Color softBlue = Color(0xFF42A5F5);        // Changed from cyan
   static const Color lightGray = Color(0xFFE0E0E0);
   static const Color mediumGray = Color(0xFFA0A0A0);
   static const Color vividRed = Color(0xFFEF4565);
-  static const Color appBarDark = Color(0xFF1A1A1A);
+  static const Color appBarDark = Color(0xFF1A237E);      // Changed to Deep Indigo
   static const Color iconColor = Color(0xFFF4F4F4);
 
   // Light Theme
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: const Color(0xFF1B5E20),
+    primaryColor: const Color(0xFF1A237E),
     colorScheme: ColorScheme.light(
-      primary: const Color(0xFF1B5E20),
-      secondary: const Color(0xFF2CB67D),
+      primary: const Color(0xFF1A237E),      // Deep Indigo
+      secondary: const Color(0xFF42A5F5),     // Soft Blue
       error: vividRed,
-      background: Colors.white,
-      surface: Colors.white,
+      background: backgroundColor,
+      surface: surfaceColor,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onBackground: Colors.black87,
-      onSurface: Colors.black87,
+      onBackground: textPrimaryColor,
+      onSurface: textPrimaryColor,
       onError: Colors.white,
     ),
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: backgroundColor,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1B5E20),
+      backgroundColor: Color(0xFF1A237E),
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
       titleTextStyle: TextStyle(
@@ -63,17 +63,17 @@ class AppTheme {
       ),
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.black87),
-      bodyMedium: TextStyle(color: Colors.black54),
-      titleLarge: TextStyle(color: Colors.black87),
-      titleMedium: TextStyle(color: Colors.black87),
+      bodyLarge: TextStyle(color: textPrimaryColor),
+      bodyMedium: TextStyle(color: textSecondaryColor),
+      titleLarge: TextStyle(color: textPrimaryColor),
+      titleMedium: TextStyle(color: textPrimaryColor),
     ),
     iconTheme: const IconThemeData(
-      color: Color(0xFF1B5E20),
+      color: Color(0xFF1A237E),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
-      selectedItemColor: Color(0xFF1B5E20),
+      selectedItemColor: Color(0xFF1A237E),
       unselectedItemColor: Colors.grey,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -122,15 +122,15 @@ class AppTheme {
     ),
   );
 
-  // Dark Theme (same green style)
+  // Dark Theme
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: deepCharcoal,
-    primaryColor: electricPurple,
+    primaryColor: electricBlue,
     colorScheme: const ColorScheme.dark(
-      primary: electricPurple,
-      secondary: softCyanBlue,
+      primary: electricBlue,
+      secondary: softBlue,
       error: vividRed,
       background: deepCharcoal,
       surface: darkSlate,
@@ -161,7 +161,7 @@ class AppTheme {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: darkSlate,
-      selectedItemColor: electricPurple,
+      selectedItemColor: electricBlue,
       unselectedItemColor: mediumGray,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(

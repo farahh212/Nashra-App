@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -19,30 +20,31 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _startAnimation() async {
     for (int i = 1; i <= _letters.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 3000));
+      await Future.delayed(const Duration(milliseconds: 150));
       setState(() => _step = i);
     }
 
-    await Future.delayed(const Duration(milliseconds: 1000));
-    Navigator.pushReplacementNamed(context, '/startup'); // 👈 Transition to StartUp
+    await Future.delayed(const Duration(milliseconds: 300));
+    Navigator.pushReplacementNamed(context, '/startup');
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFEF5),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 2000),
+          duration: const Duration(milliseconds: 200),
           transitionBuilder: (child, animation) =>
               FadeTransition(opacity: animation, child: child),
           child: Text(
             _letters[_step - 1],
             key: ValueKey(_letters[_step - 1]),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 40,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1B5E20), // dark government green
+              color: theme.colorScheme.primary,
               letterSpacing: 6,
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login.dart';
+import 'utils/theme.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -48,8 +49,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Color(0xFFFFFEF5),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -62,7 +64,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF00291A),
+                  color: theme.colorScheme.primary,
                   letterSpacing: 2,
                 ),
               ),
@@ -70,23 +72,27 @@ class _SignUpPageState extends State<SignUpPage> {
               RichText(
                 text: TextSpan(
                   text: 'Create ',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green[900]),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
                   children: [
                     TextSpan(
                       text: 'your account',
-                      style: TextStyle(color: Colors.green[900]),
+                      style: TextStyle(color: theme.colorScheme.primary),
                     ),
                   ],
                 ),
               ),
               SizedBox(height: 30),
-              buildTextField('Name', 'ex: ali ahmed', _nameController),
+              buildTextField('Name', 'ex: ali ahmed', _nameController, theme),
               SizedBox(height: 16),
-              buildTextField('Email', 'ex: ali.ahmed123@email.com', _emailController),
+              buildTextField('Email', 'ex: ali.ahmed123@email.com', _emailController, theme),
               SizedBox(height: 16),
-              buildTextField('Password', '********', _passwordController, isPassword: true),
+              buildTextField('Password', '********', _passwordController, theme, isPassword: true),
               SizedBox(height: 16),
-              buildTextField('Confirm password', '********', _confirmPasswordController, isPassword: true),
+              buildTextField('Confirm password', '********', _confirmPasswordController, theme, isPassword: true),
               SizedBox(height: 10),
               Row(
                 children: [
@@ -97,17 +103,23 @@ class _SignUpPageState extends State<SignUpPage> {
                         _agreeToTerms = value!;
                       });
                     },
-                    activeColor: Colors.green,
+                    activeColor: theme.colorScheme.primary,
                   ),
                   Expanded(
                     child: RichText(
                       text: TextSpan(
                         text: 'I understood the ',
-                        style: TextStyle(color: Colors.black, fontSize: 12),
+                        style: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                          fontSize: 12,
+                        ),
                         children: [
                           TextSpan(
                             text: 'terms & policy.',
-                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: theme.colorScheme.error,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -122,19 +134,26 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: ElevatedButton(
                   onPressed: _signUp,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4F8A10),
+                    backgroundColor: theme.colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: Text(
                     'SIGN UP',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: theme.colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),
               SizedBox(height: 20),
-              Text('or sign up with', style: TextStyle(color: Colors.grey)),
+              Text(
+                'or sign up with',
+                style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+              ),
               SizedBox(height: 10),
               GestureDetector(
                 onTap: () {
@@ -145,10 +164,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   width: 50,
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
+                    border: Border.all(color: theme.dividerColor),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                 // child: Image.asset('assets/google.png'), // <-- Make sure you have a Google logo at assets/google.png
                 ),
               ),
               SizedBox(height: 20),
@@ -159,11 +177,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: RichText(
                   text: TextSpan(
                     text: 'Have an account? ',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: theme.textTheme.bodyMedium?.color),
                     children: [
                       TextSpan(
                         text: 'SIGN IN',
-                        style: TextStyle(color: Color(0xFF4F8A10), fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -176,19 +197,28 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buildTextField(String label, String hint, TextEditingController controller, {bool isPassword = false}) {
+  Widget buildTextField(
+    String label,
+    String hint,
+    TextEditingController controller,
+    ThemeData theme, {
+    bool isPassword = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
+        labelStyle: TextStyle(color: theme.colorScheme.primary),
+        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF4F8A10)),
+          borderSide: BorderSide(color: theme.colorScheme.primary),
           borderRadius: BorderRadius.circular(8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF4F8A10)),
+          borderSide: BorderSide(color: theme.colorScheme.primary),
           borderRadius: BorderRadius.circular(8),
         ),
       ),

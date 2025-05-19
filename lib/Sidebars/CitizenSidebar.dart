@@ -5,14 +5,16 @@ import '../providers/authProvider.dart' as my_auth;
 import '../chat/messagePage_citiz.dart';
 import '../providers/authProvider.dart' as my_auth; // Import your AuthProvider
 import '../screens/reports/reports_screen.dart';
+import '../utils/theme.dart';
 
 class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: theme.scaffoldBackgroundColor,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
@@ -66,27 +68,27 @@ class _UserProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 2,
+      color: theme.cardTheme.color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
-          children: const [
+          children: [
             CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'), // change to your asset
+              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
             ),
             SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                
-                ],
+                children: [],
               ),
             ),
-            Icon(Icons.more_vert)
+            Icon(Icons.more_vert, color: theme.colorScheme.primary)
           ],
         ),
       ),
@@ -102,16 +104,24 @@ class _DrawerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 1.5,
+      color: theme.cardTheme.color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: theme.colorScheme.primary,
+              ),
+            ),
             const SizedBox(height: 10),
             ...items,
           ],
@@ -134,10 +144,18 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: Colors.green[900]),
-      title: Text(title, style: TextStyle(fontSize: 16, color: Colors.green[900])),
+      leading: Icon(icon, color: theme.colorScheme.primary),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
       onTap: () {
         Navigator.pop(context);
         onTap();

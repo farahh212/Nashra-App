@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'login.dart'; 
 import 'signup.dart'; 
+import 'utils/theme.dart';
 
 class StartUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Color(0xFFFFFEF5), // Light cream color like in the image
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -17,7 +19,7 @@ class StartUp extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B5E20), // Dark green color
+                  color: theme.colorScheme.primary,
                   letterSpacing: 2,
                 ),
               ),
@@ -25,9 +27,9 @@ class StartUp extends StatelessWidget {
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
                   colors: [
-                    Color(0xFF00291A), // Dark green
-                    Color(0xFF4F7544), // Green
-                    Color(0xFFAAAAAA), // Light gray
+                    Color(0xFF1A237E), // Deep Indigo
+                    Color(0xFF0D47A1), // Dark Blue
+                    Color(0xFF64B5F6), // Light Blue
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -37,7 +39,7 @@ class StartUp extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white, // Will be overridden by ShaderMask
+                    color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -50,11 +52,11 @@ class StartUp extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)), // Pass authenticationMode as 1 for sign up
+                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey, // Gray button
+                    backgroundColor: theme.colorScheme.secondary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -64,7 +66,7 @@ class StartUp extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.white,
+                      color: theme.colorScheme.onSecondary,
                     ),
                   ),
                 ),
@@ -77,11 +79,11 @@ class StartUp extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)), // Pass authenticationMode as 0 for login
+                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1B5E20), // Green color for sign in
+                    backgroundColor: theme.colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -91,7 +93,7 @@ class StartUp extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                     ),
                   ),
                 ),
