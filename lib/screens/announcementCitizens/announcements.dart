@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:nashra_project2/providers/announcementsProvider.dart' ;// Replace with the correct path
 import 'package:nashra_project2/providers/languageProvider.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
+import 'package:translator/translator.dart';
 
 class Announcements extends StatefulWidget {
   @override
@@ -22,6 +23,23 @@ class Announcements extends StatefulWidget {
 class _AnnouncementsState extends State<Announcements> {
   late Future<void> _announcementsFuture;
   String selectedButton = 'Announcements';
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
+
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
   @override
   void initState() {
@@ -39,19 +57,26 @@ class _AnnouncementsState extends State<Announcements> {
     final isAdmin = auth.isAdmin;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLang = languageProvider.currentLanguageCode;
     
 
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          'NASHRA',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-          ),
+        title: FutureBuilder<String>(
+          future: _translateText('NASHRA', currentLang),
+          builder: (context, snapshot) {
+            return Text(
+              snapshot.data ?? 'NASHRA',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+              ),
+            );
+          },
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
         iconTheme: IconThemeData(
@@ -92,11 +117,16 @@ class _AnnouncementsState extends State<Announcements> {
             );
           } else if (snapshot.hasError) {
             return Center(
-              child: Text(
-                'Error loading announcements',
-                style: TextStyle(
-                  color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-                ),
+              child: FutureBuilder<String>(
+                future: _translateText('Error loading announcements', currentLang),
+                builder: (context, snapshot) {
+                  return Text(
+                    snapshot.data ?? 'Error loading announcements',
+                    style: TextStyle(
+                      color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                    ),
+                  );
+                },
               ),
             );
           } else {
@@ -124,13 +154,18 @@ class _AnnouncementsState extends State<Announcements> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text(
-                          'Announcements',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        child: FutureBuilder<String>(
+                          future: _translateText('Announcements', currentLang),
+                          builder: (context, snapshot) {
+                            return Text(
+                              snapshot.data ?? 'Announcements',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       SizedBox(width: 16),
@@ -150,13 +185,18 @@ class _AnnouncementsState extends State<Announcements> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text(
-                          'Polls',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        child: FutureBuilder<String>(
+                          future: _translateText('Polls', currentLang),
+                          builder: (context, snapshot) {
+                            return Text(
+                              snapshot.data ?? 'Polls',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],

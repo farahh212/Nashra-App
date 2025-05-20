@@ -693,16 +693,16 @@ class _PollResultsScreenState extends State<PollResultsScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
                   Icon(
                     Icons.error_outline,
                     size: 48,
                     color: isDark ? Colors.red[300] : Colors.red,
                   ),
-                  const SizedBox(height: 16),
+            const SizedBox(height: 16),
                   FutureBuilder<String>(
                     future: _translateText('Error loading polls', currentLanguage),
                     builder: (context, snapshot) {
@@ -715,7 +715,7 @@ class _PollResultsScreenState extends State<PollResultsScreen> {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+            const SizedBox(height: 16),
                   FutureBuilder<String>(
                     future: _translateText('Tap to retry', currentLanguage),
                     builder: (context, snapshot) {
@@ -735,11 +735,11 @@ class _PollResultsScreenState extends State<PollResultsScreen> {
                         ),
                       );
                     },
-                  ),
-                ],
-              ),
-            );
-          }
+            ),
+          ],
+        ),
+      );
+    }
 
           return Consumer<Pollsprovider>(
             builder: (context, pollsProvider, child) {
@@ -779,9 +779,9 @@ class _PollResultsScreenState extends State<PollResultsScreen> {
                   if (filteredPolls.isEmpty)
                     Expanded(
                       child: Center(
-                        child: Column(
+      child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+        children: [
                             Icon(
                               Icons.search_off,
                               size: 48,
@@ -806,7 +806,7 @@ class _PollResultsScreenState extends State<PollResultsScreen> {
                               builder: (context, snapshot) {
                                 return Text(
                                   snapshot.data ?? 'Try adjusting your filters',
-                                  style: TextStyle(
+              style: TextStyle(
                                     color: isDark ? Colors.grey[500] : Colors.grey[700],
                                     fontSize: 14,
                                   ),

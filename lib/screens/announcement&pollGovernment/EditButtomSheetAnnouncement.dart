@@ -7,7 +7,8 @@ import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:translator/translator.dart';
+import '../../providers/languageProvider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Editbuttomsheetannouncement extends StatefulWidget {
@@ -22,13 +23,28 @@ class Editbuttomsheetannouncement extends StatefulWidget {
 class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncement> {
   late TextEditingController titleController;
   late TextEditingController descriptionController;
-  // late TextEditingController fileUrlController;
-     final fileUrlController = TextEditingController();
-   List<String>? _pickedFilePaths;
-  
+  final fileUrlController = TextEditingController();
+  List<String>? _pickedFilePaths;
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
 
   File? _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
+
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
   @override
   void initState() {
@@ -141,6 +157,8 @@ void openFile(String url) async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLang = languageProvider.currentLanguageCode;
 
     return Container(
       decoration: BoxDecoration(
@@ -161,13 +179,18 @@ void openFile(String url) async {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Edit Announcement',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+              FutureBuilder<String>(
+                future: _translateText('Edit Announcement', currentLang),
+                builder: (context, snapshot) {
+                  return Text(
+                    snapshot.data ?? 'Edit Announcement',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  );
+                },
               ),
               IconButton(
                 icon: Icon(Icons.close, color: primaryColor),
@@ -185,22 +208,27 @@ void openFile(String url) async {
                 color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               ),
             ),
-            child: TextField(
-              controller: titleController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Announcement title',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
+            child: FutureBuilder<String>(
+              future: _translateText('Announcement title', currentLang),
+              builder: (context, snapshot) {
+                return TextField(
+                  controller: titleController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: snapshot.data ?? 'Announcement title',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 16),
@@ -213,23 +241,28 @@ void openFile(String url) async {
                 color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               ),
             ),
-            child: TextField(
-              controller: descriptionController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: 'Announcement description',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
+            child: FutureBuilder<String>(
+              future: _translateText('Announcement description', currentLang),
+              builder: (context, snapshot) {
+                return TextField(
+                  controller: descriptionController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: snapshot.data ?? 'Announcement description',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 16),
@@ -242,49 +275,59 @@ void openFile(String url) async {
                 color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               ),
             ),
-            child:        GestureDetector(
-  onTap: _pickFiles,
-  child: Container(
-    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-    decoration: BoxDecoration(
-      border: Border.all(color: Colors.green),
-      borderRadius: BorderRadius.circular(5),
-      color: Colors.grey[200],
-    ),
-    child: _pickedFilePaths == null || _pickedFilePaths!.isEmpty
-        ? Row(
-            children: [
-              Icon(Icons.attach_file, color: Colors.green),
-              SizedBox(width: 8),
-              Text('Tap to select files'),
-            ],
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _pickedFilePaths!
-                .map((path) => GestureDetector(
-                      onTap: () => openFile(path),
-                      child: Text(
-                        path.split('/').last,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.blue,
-                        ),
+            child: GestureDetector(
+              onTap: _pickFiles,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.grey[200],
+                ),
+                child: _pickedFilePaths == null || _pickedFilePaths!.isEmpty
+                    ? FutureBuilder<String>(
+                        future: _translateText('Tap to select files', currentLang),
+                        builder: (context, snapshot) {
+                          return Row(
+                            children: [
+                              Icon(Icons.attach_file, color: Colors.green),
+                              SizedBox(width: 8),
+                              Text(snapshot.data ?? 'Tap to select files'),
+                            ],
+                          );
+                        },
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _pickedFilePaths!
+                            .map((path) => GestureDetector(
+                                  onTap: () => openFile(path),
+                                  child: Text(
+                                    path.split('/').last,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
                       ),
-                    ))
-                .toList(),
-          ),
-  ),
-),
+              ),
+            ),
           ),
           const SizedBox(height: 20),
-          Text(
-            'Edit Image:',
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.bold,
-            ),
+          FutureBuilder<String>(
+            future: _translateText('Edit Image:', currentLang),
+            builder: (context, snapshot) {
+              return Text(
+                snapshot.data ?? 'Edit Image:',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
           ),
           const SizedBox(height: 8),
           GestureDetector(
@@ -307,33 +350,43 @@ void openFile(String url) async {
                             child: Image.network(
                               widget.announcement.imageUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Column(
+                              errorBuilder: (context, error, stackTrace) => FutureBuilder<String>(
+                                future: _translateText('Failed to load image', currentLang),
+                                builder: (context, snapshot) {
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.error_outline, color: primaryColor),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        snapshot.data ?? 'Failed to load image',
+                                        style: TextStyle(
+                                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          )
+                        : FutureBuilder<String>(
+                            future: _translateText('Select image', currentLang),
+                            builder: (context, snapshot) {
+                              return Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.error_outline, color: primaryColor),
+                                  Icon(Icons.image, color: primaryColor, size: 32),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Failed to load image',
+                                    snapshot.data ?? 'Select image',
                                     style: TextStyle(
                                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.image, color: primaryColor, size: 32),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Select image",
-                                style: TextStyle(
-                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                              );
+                            },
                           ))
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -343,24 +396,29 @@ void openFile(String url) async {
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _editAnnouncement,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: isDark ? 0 : 2,
-            ),
-            child: const Text(
-              'Update',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          FutureBuilder<String>(
+            future: _translateText('Update', currentLang),
+            builder: (context, snapshot) {
+              return ElevatedButton(
+                onPressed: _editAnnouncement,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: isDark ? 0 : 2,
+                ),
+                child: Text(
+                  snapshot.data ?? 'Update',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
