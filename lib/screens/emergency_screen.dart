@@ -72,7 +72,7 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      drawer: _isAdmin ? const GovSidebar() : const CitizenSidebar(),
+      drawer: _isAdmin ?  GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,

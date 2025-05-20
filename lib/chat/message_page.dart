@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/message.dart';
 import '../models/notification.dart';
 import '../services/notificationService.dart';
+import '../utils/theme.dart'; // Import your theme file
 
 class MessagePage extends StatefulWidget {
   final String chatId;
@@ -99,23 +100,26 @@ class _MessagePageState extends State<MessagePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
         elevation: 1,
         title: Row(
           children: [
-            const CircleAvatar(
-              backgroundColor: Color(0xFF1976D2),
-              child: Icon(Icons.person, color: Colors.white),
+            CircleAvatar(
+              backgroundColor: theme.colorScheme.primary,
+              child: Icon(Icons.person, color: theme.colorScheme.onPrimary),
             ),
             const SizedBox(width: 8),
-            Text(widget.chatName, style: const TextStyle(color: Colors.black)),
+            Text(widget.chatName, style: theme.textTheme.titleMedium?.copyWith(color: theme.appBarTheme.titleTextStyle?.color ?? theme.textTheme.titleMedium?.color)),
           ],
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: theme.iconTheme,
       ),
       body: Column(
         children: [
@@ -155,8 +159,8 @@ class _MessagePageState extends State<MessagePage> {
                         ),
                         decoration: BoxDecoration(
                           color: isSender
-                              ? const Color(0xFF1976D2)
-                              : const Color(0xFFF0F0F0),
+                              ? theme.colorScheme.primary
+                              : theme.cardColor,
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(18),
                             topRight: const Radius.circular(18),
@@ -172,7 +176,9 @@ class _MessagePageState extends State<MessagePage> {
                             Text(
                               message.content,
                               style: TextStyle(
-                                color: isSender ? Colors.white : Colors.black87,
+                                color: isSender
+                                    ? theme.colorScheme.onPrimary
+                                    : theme.textTheme.bodyMedium?.color,
                                 fontSize: 15,
                               ),
                             ),
@@ -180,7 +186,9 @@ class _MessagePageState extends State<MessagePage> {
                             Text(
                               '${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}',
                               style: TextStyle(
-                                color: isSender ? Colors.white70 : Colors.black54,
+                                color: isSender
+                                    ? theme.colorScheme.onPrimary.withOpacity(0.7)
+                                    : theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                                 fontSize: 11,
                               ),
                             ),
@@ -196,19 +204,19 @@ class _MessagePageState extends State<MessagePage> {
           const Divider(height: 1),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            color: Colors.white,
+            color: theme.cardColor,
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    style: const TextStyle(fontSize: 15),
+                    style: theme.textTheme.bodyMedium,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       hintText: 'Type your message...',
-                      hintStyle: TextStyle(color: Colors.grey[600]),
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
                       filled: true,
-                      fillColor: const Color(0xFFF7F7F7),
+                      fillColor: theme.inputDecorationTheme.fillColor ?? (isDark ? Colors.grey[800] : Colors.grey[100]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide.none,
@@ -219,7 +227,7 @@ class _MessagePageState extends State<MessagePage> {
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.send_rounded),
-                  color: const Color(0xFF1976D2),
+                  color: theme.colorScheme.primary,
                   onPressed: () {
                     if (_messageController.text.trim().isNotEmpty) {
                       sendMessage();
