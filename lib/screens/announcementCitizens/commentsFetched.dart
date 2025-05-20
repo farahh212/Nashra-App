@@ -5,8 +5,7 @@ import 'package:nashra_project2/models/comment.dart';
 import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:provider/provider.dart';
-import 'package:translator/translator.dart';
-import 'package:nashra_project2/providers/languageProvider.dart';
+import 'package:nashra_project2/services/text_moderation.dart'; // Add this import
 
 class CommentsFetched extends StatefulWidget {
   final Announcement announcement;
@@ -21,51 +20,19 @@ class _CommentsFetchedState extends State<CommentsFetched> {
   final TextEditingController _commentController = TextEditingController();
   bool _isPostingComment = false;
   bool isAnonymous = false;
-  final _translator = GoogleTranslator();
-  final Map<String, String> _translations = {};
-  String _tooltipText = 'Send comment';
-  String _hintText = 'Write a comment...';
-  String _closeText = 'Close';
-
-  Future<String> _translateText(String text, String targetLang) async {
-    final key = '${text}_$targetLang';
-    if (_translations.containsKey(key)) {
-      return _translations[key]!;
-    }
-    try {
-      final translation = await _translator.translate(text, to: targetLang);
-      _translations[key] = translation.text;
-      return translation.text;
-    } catch (e) {
-      print('Translation error: $e');
-      return text;
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     _loadComments();
-    _loadTranslations();
-  }
-
-  Future<void> _loadTranslations() async {
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final currentLang = languageProvider.currentLanguageCode;
-    
-    _tooltipText = await _translateText('Send comment', currentLang);
-    _hintText = await _translateText('Write a comment...', currentLang);
-    _closeText = await _translateText('Close', currentLang);
-    
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   void _loadComments() {
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
-    announcementsProvider.fetchCommentsForAnnouncement(widget.announcement.id, auth.token);
+    final announcementsProvider =
+        Provider.of<Announcementsprovider>(context, listen: false);
+    announcementsProvider.fetchCommentsForAnnouncement(
+        widget.announcement.id, auth.token);
   }
 
   Future<String?> getDisplayNameByUid(String uid) async {
@@ -79,53 +46,90 @@ class _CommentsFetchedState extends State<CommentsFetched> {
   Future<void> _postComment() async {
     if (_commentController.text.isEmpty) return;
 
-    setState(() {
-      _isPostingComment = true;
-    });
+    setState(() => _isPostingComment = true);
 
     try {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
-      final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-      final currentLang = languageProvider.currentLanguageCode;
+      // Check content safety
+      final isSafe = await TextModeration.isContentSafe(_commentController.text);
+      if (!isSafe) {
+        if (mounted) {
+          final shouldPost = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Content Warning'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Your comment contains language that may be harmful:'),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _commentController.text,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text('Are you sure you want to post this?'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('EDIT'),
+                ),
+              ],
+            ),
+          );
 
-      String? displayName;
-
-      if (!isAnonymous) {
-        displayName = await getDisplayNameByUid(auth.userId!);
-      } else {
-        displayName = await _translateText('Anonymous', currentLang);
+          if (shouldPost != true) {
+            return; // User chose to edit
+          }
+        }
       }
+
+      // Post the comment
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final announcementsProvider =
+          Provider.of<Announcementsprovider>(context, listen: false);
 
       final newComment = Comment(
         id: '',
         userId: auth.userId!,
-        name: displayName,
+        name: isAnonymous ? 'Anonymous' : await getDisplayNameByUid(auth.userId!),
         content: _commentController.text,
         anonymous: isAnonymous,
         createdAt: DateTime.now(),
       );
 
-      await announcementsProvider.addCommentToAnnouncement(widget.announcement.id, newComment, auth.token);
-      await announcementsProvider.fetchCommentsForAnnouncement(widget.announcement.id, auth.token);
-      final announcementIndex = announcementsProvider.announcements.indexWhere((a) => a.id == widget.announcement.id);
-      final currentAnnouncement = announcementsProvider.announcements.firstWhere(
-        (a) => a.id == widget.announcement.id,
-        orElse: () => widget.announcement,
-      );
+      await announcementsProvider.addCommentToAnnouncement(
+          widget.announcement.id, newComment, auth.token);
+      await announcementsProvider.fetchCommentsForAnnouncement(
+          widget.announcement.id, auth.token);
 
-      _commentController.clear();
+      if (mounted) {
+        _commentController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Comment posted successfully!')),
+        );
+      }
     } catch (e) {
-      final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-      final currentLang = languageProvider.currentLanguageCode;
-      final errorMessage = await _translateText('Failed to post comment', currentLang);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$errorMessage: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString().replaceAll(RegExp(r'^Exception: '), '')}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        _isPostingComment = false;
-      });
+      if (mounted) {
+        setState(() => _isPostingComment = false);
+      }
     }
   }
 
@@ -142,8 +146,6 @@ class _CommentsFetchedState extends State<CommentsFetched> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
-    final languageProvider = Provider.of<LanguageProvider>(context);
-    final currentLang = languageProvider.currentLanguageCode;
 
     return Container(
       decoration: BoxDecoration(
@@ -164,23 +166,17 @@ class _CommentsFetchedState extends State<CommentsFetched> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              FutureBuilder<String>(
-                future: _translateText('Comments', currentLang),
-                builder: (context, snapshot) {
-                  return Text(
-                    snapshot.data ?? 'Comments',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  );
-                },
+              Text(
+                'Comments',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               IconButton(
                 icon: Icon(Icons.close, color: primaryColor),
                 onPressed: () => Navigator.pop(context),
-                tooltip: _closeText,
               ),
             ],
           ),
@@ -197,16 +193,11 @@ class _CommentsFetchedState extends State<CommentsFetched> {
 
                 if (comments.isEmpty) {
                   return Center(
-                    child: FutureBuilder<String>(
-                      future: _translateText('No comments yet. Be the first to comment!', currentLang),
-                      builder: (context, snapshot) {
-                        return Text(
-                          snapshot.data ?? 'No comments yet. Be the first to comment!',
-                          style: TextStyle(
-                            color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          ),
-                        );
-                      },
+                    child: Text(
+                      'No comments yet. Be the first to comment!',
+                      style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
                     ),
                   );
                 }
@@ -227,28 +218,18 @@ class _CommentsFetchedState extends State<CommentsFetched> {
                         ),
                       ),
                       child: ListTile(
-                        title: FutureBuilder<String>(
-                          future: _translateText(comment.name ?? 'Government', currentLang),
-                          builder: (context, snapshot) {
-                            return Text(
-                              snapshot.data ?? (comment.name ?? 'Government'),
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black87,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          },
+                        title: Text(
+                          comment.name ?? 'Government',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        subtitle: FutureBuilder<String>(
-                          future: _translateText(comment.content, currentLang),
-                          builder: (context, snapshot) {
-                            return Text(
-                              snapshot.data ?? comment.content,
-                              style: TextStyle(
-                                color: isDark ? Colors.grey[300] : Colors.grey[700],
-                              ),
-                            );
-                          },
+                        subtitle: Text(
+                          comment.content,
+                          style: TextStyle(
+                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                          ),
                         ),
                       ),
                     );
@@ -289,16 +270,11 @@ class _CommentsFetchedState extends State<CommentsFetched> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                FutureBuilder<String>(
-                  future: _translateText('Anonymous', currentLang),
-                  builder: (context, snapshot) {
-                    return Text(
-                      snapshot.data ?? 'Anonymous',
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    );
-                  },
+                Text(
+                  "Anonymous",
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
               ],
             ),
@@ -322,7 +298,7 @@ class _CommentsFetchedState extends State<CommentsFetched> {
                       color: isDark ? Colors.white : Colors.black87,
                     ),
                     decoration: InputDecoration(
-                      hintText: _hintText,
+                      hintText: 'Write a comment...',
                       hintStyle: TextStyle(
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
                       ),
@@ -356,7 +332,6 @@ class _CommentsFetchedState extends State<CommentsFetched> {
                       child: IconButton(
                         icon: const Icon(Icons.send, color: Colors.white),
                         onPressed: _postComment,
-                        tooltip: _tooltipText,
                       ),
                     ),
             ],

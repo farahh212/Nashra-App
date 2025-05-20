@@ -50,7 +50,11 @@ class _ViewReportsPageState extends State<ViewReportsPage> {
       drawer: const CitizenSidebar(),
       bottomNavigationBar: const CustomBottomNavigationBar(),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+      
+        backgroundColor: (isDark ? Colors.black : Colors.white),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
         elevation: 0,
         title: FutureBuilder<String>(
           future: _translateText('View Reports', currentLanguage),
@@ -66,9 +70,7 @@ class _ViewReportsPageState extends State<ViewReportsPage> {
             );
           },
         ),
-        iconTheme: IconThemeData(
-          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-        ),
+       
       ),
       body: Container(
         decoration: BoxDecoration(

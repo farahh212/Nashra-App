@@ -174,18 +174,24 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: (isDark ? Colors.black : Colors.white),
+         elevation: 0.5,
+         backgroundColor: (isDark ? Colors.black : Colors.white),
         iconTheme: IconThemeData(
           color: isDark ? Colors.white : Color(0xFF1976D2),
         ),
-        title: Text(
-          "Advertisement",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Color(0xFF1976D2),
-          ),
+
+        title: FutureBuilder<String>(
+          future: _translateText('Advertisements', currentLanguage),
+          builder: (context, snapshot) {
+            return Text(
+              snapshot.data ?? 'Advertisements',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Color(0xFF1976D2),
+              ),
+            );
+          }
         ),
         actions: [
           IconButton(

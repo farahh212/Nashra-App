@@ -265,6 +265,7 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
       print('Error checking admin status: $e');
     }
   }
+  
 
 
   @override
@@ -278,7 +279,10 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       drawer: _isAdmin ? const GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
+        backgroundColor: (isDark ? Colors.black : Colors.white),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
         elevation: 0,
         title: FutureBuilder<String>(
           future: _translateText(
@@ -303,15 +307,13 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
               style: TextStyle(
                 color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
                 fontWeight: FontWeight.bold,
-                fontSize: 24,
+                fontSize: 20,
               ),
               overflow: TextOverflow.ellipsis,
             );
           }
         ),
-        iconTheme: IconThemeData(
-          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-        ),
+      
       ),
       body: Consumer<EmergencyProvider>(
         builder: (context, provider, _) {
@@ -482,23 +484,32 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                         },
                       )
                     : null,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(16),
-                    child: FutureBuilder<String>(
-                      future: _translateText(contact.title, currentLanguage),
-                      builder: (context, snapshot) {
-                        return Text(
-                          snapshot.data ?? contact.title,
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black87,
-                            fontSize: 16,
-                          ),
-                        );
-                      }
-                    ),
-                  ),
-                ],
+               children: [
+  if (!_isAdmin)
+    ListTile(
+      leading: Icon(Icons.call, color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2)),
+      title: FutureBuilder<String>(
+        future: _translateText('Call this number', currentLanguage),
+        builder: (context, snapshot) {
+          return Text(
+            snapshot.data ?? 'Call this number',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+        },
+      ),
+      subtitle: Text(
+        contact.number.toString(),
+        style: TextStyle(
+          color: isDark ? Colors.white70 : Colors.black54,
+        ),
+      ),
+      onTap: () => _launchDialer(contact.number),
+    ),
+],
+
               );
             },
           );

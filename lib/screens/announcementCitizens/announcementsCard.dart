@@ -277,7 +277,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                       context: context,
                       isScrollControlled: true,
                       builder: (context) => Container(
-                        height: MediaQuery.of(context).size.height * 0.50,
+                        height: MediaQuery.of(context).size.height * 1,
                         padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).viewInsets.bottom,
                         ),

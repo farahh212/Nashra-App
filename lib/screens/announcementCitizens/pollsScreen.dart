@@ -78,10 +78,10 @@ class _pollScreenState extends State<pollScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: FutureBuilder<String>(
-          future: _translateText('NASHRA', currentLang),
+          future: _translateText('Polls', currentLang),
           builder: (context, snapshot) {
             return Text(
-              snapshot.data ?? 'NASHRA',
+              snapshot.data ?? 'Polls',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
