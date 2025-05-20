@@ -6,6 +6,8 @@ import 'package:nashra_project2/providers/advertisementProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:translator/translator.dart';
+import 'package:nashra_project2/providers/languageProvider.dart';
 
 class AdDetailsPage extends StatefulWidget {
   final String adId;
@@ -19,6 +21,22 @@ class AdDetailsPage extends StatefulWidget {
 class _AdDetailsPageState extends State<AdDetailsPage> {
   Advertisement? ad;
   bool _isLoading = true;
+  final GoogleTranslator _translator = GoogleTranslator();
+  final Map<String, String> translations = {};
+
+  Future<String> _translateText(String text, String targetLang) async {
+    if (translations.containsKey('${text}$targetLang')) {
+      return translations['${text}$targetLang']!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      translations['${text}$targetLang'] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
   @override
   void initState() {
@@ -63,6 +81,8 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentLanguage = Provider.of<LanguageProvider>(context).currentLanguageCode;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Advertisement Details")),
       body: _isLoading
@@ -74,24 +94,34 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        ad!.title,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      FutureBuilder<String>(
+                        future: _translateText(ad!.title, currentLanguage),
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? ad!.title,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       _buildImage(ad!.imageUrl),
                       const SizedBox(height: 24),
-                      Text(
-                        ad!.description,
-                        style: const TextStyle(fontSize: 16),
+                      FutureBuilder<String>(
+                        future: _translateText(ad!.description, currentLanguage),
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? ad!.description,
+                            style: const TextStyle(fontSize: 16),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
-                 bottomNavigationBar: CustomBottomNavigationBar(),
+      bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
 }
