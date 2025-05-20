@@ -174,59 +174,51 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: theme.appBarTheme.backgroundColor ?? 
-            (isDark ? Colors.black : Colors.white),
-        title: FutureBuilder<String>(
-          future: _translateText('Advertisements', currentLanguage),
-          builder: (context, snapshot) {
-            return Text(
-              snapshot.data ?? 'Advertisements',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            );
-          }
+  elevation: 4,
+  backgroundColor: isDark ? Colors.black : Colors.white,
+  iconTheme: IconThemeData(
+    color: isDark ? Colors.white : Colors.black, // for back buttons, etc.
+  ),
+  title: FutureBuilder<String>(
+    future: _translateText('Advertisements', currentLanguage),
+    builder: (context, snapshot) {
+      return Text(
+        snapshot.data ?? 'Advertisements',
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: isDark ? Colors.white : Colors.black87,
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add, 
-                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2)),
-            tooltip: 'Create Ad',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CreateAdScreen()),
-              );
-            },
-          ),
-          TextButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MyAdvertisementsScreen()),
-              );
-            },
-            label: FutureBuilder<String>(
-              future: _translateText('My Ads', currentLanguage),
-              builder: (context, snapshot) {
-                return Text(
-                  snapshot.data ?? 'My Ads',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-                  ),
-                );
-              }
-            ),
-            icon: Icon(Icons.person,
-                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2)),
-          ),
-          const SizedBox(width: 6),
-        ],
-      ),
+      );
+    },
+  ),
+  actions: [
+    IconButton(
+      icon: Icon(Icons.add),
+      tooltip: 'Create Ad',
+      color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CreateAdScreen()),
+        );
+      },
+    ),
+    IconButton(
+      icon: Icon(Icons.person),
+      tooltip: 'My Ads',
+      color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyAdvertisementsScreen()),
+        );
+      },
+    ),
+    const SizedBox(width: 8),
+  ],
+),
+
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(
