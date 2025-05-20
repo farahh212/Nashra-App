@@ -81,9 +81,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-// TODO: Update the import path below if your AuthProvider is located elsewhere
-import '../providers/authProvider.dart';  // Your AuthProvider
+import '../providers/authProvider.dart';
 import 'message_page.dart';
+import '../utils/theme.dart'; // Import your theme
 
 class CitizenMessageWrapper extends StatefulWidget {
   const CitizenMessageWrapper({Key? key}) : super(key: key);
@@ -100,21 +100,19 @@ class _CitizenMessageWrapperState extends State<CitizenMessageWrapper> {
     super.initState();
     _initChat();
   }
+
   Future<String?> getEmailByUid(String uid) async {
-  final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-  if (doc.exists) {
-    return doc.data()?['email'];
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (doc.exists) {
+      return doc.data()?['email'];
+    }
+    return null;
   }
-return null;
-}
 
   Future<void> _initChat() async {
     try {
-      // Get the current user email from AuthProvider
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      
       final userEmail = await getEmailByUid(auth.userId);
-
 
       if (userEmail == null) {
         print("User not logged in");
@@ -136,13 +134,11 @@ return null;
           'userEmail1': userEmail,
           'userEmail2': governmentEmail,
           'createdAt': Timestamp.now(),
-           'name': userEmail,
-          //  'id': query.docs.first.id
+          'name': userEmail,
         });
-        // Now update the chat document to include its own ID
-await FirebaseFirestore.instance.collection('chats').doc(chatDoc.id).update({
-  'id': chatDoc.id,
-});
+        await FirebaseFirestore.instance.collection('chats').doc(chatDoc.id).update({
+          'id': chatDoc.id,
+        });
         chatId = chatDoc.id;
       }
 
@@ -163,8 +159,16 @@ await FirebaseFirestore.instance.collection('chats').doc(chatDoc.id).update({
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Scaffold(
+      backgroundColor: isDark ? AppTheme.deepCharcoal : AppTheme.backgroundColor,
+      body: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(
+            isDark ? AppTheme.electricBlue : AppTheme.primaryColor,
+          ),
+        ),
+      ),
     );
   }
 }

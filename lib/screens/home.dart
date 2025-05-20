@@ -128,7 +128,7 @@ class HomeScreen extends StatelessWidget {
         _buildFeatureTile(context, Icons.announcement, 'Announcements', '/announcements'),
         _buildFeatureTile(context, Icons.campaign, 'Ads', '/gov_advertisement'),
         _buildFeatureTile(context, Icons.poll, 'Polls', '/polls'),
-        _buildFeatureTile(context, Icons.report, 'Reports', '/gov_reports'),
+        _buildFeatureTile(context, Icons.report, 'Reports', '/govreports'),
         _buildFeatureTile(context, Icons.analytics, 'Analytics', '/analytics'),
         _buildFeatureTile(context, Icons.chat, 'Messages', '/gov_chats'),
       ];

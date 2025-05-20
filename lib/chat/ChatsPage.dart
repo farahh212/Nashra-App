@@ -569,158 +569,166 @@ class ChatsPage extends StatelessWidget {
     return counts;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF1976D2), // dark navy background
-      body: Column(
-        children: [
-          // AppBar-like section
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
-                      'Messaging',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                   
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Search bar
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: const Color(0xFFF0F1F5),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
+@override
+Widget build(BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+  return Scaffold(
+    backgroundColor: isDarkMode ? const Color(0xFF121212) : const Color(0xFF1976D2),
+    body: Column(
+      children: [
+        // AppBar-like section
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 50, 20, 12),
+          decoration: BoxDecoration(
+            color: isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Messaging',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          // Chat list
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              child: StreamBuilder<List<Chat>>(
-                stream: getChats(),
-                builder: (context, chatSnapshot) {
-                  if (chatSnapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (!chatSnapshot.hasData || chatSnapshot.data!.isEmpty) {
-                    return const Center(child: Text('No chats found.'));
-                  }
-
-                  final chats = chatSnapshot.data!;
-
-                  return FutureBuilder<Map<String, int>>(
-                    future: getUnreadCountsForChats(chats.map((c) => c.id).toList()),
-                    builder: (context, unreadSnapshot) {
-                      final unreadCounts = unreadSnapshot.data ?? {};
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 90),
-                        itemCount: chats.length,
-                        itemBuilder: (context, index) {
-                          final chat = chats[index];
-                          final unreadCount = unreadCounts[chat.id] ?? 0;
-
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MessagePage(
-                                    chatId: chat.id,
-                                    chatName: chat.name,
-                                    senderemail: 'government@nashra.com',
-                                  ),
-                                ),
-                              );
-                            },
-                           leading: const CircleAvatar(
-                              backgroundColor: Color(0xFF1976D2),
-                              child: Icon(Icons.person, color: Colors.white),
-                            ),
-                            title: Text(
-                              chat.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              "Message preview goes here...",
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 13,
-                              ),
-                            ),
-                            trailing: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "8:15 PM",
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.black45),
-                                ),
-                                if (unreadCount > 0)
-                                  const SizedBox(height: 6),
-                                if (unreadCount > 0)
-                                  Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF0A1732),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      '$unreadCount',
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 11),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
+                ],
               ),
+              const SizedBox(height: 12),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  hintStyle: TextStyle(
+                    color: isDarkMode ? Colors.white54 : null,
+                  ),
+                  prefixIcon: Icon(Icons.search, color: isDarkMode ? Colors.white70 : null),
+                  filled: true,
+                  fillColor: isDarkMode ? const Color(0xFF2C2C2C) : const Color(0xFFF0F1F5),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Chat list
+        Expanded(
+          child: Container(
+            color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+            child: StreamBuilder<List<Chat>>(
+              stream: getChats(),
+              builder: (context, chatSnapshot) {
+                if (chatSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!chatSnapshot.hasData || chatSnapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No chats found.',
+                      style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black),
+                    ),
+                  );
+                }
+
+                final chats = chatSnapshot.data!;
+
+                return FutureBuilder<Map<String, int>>(
+                  future: getUnreadCountsForChats(chats.map((c) => c.id).toList()),
+                  builder: (context, unreadSnapshot) {
+                    final unreadCounts = unreadSnapshot.data ?? {};
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 90),
+                      itemCount: chats.length,
+                      itemBuilder: (context, index) {
+                        final chat = chats[index];
+                        final unreadCount = unreadCounts[chat.id] ?? 0;
+
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MessagePage(
+                                  chatId: chat.id,
+                                  chatName: chat.name,
+                                  senderemail: 'government@nashra.com',
+                                ),
+                              ),
+                            );
+                          },
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFF1976D2),
+                            child: Icon(Icons.person, color: Colors.white),
+                          ),
+                          title: Text(
+                            chat.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "Message preview goes here...",
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white70 : Colors.black54,
+                              fontSize: 13,
+                            ),
+                          ),
+                          trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "8:15 PM",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDarkMode ? Colors.white38 : Colors.black45,
+                                ),
+                              ),
+                              if (unreadCount > 0) ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: isDarkMode
+                                        ? const Color(0xFF64B5F6)
+                                        : const Color(0xFF0A1732),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '$unreadCount',
+                                    style: const TextStyle(color: Colors.white, fontSize: 11),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
             ),
           ),
-        ],
-      ),
-
-      // Bottom Navigation
-    
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }

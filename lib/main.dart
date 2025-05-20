@@ -92,7 +92,7 @@ Future<void> main() async {
               '/gov_chats': (context) => ChatsPage(),
               '/emergency': (context) => EmergencyNumbersScreen(),
               '/analytics': (context) => AnalyticsScreen(),
-              '/report_gov': (context)=> ViewReportsPage(),
+              '/govreports': (context)=> ViewReportsPage(),
             },
           );
         },

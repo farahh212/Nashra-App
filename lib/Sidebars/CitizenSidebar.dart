@@ -33,7 +33,7 @@ class CitizenSidebar extends StatelessWidget {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const CitizenMessageWrapper()));
                   }),
                   _DrawerItem(icon: Icons.report_problem, title: "Report a Problem", onTap: () {
-                    // Your logic
+                    Navigator.push(context, MaterialPageRoute(builder: (_) =>  AllReports()));
                   }),
                   _DrawerItem(icon: Icons.local_phone, title: "Emergency Numbers", onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const EmergencyNumbersScreen()));
