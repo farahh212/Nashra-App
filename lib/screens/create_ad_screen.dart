@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nashra_project2/models/advertisement.dart';
 import 'package:nashra_project2/providers/advertisementProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
+import 'package:nashra_project2/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 
 class CreateAdScreen extends StatefulWidget {
@@ -96,7 +97,7 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
                 child: Container(
                   height: 160,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
+                    border: Border.all(color: Color(0xFF1976D2)),
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.grey[100],
                   ),
@@ -123,7 +124,7 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade800,
+                  backgroundColor:  Color(0xFF1976D2),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 14),
                   textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -137,6 +138,7 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
           ),
         ),
       ),
+       bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
 }
