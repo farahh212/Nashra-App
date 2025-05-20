@@ -2,10 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
 import '../providers/languageProvider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../providers/authProvider.dart';
 
-class CustomBottomNavigationBar extends StatelessWidget {
+class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({Key? key}) : super(key: key);
 
+  @override
+  State<CustomBottomNavigationBar> createState() => _CustomBottomNavigationBarState();
+}
+
+class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
+  String? userEmail;
+
+    @override
+  void initState() {
+    super.initState();
+    _loadEmail();
+  }
+
+  void _loadEmail() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final email = await getEmailByUid(authProvider.userId);
+    setState(() {
+      userEmail = email;
+    });
+  }
+  Future<String> getEmailByUid(String uid) async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (doc.exists && doc.data()?['email'] != null) {
+      return doc.data()?['email'];
+    }
+    return 'government@nashra.com'; // default fallback
+  }
+
+  Future<int> getUnreadNotificationCount() async {
+  if (userEmail == null) return 0;
+
+  final snapshot = await FirebaseFirestore.instance
+      .collection('notifications')
+      .where('userEmail', isEqualTo: userEmail)
+      .where('isRead', isEqualTo: false)
+      .get();
+
+  return snapshot.docs.length;
+}
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
@@ -34,12 +75,67 @@ class CustomBottomNavigationBar extends StatelessWidget {
               Navigator.pushNamed(context, '/home');
             },
           ),
-          IconButton(
-            icon: Icon(Icons.notifications_outlined, color: primaryColor, size: 28),
-            onPressed: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.notifications_outlined, color: primaryColor, size: 28),
+          //   onPressed: () {
+          //     Navigator.pushNamed(context, '/notifications');
+          //   },
+          // ),
+          userEmail == null
+    ? IconButton(
+        icon: const Icon(Icons.notifications_outlined, size: 28),
+        color: primaryColor,
+        onPressed: () {
+          Navigator.pushNamed(context, '/notifications');
+        },
+      )
+    : StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('notifications')
+            .where('userEmail', isEqualTo: userEmail)
+            .where('isRead', isEqualTo: false)
+            .snapshots(),
+        builder: (context, snapshot) {
+          final unreadCount = snapshot.data?.docs.length ?? 0;
+
+          return Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined, size: 28),
+                color: primaryColor,
+                onPressed: () {
+                  Navigator.pushNamed(context, '/notifications');
+                },
+              ),
+              if (unreadCount > 0)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+
           PopupMenuButton<String>(
             icon: Icon(Icons.language, color: primaryColor, size: 28),
             onSelected: (String langCode) {
