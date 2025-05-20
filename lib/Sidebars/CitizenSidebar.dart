@@ -10,19 +10,35 @@ import 'package:translator/translator.dart';
 import '../providers/authProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CitizenSidebar extends StatelessWidget {
+class CitizenSidebar extends StatefulWidget {
   const CitizenSidebar({super.key});
 
+  @override
+  State<CitizenSidebar> createState() => _CitizenSidebarState();
+}
+
+class _CitizenSidebarState extends State<CitizenSidebar> {
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
+  String _navigationText = 'Navigation';
+  String _createAdvertisementText = 'Create Advertisement';
+  String _contactGovernmentText = 'Contact Government';
+  String _reportProblemText = 'Report a Problem';
+  String _emergencyNumbersText = 'Emergency Numbers';
+  String _checkAnnouncementsText = 'Check Announcements';
+  String _pollsText = 'Polls';
+  String _settingsText = 'Settings';
+  String _logoutText = 'Logout';
+  String _citizenPortalText = 'Citizen Portal';
+
   Future<String> _translateText(String text, String targetLang) async {
-    final translator = GoogleTranslator();
-    final translations = <String, String>{};
     final key = '${text}_$targetLang';
-    if (translations.containsKey(key)) {
-      return translations[key]!;
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
     }
     try {
-      final translation = await translator.translate(text, to: targetLang);
-      translations[key] = translation.text;
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
       return translation.text;
     } catch (e) {
       print('Translation error: $e');
@@ -30,21 +46,30 @@ class CitizenSidebar extends StatelessWidget {
     }
   }
 
-  // Helper widget to build a translated drawer item title
-  Widget _translatedDrawerItemTitle(BuildContext context, String text) {
+  @override
+  void initState() {
+    super.initState();
+    _loadTranslations();
+  }
+
+  Future<void> _loadTranslations() async {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final currentLang = languageProvider.currentLanguageCode;
-
-    return FutureBuilder<String>(
-      future: _translateText(text, currentLang),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-          return Text(snapshot.data!);
-        } else {
-          return Text(text);
-        }
-      },
-    );
+    
+    _navigationText = await _translateText('Navigation', currentLang);
+    _createAdvertisementText = await _translateText('Create Advertisement', currentLang);
+    _contactGovernmentText = await _translateText('Contact Government', currentLang);
+    _reportProblemText = await _translateText('Report a Problem', currentLang);
+    _emergencyNumbersText = await _translateText('Emergency Numbers', currentLang);
+    _checkAnnouncementsText = await _translateText('Check Announcements', currentLang);
+    _pollsText = await _translateText('Polls', currentLang);
+    _settingsText = await _translateText('Settings', currentLang);
+    _logoutText = await _translateText('Logout', currentLang);
+    _citizenPortalText = await _translateText('Citizen Portal', currentLang);
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -59,21 +84,21 @@ class CitizenSidebar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
           child: ListView(
             children: [
-              _UserProfileCard(),
+              _UserProfileCard(citizenPortalText: _citizenPortalText),
               const SizedBox(height: 20),
               _DrawerSection(
-                title: "Navigation",
+                title: _navigationText,
                 items: [
                   _DrawerItem(
                     icon: Icons.post_add,
-                    titleWidget: _translatedDrawerItemTitle(context, "Create Advertisement"),
+                    title: _createAdvertisementText,
                     onTap: () {
                       Navigator.pushNamed(context, '/advertisement');
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.chat,
-                    titleWidget: _translatedDrawerItemTitle(context, "Contact Government"),
+                    title: _contactGovernmentText,
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const CitizenMessageWrapper()));
@@ -81,14 +106,14 @@ class CitizenSidebar extends StatelessWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.report_problem,
-                    titleWidget: _translatedDrawerItemTitle(context, "Report a Problem"),
+                    title: _reportProblemText,
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => AllReports()));
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.local_phone,
-                    titleWidget: _translatedDrawerItemTitle(context, "Emergency Numbers"),
+                    title: _emergencyNumbersText,
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const EmergencyNumbersScreen()));
@@ -96,14 +121,14 @@ class CitizenSidebar extends StatelessWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.announcement,
-                    titleWidget: _translatedDrawerItemTitle(context, "Check Announcements"),
+                    title: _checkAnnouncementsText,
                     onTap: () {
                       Navigator.pushNamed(context, '/announcements');
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.poll,
-                    titleWidget: _translatedDrawerItemTitle(context, "Polls"),
+                    title: _pollsText,
                     onTap: () {
                       Navigator.pushNamed(context, '/polls');
                     },
@@ -112,11 +137,11 @@ class CitizenSidebar extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               _DrawerSection(
-                title: "Settings",
+                title: _settingsText,
                 items: [
                   _DrawerItem(
                     icon: Icons.logout,
-                    titleWidget: _translatedDrawerItemTitle(context, "Logout"),
+                    title: _logoutText,
                     onTap: () async {
                       await Provider.of<my_auth.AuthProvider>(context, listen: false).logout();
                       Navigator.pushReplacementNamed(context, '/login');
@@ -133,6 +158,10 @@ class CitizenSidebar extends StatelessWidget {
 }
 
 class _UserProfileCard extends StatefulWidget {
+  final String citizenPortalText;
+
+  const _UserProfileCard({required this.citizenPortalText});
+
   @override
   _UserProfileCardState createState() => _UserProfileCardState();
 }
@@ -194,7 +223,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                     ),
                   ),
                   Text(
-                    "Citizen Portal",
+                    widget.citizenPortalText,
                     style: TextStyle(
                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
@@ -202,14 +231,12 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                 ],
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 }
-
 
 class _DrawerSection extends StatelessWidget {
   final String title;
@@ -250,12 +277,12 @@ class _DrawerSection extends StatelessWidget {
 
 class _DrawerItem extends StatelessWidget {
   final IconData icon;
-  final Widget titleWidget; // Changed from String title to Widget for flexibility
+  final String title;
   final VoidCallback onTap;
 
   const _DrawerItem({
     required this.icon,
-    required this.titleWidget,
+    required this.title,
     required this.onTap,
   });
 
@@ -270,12 +297,12 @@ class _DrawerItem extends StatelessWidget {
         icon,
         color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
       ),
-      title: DefaultTextStyle(
+      title: Text(
+        title,
         style: TextStyle(
           fontSize: 16,
           color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
         ),
-        child: titleWidget,
       ),
       onTap: () {
         Navigator.pop(context);
