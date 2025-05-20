@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:nashra_project2/models/announcement.dart';
 import 'package:nashra_project2/providers/announcementsProvider.dart';
@@ -5,6 +7,8 @@ import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class Editbuttomsheetannouncement extends StatefulWidget {
   final Announcement announcement;
@@ -18,7 +22,10 @@ class Editbuttomsheetannouncement extends StatefulWidget {
 class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncement> {
   late TextEditingController titleController;
   late TextEditingController descriptionController;
-  late TextEditingController fileUrlController;
+  // late TextEditingController fileUrlController;
+     final fileUrlController = TextEditingController();
+   List<String>? _pickedFilePaths;
+  
 
   File? _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
@@ -28,8 +35,64 @@ class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncemen
     super.initState();
     titleController = TextEditingController(text: widget.announcement.title);
     descriptionController = TextEditingController(text: widget.announcement.description);
-    fileUrlController = TextEditingController(text: widget.announcement.fileUrl ?? '');
+    // fileUrlController = TextEditingController(text: widget.announcement.fileUrl ?? '');
   }
+  
+   Future<void> _pickFiles() async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles(
+    allowMultiple: true,
+    type: FileType.any,
+  );
+
+  if (result != null) {
+    setState(() {
+      _pickedFilePaths = result.paths.whereType<String>().toList();
+    });
+  }
+}
+
+Future<void> _uploadPickedFiles() async {
+  if (_pickedFilePaths == null || _pickedFilePaths!.isEmpty) return;
+
+  List<String> uploadedUrls = [];
+
+  for (String path in _pickedFilePaths!) {
+    File file = File(path);
+    String fileName = path.split('/').last;
+
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('announcements')
+        .child('${DateTime.now().millisecondsSinceEpoch}_$fileName');
+
+    // Upload the file
+    UploadTask uploadTask = ref.putFile(file);
+    TaskSnapshot snapshot = await uploadTask;
+
+    // Get the download URL
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+
+    uploadedUrls.add(downloadUrl);
+  }
+
+  // Now set the URLs for use in your announcement
+  setState(() {
+    _pickedFilePaths = uploadedUrls;
+    
+  });
+}
+
+
+void openFile(String url) async {
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Could not open file')),
+    );
+  }
+}
 
   Future<void> _pickImage() async {
     final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
@@ -43,6 +106,15 @@ class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncemen
  Future<void> _editAnnouncement() async {
   final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
   final auth = Provider.of<AuthProvider>(context, listen: false);
+    await _uploadPickedFiles();
+   
+
+    String? combinedFilePaths;
+    if (_pickedFilePaths != null && _pickedFilePaths!.isNotEmpty) {
+      combinedFilePaths = _pickedFilePaths!.join(','); // Join all URLs with commas
+    } else if (fileUrlController.text.trim().isNotEmpty) {
+      combinedFilePaths = fileUrlController.text.trim();
+    }
 
   try {
     await announcementsProvider.editAnnouncement(
@@ -52,7 +124,7 @@ class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncemen
       newTitle: titleController.text.trim(),
       newDescription: descriptionController.text.trim(),
       newImageUrl: _imageFile != null ? _imageFile!.path : widget.announcement.imageUrl,
-      newFileUrl: fileUrlController.text.trim().isEmpty ? null : fileUrlController.text.trim(),
+      newFileUrl: combinedFilePaths,
     );
 
     Navigator.pop(context); // Close the bottom sheet
@@ -170,23 +242,41 @@ class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncemen
                 color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               ),
             ),
-            child: TextField(
-              controller: fileUrlController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Paste file URL (e.g. Google Drive)',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
-            ),
+            child:        GestureDetector(
+  onTap: _pickFiles,
+  child: Container(
+    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.green),
+      borderRadius: BorderRadius.circular(5),
+      color: Colors.grey[200],
+    ),
+    child: _pickedFilePaths == null || _pickedFilePaths!.isEmpty
+        ? Row(
+            children: [
+              Icon(Icons.attach_file, color: Colors.green),
+              SizedBox(width: 8),
+              Text('Tap to select files'),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _pickedFilePaths!
+                .map((path) => GestureDetector(
+                      onTap: () => openFile(path),
+                      child: Text(
+                        path.split('/').last,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+  ),
+),
           ),
           const SizedBox(height: 20),
           Text(
