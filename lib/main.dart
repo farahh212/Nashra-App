@@ -17,8 +17,6 @@ import 'package:nashra_project2/screens/home.dart';
 import 'package:nashra_project2/screens/reports/gov_reports_screen.dart';
 import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'chat/messagePage_citiz.dart';
 import 'package:nashra_project2/screens/reports/reports_screen.dart';
 import 'login.dart';
@@ -60,18 +58,22 @@ Future<void> main() async {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Nashra Project',
-            theme: Provider.of<ThemeProvider>(context).currentTheme,
+            theme: Provider.of<ThemeProvider>(context).currentTheme.copyWith(
+              appBarTheme: Provider.of<ThemeProvider>(context).currentTheme.appBarTheme.copyWith(
+                centerTitle: true,
+              ),
+              drawerTheme: DrawerThemeData(
+                scrimColor: Colors.black54,
+              ),
+              textTheme: Provider.of<ThemeProvider>(context).currentTheme.textTheme.apply(
+                bodyColor: Provider.of<ThemeProvider>(context).currentTheme.textTheme.bodyLarge?.color,
+                displayColor: Provider.of<ThemeProvider>(context).currentTheme.textTheme.displayLarge?.color,
+              ),
+              iconTheme: IconThemeData(
+                color: Color(0xFF1976D2),
+              ),
+            ),
             locale: languageProvider.currentLocale,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en'), // English
-              Locale('ar'), // Arabic
-            ],
             home: SplashScreen(),
             routes: {
               '/startup': (context) => StartUp(),
@@ -83,15 +85,14 @@ Future<void> main() async {
               '/home': (context) => HomeScreen(),
               '/message': (context) => CitizenMessageWrapper(),
               '/notifications': (context) => NotificationPage(),
-               '/home': (context) => HomeScreen(),
-               '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
-               '/reports': (context) => AllReports(),
-               '/chats': (context) => CitizenMessageWrapper(),
-               '/gov_chats': (context) => ChatsPage(),
-               '/emergency': (context) => EmergencyNumbersScreen(),
-               '/analytics': (context) => AnalyticsScreen(),
-               '/report_gov': (context)=> ViewReportsPage(),
-
+              '/home': (context) => HomeScreen(),
+              '/gov_advertisement': (context) => GovernmentAdvertisementsScreen(),
+              '/reports': (context) => AllReports(),
+              '/chats': (context) => CitizenMessageWrapper(),
+              '/gov_chats': (context) => ChatsPage(),
+              '/emergency': (context) => EmergencyNumbersScreen(),
+              '/analytics': (context) => AnalyticsScreen(),
+              '/report_gov': (context)=> ViewReportsPage(),
             },
           );
         },

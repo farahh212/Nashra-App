@@ -29,7 +29,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(
-            icon: Icon(Icons.home, color:  Color(0xFF1976D2), size: 28),
+            icon: Icon(Icons.home, color: primaryColor, size: 28),
             onPressed: () {
               Navigator.pushNamed(context, '/home');
             },
@@ -40,20 +40,33 @@ class CustomBottomNavigationBar extends StatelessWidget {
               Navigator.pushNamed(context, '/notifications');
             },
           ),
-          IconButton(
+          PopupMenuButton<String>(
             icon: Icon(Icons.language, color: primaryColor, size: 28),
-            onPressed: () {
-              languageProvider.toggleLanguage();
+            onSelected: (String langCode) {
+              languageProvider.setLocale(langCode);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    languageProvider.currentLocale.languageCode == 'en' 
-                        ? 'Language changed to English' 
-                        : 'تم تغيير اللغة إلى العربية',
+                    'Language changed to ${LanguageProvider.supportedLanguages[langCode]}',
                   ),
                   duration: const Duration(seconds: 2),
                 ),
               );
+            },
+            itemBuilder: (BuildContext context) {
+              return languageProvider.availableLanguages.map((entry) {
+                return PopupMenuItem<String>(
+                  value: entry.key,
+                  child: Row(
+                    children: [
+                      if (entry.key == languageProvider.currentLanguageCode)
+                        Icon(Icons.check, color: primaryColor, size: 20),
+                      SizedBox(width: entry.key == languageProvider.currentLanguageCode ? 8 : 28),
+                      Text(entry.value),
+                    ],
+                  ),
+                );
+              }).toList();
             },
           ),
           IconButton(
