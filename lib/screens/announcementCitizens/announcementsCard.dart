@@ -21,10 +21,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
   late Future<void> _announcementsFuture;
   bool isLiked = false;
 
-  bool isImageUrl(String url) {
-    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-    return imageExtensions.any((ext) => url.toLowerCase().endsWith(ext));
-  }
+  
 
   @override
   void initState() {
@@ -100,8 +97,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
 
             const SizedBox(height: 12),
 if (widget.announcement.imageUrl != null &&
-    widget.announcement.imageUrl!.isNotEmpty &&
-    isImageUrl(widget.announcement.imageUrl!))
+    widget.announcement.imageUrl!.isNotEmpty)
   Padding(
     padding: const EdgeInsets.only(top: 8.0, bottom: 12.0),
     child: ClipRRect(
@@ -120,8 +116,7 @@ if (widget.announcement.imageUrl != null &&
 
             // If the file is not an image (e.g., PDF), show a button to open it
             if (widget.announcement.fileUrl != null &&
-                widget.announcement.fileUrl!.isNotEmpty &&
-                !isImageUrl(widget.announcement.fileUrl!))
+                widget.announcement.fileUrl!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
                 child: ElevatedButton.icon(

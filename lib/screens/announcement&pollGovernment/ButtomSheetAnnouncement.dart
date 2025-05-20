@@ -25,8 +25,9 @@ class ButtomsheetannouncementState extends State<Buttomsheetannouncement> {
   String? _imageUrl; // Add this to your state
 
 
-  final ImagePicker _imagePicker = ImagePicker();
+  // final ImagePicker _imagePicker = ImagePicker();
   List<String>? _pickedFilePaths;
+  
 
 // New method to pick files:
 // Future<void> _pickFiles() async {
@@ -100,34 +101,43 @@ void openFile(String url) async {
   }
 }
 
+Future<void> _uploadImage() async {
+  if (_imageFile == null) return;
 
-Future<void> _pickImages() async {
-  final pickedFiles = await _imagePicker.pickMultiImage();
-  if (pickedFiles != null && pickedFiles.isNotEmpty) {
-    List<String> uploadedUrls = [];
+  try {
+    // Create a reference to the location you want to upload to in Firebase Storage
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('announcement_images')
+        .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-    for (var pickedFile in pickedFiles) {
-      File image = File(pickedFile.path);
+    // Upload the file
+    UploadTask uploadTask = ref.putFile(_imageFile!);
+    TaskSnapshot snapshot = await uploadTask;
 
-      // Upload to Firebase Storage
-      String fileName = pickedFile.path.split('/').last;
-      Reference ref = FirebaseStorage.instance
-          .ref()
-          .child('images')
-          .child('${DateTime.now().millisecondsSinceEpoch}_$fileName');
-
-      UploadTask uploadTask = ref.putFile(image);
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-
-      uploadedUrls.add(downloadUrl);
-    }
+    // Get the download URL
+    String downloadUrl = await snapshot.ref.getDownloadURL();
 
     setState(() {
-      // If you want to keep the local File(s), you may need a list of Files as well
-      // But for the frontend image displaying, you mainly need URLs:
-      _imageUrl = uploadedUrls.join(','); // or keep as List<String> if preferred
+      _imageUrl = downloadUrl;
     });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to upload image: ${e.toString()}')),
+    );
+  }
+}
+
+Future<void> _pickImages() async {
+  final picker = ImagePicker();
+  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null) {
+    setState(() {
+      _imageFile = File(pickedFile.path);
+    });
+    // Upload the image immediately after picking
+    await _uploadImage();
   }
 }
 
@@ -140,6 +150,7 @@ Future<void> postAnnouncement() async {
   try {
     // Upload files to Firebase Storage and get download URLs
     await _uploadPickedFiles();
+   
 
     String? combinedFilePaths;
     if (_pickedFilePaths != null && _pickedFilePaths!.isNotEmpty) {
@@ -147,6 +158,8 @@ Future<void> postAnnouncement() async {
     } else if (fileUrlController.text.trim().isNotEmpty) {
       combinedFilePaths = fileUrlController.text.trim();
     }
+
+    
 
     final newAnnouncement = Announcement(
       id: '',
