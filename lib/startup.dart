@@ -21,7 +21,13 @@ class StartUp extends StatelessWidget {
                 shaderCallback: (bounds) => LinearGradient(
                   colors: isDark 
                     ? [Color(0xFF64B5F6), Color(0xFF2196F3), Color(0xFF1976D2)]
-                    : [Color(0xFF1976D2), Color(0xFF2196F3), Color(0xFF64B5F6)],
+                    : [
+  Color(0xFF0D47A1), // Navy Blue (deep)
+  Color(0xFF1976D2), // Strong Blue (mid)
+  Color(0xFF42A5F5), // Sky Blue (soft mid)
+  Color(0xFFBBDEFB), // Light Blue (almost white)
+]
+,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ).createShader(bounds),
@@ -60,13 +66,24 @@ class StartUp extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)),
-                    );
+                  Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(authenticationMode: 1),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Slide in from right
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(position: animation.drive(tween), child: child);
+    },
+  ),
+);
+
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                    backgroundColor: isDark ? Color.fromARGB(255, 25, 141, 236) : Color.fromARGB(255, 41, 43, 139),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -87,10 +104,21 @@ class StartUp extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)),
-                    );
+                   Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(authenticationMode: 0),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Slide in from right
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(position: animation.drive(tween), child: child);
+    },
+  ),
+);
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark ? Color(0xFF2196F3) : Color(0xFF1976D2),

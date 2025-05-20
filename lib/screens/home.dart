@@ -326,18 +326,19 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       drawer: isAdmin ?  GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
+        backgroundColor: theme.primaryColor,
         elevation: 0,
         title: Text(
           'Welcome to Nashra',
-          style: theme.appBarTheme.titleTextStyle,
+          // style: theme.appBarTheme.titleTextStyle,
+          style: const TextStyle(color: Colors.white),
         ),
         iconTheme: theme.appBarTheme.iconTheme,
         actions: [
           IconButton(
             icon: Icon(
               themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: theme.appBarTheme.iconTheme?.color,
+              color: Colors.white,
             ),
             onPressed: () => themeProvider.toggleTheme(),
           ),
@@ -363,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: theme.colorScheme.onPrimary,
                   child: Icon(Icons.person, color: theme.colorScheme.primary),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -399,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
 
           // Feature Cards
           Padding(
@@ -525,7 +526,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
+                        color: theme.textTheme.bodyMedium?.color
                       ),
                     ),
                     const SizedBox(height: 4),
