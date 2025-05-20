@@ -58,16 +58,18 @@ class AppTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: Colors.white,
     ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      iconTheme: IconThemeData(color: primaryColor),
-      titleTextStyle: TextStyle(
-        color: primaryColor,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
+appBarTheme: const AppBarTheme(
+  backgroundColor: AppTheme.primaryColor, 
+  elevation: 0,
+  iconTheme: IconThemeData(color: Colors.white), // ✅ White icon
+  titleTextStyle: TextStyle(
+    color: Colors.white, // ✅ White title text to match
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
@@ -96,7 +98,7 @@ class AppTheme {
       bodyMedium: TextStyle(color: Colors.black87),
     ),
     iconTheme: const IconThemeData(
-      color: primaryColor,
+      color: Color.fromARGB(255, 248, 251, 253),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
@@ -127,16 +129,17 @@ class AppTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: const Color(0xFF1E1E1E),
     ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1E1E1E),
-      elevation: 0,
-      iconTheme: IconThemeData(color: accentColor),
-      titleTextStyle: TextStyle(
-        color: accentColor,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
+appBarTheme: const AppBarTheme(
+  backgroundColor: AppTheme.appBarDark, // already dark
+  elevation: 0,
+  iconTheme: IconThemeData(color: Colors.white), // ✅ force white icon in dark mode
+  titleTextStyle: TextStyle(
+    color: Colors.white,
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: accentColor,
@@ -165,7 +168,7 @@ class AppTheme {
       bodyMedium: TextStyle(color: Colors.white),
     ),
     iconTheme: const IconThemeData(
-      color: accentColor,
+      color: Color.fromARGB(255, 251, 253, 255),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF1E1E1E),

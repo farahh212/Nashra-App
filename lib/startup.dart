@@ -60,10 +60,21 @@ class StartUp extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)),
-                    );
+                  Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(authenticationMode: 1),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Slide in from right
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(position: animation.drive(tween), child: child);
+    },
+  ),
+);
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
@@ -87,10 +98,21 @@ class StartUp extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)),
-                    );
+                   Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(authenticationMode: 0),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Slide in from right
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(position: animation.drive(tween), child: child);
+    },
+  ),
+);
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark ? Color(0xFF2196F3) : Color(0xFF1976D2),
