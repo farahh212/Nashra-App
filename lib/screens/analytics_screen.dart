@@ -28,7 +28,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const GovSidebar(),
+      drawer: GovSidebar(),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

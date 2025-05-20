@@ -260,6 +260,45 @@ class _HomeScreenState extends State<HomeScreen> {
     print('User email: $userEmail');
   }
 
+  void _showEditDialog() {
+  final controller = TextEditingController(text: userEmail ?? '');
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Edit Name"),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: "Name"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty) {
+                final uid = Provider.of<AuthProvider>(context, listen: false).userId;
+                await FirebaseFirestore.instance.collection('users').doc(uid).update({
+                  'name': newName,
+                });
+                setState(() {
+                  userEmail = newName;
+                });
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
    Future<String> getNameByUid(String uid) async {
     final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (doc.exists && doc.data()?['name'] != null) {
@@ -285,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      drawer: isAdmin ? const GovSidebar() : const CitizenSidebar(),
+      drawer: isAdmin ?  GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
@@ -325,15 +364,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Icon(Icons.person, color: theme.colorScheme.primary),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                 userEmail != null ? 'Hi, $userEmail' : 'Hi, User',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      isAdmin ? 'Hi, Admin' : 'Hi, ${userEmail ?? "User"}',
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-  
-),
+                  if (!isAdmin)
+                    IconButton(
+                      icon: Icon(Icons.edit, color: theme.colorScheme.onPrimary),
+                      onPressed: () => _showEditDialog(),
+                    ),
+                ],
+              ),
+
                 const SizedBox(height: 4),
                 Text(
                   isAdmin

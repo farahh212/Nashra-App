@@ -71,7 +71,7 @@ class _PollResultsScreenState extends State<PollResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: _isAdmin ? const GovSidebar() : const CitizenSidebar(),
+      drawer: _isAdmin ?  GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
