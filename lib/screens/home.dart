@@ -4,35 +4,44 @@ import '../Sidebars/CitizenSidebar.dart';
 import '../Sidebars/govSidebar.dart';
 import '../utils/theme.dart';
 import '../providers/authProvider.dart' as my_auth;
-
+import '../widgets/bottom_navigation_bar.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<my_auth.AuthProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final isAdmin = authProvider.isAdmin;
-
-    final green =   Color(0xFF002B5B);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 254, 254, 254),
+      backgroundColor: theme.scaffoldBackgroundColor,
       drawer: isAdmin ? const GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: green,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Welcome to Nashra',
-          style: TextStyle(color: Colors.white),
+          style: theme.appBarTheme.titleTextStyle,
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: theme.appBarTheme.iconTheme,
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            onPressed: () => themeProvider.toggleTheme(),
+          ),
+        ],
       ),
       body: ListView(
         children: [
           // Header
           Container(
             decoration: BoxDecoration(
-              color: green,
+              color: theme.colorScheme.primary,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -42,22 +51,28 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 28,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, color: Color(0xFF1B5E20)),
+                  backgroundColor: theme.colorScheme.onPrimary,
+                  child: Icon(Icons.person, color: theme.colorScheme.primary),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   isAdmin ? 'Hi, Admin' : 'Hi, User',
-                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   isAdmin
                       ? 'Welcome to Nashra Government Services'
                       : 'Welcome to Nashra E-Office Services',
-                  style: const TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimary.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -65,19 +80,19 @@ class HomeScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Feature Cards (Wrap version to prevent overflow)
+          // Feature Cards
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardTheme.color,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 6,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -97,23 +112,14 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               'Highlights',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: green),
+              style: theme.textTheme.titleLarge,
             ),
           ),
           const SizedBox(height: 12),
           ..._buildHighlights(context, isAdmin),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: green,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.language), label: 'Language'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'More'),
-        ],
-      ),
+      bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
 
@@ -144,11 +150,12 @@ class HomeScreen extends StatelessWidget {
       : [
           _buildHighlightCard(title: 'New Announcement', subtitle: 'Check out the latest updates from the city council.', onTap: () => Navigator.pushNamed(context, '/announcements')),
           _buildHighlightCard(title: 'Ongoing Poll', subtitle: 'Your feedback matters! Cast your vote now.', onTap: () => Navigator.pushNamed(context, '/polls')),
-          _buildHighlightCard(title: 'Featured Ad', subtitle: 'Don’t miss our latest government announcements.', onTap: () => Navigator.pushNamed(context, '/advertisement')),
+          _buildHighlightCard(title: 'Featured Ad', subtitle: "Don't miss our latest government announcements.", onTap: () => Navigator.pushNamed(context, '/advertisement')),
           _buildHighlightCard(title: 'Emergency Info', subtitle: 'Access contacts and services for urgent help.', onTap: () => Navigator.pushNamed(context, '/emergency')),
         ];
 
   Widget _buildFeatureTile(BuildContext context, IconData icon, String label, String route) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, route),
       child: SizedBox(
@@ -158,14 +165,17 @@ class HomeScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: const Color(0xFFE8F5E9),
-              child: Icon(icon, size: 25, color: const Color(0xFF1B5E20)),
+              backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+              child: Icon(icon, size: 25, color: theme.colorScheme.primary),
             ),
             const SizedBox(height: 8),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13),
+              style: TextStyle(
+                fontSize: 13,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
             ),
           ],
         ),
@@ -174,26 +184,43 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildHighlightCard({required String title, required String subtitle, VoidCallback? onTap}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B5E20))),
-                const SizedBox(height: 4),
-                Text(subtitle),
-              ],
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
+          child: GestureDetector(
+            onTap: onTap,
+            child: Card(
+              color: theme.cardTheme.color,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: theme.textTheme.bodyMedium?.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

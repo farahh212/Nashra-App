@@ -127,7 +127,6 @@ Future<void> _uploadImage() async {
     );
   }
 }
-
 Future<void> _pickImages() async {
   final picker = ImagePicker();
   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -189,113 +188,218 @@ Future<void> postAnnouncement() async {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFFEFFF3),
-        borderRadius: BorderRadius.circular(12.0),
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black26 : Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: ListView(
         shrinkWrap: true,
         children: [
-          const Text(
-            'Add Announcement',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: titleController,
-            decoration: InputDecoration(
-              hintText: 'Announcement title',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            ),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: descriptionController,
-            decoration: InputDecoration(
-              hintText: 'Announcement description',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            ),
-          ),
-SizedBox(height: 10),
-GestureDetector(
-  onTap: _pickFiles,
-  child: Container(
-    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-    decoration: BoxDecoration(
-      border: Border.all(color: Colors.green),
-      borderRadius: BorderRadius.circular(5),
-      color: Colors.grey[200],
-    ),
-    child: _pickedFilePaths == null || _pickedFilePaths!.isEmpty
-        ? Row(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.attach_file, color: Colors.green),
-              SizedBox(width: 8),
-              Text('Tap to select files'),
+              Text(
+                'Add Announcement',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: primaryColor),
+                onPressed: () => Navigator.pop(context),
+              ),
             ],
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _pickedFilePaths!
-                .map((path) => GestureDetector(
-                      onTap: () => openFile(path),
-                      child: Text(
-                        path.split('/').last,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ))
-                .toList(),
           ),
-  ),
-),
-
-          SizedBox(height: 10),
-          Text('Add Image:'),
+          const SizedBox(height: 20),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: TextField(
+              controller: titleController,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Announcement title',
+                hintStyle: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: TextField(
+              controller: descriptionController,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: 'Announcement description',
+                hintStyle: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: _pickFiles,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[850] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                ),
+              ),
+              child: _pickedFilePaths == null || _pickedFilePaths!.isEmpty
+                  ? Row(
+                      children: [
+                        Icon(Icons.attach_file, color: primaryColor),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Tap to select files',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _pickedFilePaths!
+                          .map((path) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: GestureDetector(
+                                  onTap: () => openFile(path),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.insert_drive_file, color: primaryColor),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          path.split('/').last,
+                                          style: TextStyle(
+                                            color: primaryColor,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Add Image:',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
           GestureDetector(
             onTap: _pickImages,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               height: 120,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.green),
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey[200],
+                color: isDark ? Colors.grey[850] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                ),
               ),
               child: Center(
                 child: _imageFile == null
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.image, color: Colors.grey),
-                          Text("Select image"),
+                          Icon(Icons.image, color: primaryColor, size: 32),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Select image",
+                            style: TextStyle(
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                          ),
                         ],
                       )
-                    : Image.file(_imageFile!, fit: BoxFit.cover),
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(_imageFile!, fit: BoxFit.cover),
+                      ),
               ),
             ),
           ),
-          SizedBox(height: 10),
-          TextButton(
+          const SizedBox(height: 24),
+          ElevatedButton(
             onPressed: postAnnouncement,
-            child: Text(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: isDark ? 0 : 2,
+            ),
+            child: const Text(
               'Post',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.green,
-            ),
-          )
+          ),
         ],
       ),
     );

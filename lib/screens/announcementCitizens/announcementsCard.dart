@@ -36,13 +36,15 @@ class _AnnouncementcardState extends State<Announcementcard> {
     final announcementsProvider = Provider.of<Announcementsprovider>(context);
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin = auth.isAdmin;
-    final darkGreen = Colors.green.shade800;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
 
     return Card(
       margin: const EdgeInsets.all(8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      color: Colors.white,
-      elevation: 3,
+      color: isDark ? Colors.grey[850] : Colors.white,
+      elevation: isDark ? 2 : 3,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -55,7 +57,11 @@ class _AnnouncementcardState extends State<Announcementcard> {
                 Expanded(
                   child: Text(
                     widget.announcement.title,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
                   ),
                 ),
                 if (isAdmin) ...[
@@ -67,7 +73,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                         auth.userId,
                       );
                     },
-                    icon: Icon(Icons.delete, color: Colors.grey),
+                    icon: Icon(Icons.delete, color: primaryColor),
                     tooltip: 'Delete Announcement',
                   ),
                   IconButton(
@@ -81,7 +87,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                         ),
                       );
                     },
-                    icon: Icon(Icons.edit, color: Colors.grey),
+                    icon: Icon(Icons.edit, color: primaryColor),
                     tooltip: 'Edit Announcement',
                   ),
                 ],
@@ -92,27 +98,75 @@ class _AnnouncementcardState extends State<Announcementcard> {
 
             Text(
               widget.announcement.createdAt.toString(),
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
             ),
 
             const SizedBox(height: 12),
-if (widget.announcement.imageUrl != null &&
-    widget.announcement.imageUrl!.isNotEmpty)
-  Padding(
-    padding: const EdgeInsets.only(top: 8.0, bottom: 12.0),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        widget.announcement.imageUrl!,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: 200,
-        errorBuilder: (context, error, stackTrace) =>
-            const Text("Failed to load image"),
-      ),
-    ),
-  ),
+// if (widget.announcement.imageUrl != null &&
+//     widget.announcement.imageUrl!.isNotEmpty)
+//   Padding(
+//     padding: const EdgeInsets.only(top: 8.0, bottom: 12.0),
+//     child: ClipRRect(
+//       borderRadius: BorderRadius.circular(12),
+//       child: Image.network(
+//         widget.announcement.imageUrl!,
+//         fit: BoxFit.cover,
+//         width: double.infinity,
+//         height: 200,
+//         errorBuilder: (context, error, stackTrace) =>
+//             const Text("Failed to load image"),
+//       ),
+//     ),
+//   ),
 
+            if (widget.announcement.imageUrl != null &&
+                widget.announcement.imageUrl!.isNotEmpty)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                    width: 1,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    widget.announcement.imageUrl!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 200,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[800] : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.broken_image,
+                            size: 48,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Failed to load image",
+                            style: TextStyle(
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
             // If the file is not an image (e.g., PDF), show a button to open it
             if (widget.announcement.fileUrl != null &&
@@ -125,7 +179,12 @@ if (widget.announcement.imageUrl != null &&
                       context,
                       MaterialPageRoute(
                         builder: (context) => Scaffold(
-                          appBar: AppBar(title: Text('View Attachment')),
+                          appBar: AppBar(
+                            title: Text('View Attachment'),
+                            backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+                            iconTheme: IconThemeData(color: primaryColor),
+                            elevation: 0,
+                          ),
                           body: SfPdfViewer.network(widget.announcement.fileUrl!),
                         ),
                       ),
@@ -134,27 +193,42 @@ if (widget.announcement.imageUrl != null &&
                   icon: Icon(Icons.attach_file, color: Colors.white),
                   label: const Text("View Attached File"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: darkGreen,
+                    backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ),
 
-            Text(
-              widget.announcement.description,
-              style: const TextStyle(fontSize: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                widget.announcement.description,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? Colors.grey[300] : Colors.black87,
+                  height: 1.5,
+                ),
+              ),
             ),
 
-            const SizedBox(height: 16),
+            Divider(color: isDark ? Colors.grey[700] : Colors.grey[300]),
 
             // Comment and Like row
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: Icon(Icons.mode_comment_rounded, color: darkGreen),
+                  icon: Icon(
+                    Icons.mode_comment_rounded,
+                    color: primaryColor,
+                  ),
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
@@ -175,13 +249,13 @@ if (widget.announcement.imageUrl != null &&
                   '${widget.announcement.commentsNo ?? 0}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: darkGreen,
+                    color: primaryColor,
                     fontSize: 16,
                   ),
                 ),
                 const SizedBox(width: 20),
 
-                if (!isAdmin)
+                if (!isAdmin) ...[
                   IconButton(
                     onPressed: () {
                       setState(() {
@@ -197,20 +271,18 @@ if (widget.announcement.imageUrl != null &&
                     },
                     icon: Icon(
                       Icons.thumb_up_off_alt_rounded,
-                      color: isLiked ? darkGreen : Colors.grey[700],
+                      color: isLiked ? primaryColor : (isDark ? Colors.grey[400] : Colors.grey[700]),
                     ),
                     tooltip: 'Like',
                   ),
-
-                if (!isAdmin)
                   Text(
                     widget.announcement.likes.toString(),
                     style: TextStyle(
                       fontSize: 16,
-                      color: isLiked ? darkGreen : Colors.grey[700],
+                      color: isLiked ? primaryColor : (isDark ? Colors.grey[400] : Colors.grey[700]),
                     ),
                   ),
-                const SizedBox(width: 8),
+                ],
               ],
             ),
           ],

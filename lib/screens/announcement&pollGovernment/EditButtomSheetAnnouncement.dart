@@ -66,82 +66,212 @@ class _EditButtomsheetannouncementState extends State<Editbuttomsheetannouncemen
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFFEFFF3),
-        borderRadius: BorderRadius.circular(12.0),
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black26 : Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: ListView(
         shrinkWrap: true,
         children: [
-          const Text(
-            'Edit Announcement',
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Edit Announcement',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: primaryColor),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: TextField(
+              controller: titleController,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Announcement title',
+                hintStyle: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: TextField(
+              controller: descriptionController,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: 'Announcement description',
+                hintStyle: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: TextField(
+              controller: fileUrlController,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Paste file URL (e.g. Google Drive)',
+                hintStyle: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Edit Image:',
             style: TextStyle(
-              fontSize: 20,
+              color: isDark ? Colors.white : Colors.black87,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
             ),
           ),
-          SizedBox(height: 10),
-          TextField(
-            controller: titleController,
-            decoration: InputDecoration(
-              hintText: 'Announcement title',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            ),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: descriptionController,
-            decoration: InputDecoration(
-              hintText: 'Announcement description',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            ),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: fileUrlController,
-            decoration: InputDecoration(
-              hintText: 'Paste file URL (e.g. Google Drive)',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            ),
-          ),
-          SizedBox(height: 10),
-          Text('Edit Image:'),
+          const SizedBox(height: 8),
           GestureDetector(
             onTap: _pickImage,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               height: 120,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.green),
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey[200],
+                color: isDark ? Colors.grey[850] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                ),
               ),
               child: Center(
                 child: _imageFile == null
                     ? (widget.announcement.imageUrl != null
-                        ? Image.network(widget.announcement.imageUrl!, fit: BoxFit.cover)
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              widget.announcement.imageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.error_outline, color: primaryColor),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Failed to load image',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.image, color: Colors.grey),
-                              Text("Select image"),
+                              Icon(Icons.image, color: primaryColor, size: 32),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Select image",
+                                style: TextStyle(
+                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                ),
+                              ),
                             ],
                           ))
-                    : Image.file(_imageFile!, fit: BoxFit.cover),
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(_imageFile!, fit: BoxFit.cover),
+                      ),
               ),
             ),
           ),
-          SizedBox(height: 10),
-          TextButton(
+          const SizedBox(height: 24),
+          ElevatedButton(
             onPressed: _editAnnouncement,
-            child: Text('Update', style: TextStyle(color: Colors.white)),
-            style: TextButton.styleFrom(backgroundColor: Colors.green),
-          )
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: isDark ? 0 : 2,
+            ),
+            child: const Text(
+              'Update',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );

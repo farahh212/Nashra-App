@@ -1,34 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'login.dart'; 
-import 'signup.dart'; 
+import 'signup.dart';
+import 'utils/theme.dart';
 
 class StartUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Color(0xFFFFFEF5), // Light cream color like in the image
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'NASHRA',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B5E20), // Dark green color
-                  letterSpacing: 2,
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: isDark 
+                    ? [Color(0xFF64B5F6), Color(0xFF2196F3), Color(0xFF1976D2)]
+                    : [Color(0xFF1976D2), Color(0xFF2196F3), Color(0xFF64B5F6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(bounds),
+                child: Text(
+                  'NASHRA',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
               SizedBox(height: 20),
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
-                  colors: [
-                    Color(0xFF00291A), // Dark green
-                    Color(0xFF4F7544), // Green
-                    Color(0xFFAAAAAA), // Light gray
-                  ],
+                  colors: isDark 
+                    ? [Color(0xFF64B5F6), Color(0xFF2196F3)]
+                    : [Color(0xFF1976D2), Color(0xFF2196F3)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ).createShader(bounds),
@@ -37,7 +49,7 @@ class StartUp extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white, // Will be overridden by ShaderMask
+                    color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -50,11 +62,11 @@ class StartUp extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)), // Pass authenticationMode as 1 for sign up
+                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 1)),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey, // Gray button
+                    backgroundColor: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -77,11 +89,11 @@ class StartUp extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)), // Pass authenticationMode as 0 for login
+                      MaterialPageRoute(builder: (context) => LoginPage(authenticationMode: 0)),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1B5E20), // Green color for sign in
+                    backgroundColor: isDark ? Color(0xFF2196F3) : Color(0xFF1976D2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

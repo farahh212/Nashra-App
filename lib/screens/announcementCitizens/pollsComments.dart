@@ -107,124 +107,211 @@ final currentPoll = pollsprovider.polls.firstWhere(
 
   @override
   Widget build(BuildContext context) {
-     final auth = Provider.of<AuthProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin = auth.isAdmin;
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFFEFFF3),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Comments',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: true,
+      body: Container(
+        decoration: BoxDecoration(
+          color: isDark ? Colors.grey[900] : Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          boxShadow: [
+            BoxShadow(
+              color: isDark ? Colors.black26 : Colors.grey.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
             ),
-          ),
-          const SizedBox(height: 10),
-
-          // Comments list
-          Expanded(
-            child: Consumer<Pollsprovider>(
-              builder: (ctx, pollsprovider, _) {
-                final poll =
-                    pollsprovider.polls.firstWhere(
-                  (a) => a.id == widget.poll.id,
-                  orElse: () => widget.poll,
-                );
-
-                final comments = poll.comments;
-
-                if (comments.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No comments yet. Be the first to comment!',
-                      style: TextStyle(color: Colors.grey),
-                    ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Comments',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, color: primaryColor),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Consumer<Pollsprovider>(
+                builder: (ctx, pollsprovider, _) {
+                  final poll = pollsprovider.polls.firstWhere(
+                    (a) => a.id == widget.poll.id,
+                    orElse: () => widget.poll,
                   );
-                }
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: comments.length,
-                  itemBuilder: (ctx, index) {
-                    final comment = comments[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      color: const Color(0xFFFEFFF3),
-                      child: ListTile(
-                        title: Text(comment.name ?? 'Government'),
-                        subtitle: Text(comment.content),
-                        // Optionally add timestamp here
+                  final comments = poll.comments;
+
+                  if (comments.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No comments yet. Be the first to comment!',
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        ),
                       ),
                     );
-                  },
-                );
-              },
-            ),
-          ),
-  SizedBox(height:10),
-        if(!isAdmin)
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isAnonymous = !isAnonymous;
-                  });
-                },
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.blue, width: 2),
-                    color: isAnonymous ? Colors.blue : Colors.transparent,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text("Anonymous"),
-            ],
-          ),
-          SizedBox(height:10),
+                  }
 
-          
-          // Comment input field
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _commentController,
-                  decoration: InputDecoration(
-                    hintText: 'Write a comment...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 16,
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: comments.length,
+                    itemBuilder: (ctx, index) {
+                      final comment = comments[index];
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[850] : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                          ),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            comment.name ?? 'Government',
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            comment.content,
+                            style: TextStyle(
+                              color: isDark ? Colors.grey[300] : Colors.grey[700],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            if (!isAdmin) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isAnonymous = !isAnonymous;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: primaryColor,
+                          width: 2,
+                        ),
+                        color: isAnonymous ? primaryColor : Colors.transparent,
+                      ),
+                      child: isAnonymous
+                          ? Icon(
+                              Icons.check,
+                              size: 16,
+                              color: Colors.white,
+                            )
+                          : null,
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              _isPostingComment
-                  ? const CircularProgressIndicator()
-                  : IconButton(
-                      icon: const Icon(Icons.send,
-                          color: Color.fromARGB(255, 79, 181, 97)),
-                      onPressed: _postComment,
+                  const SizedBox(width: 8),
+                  Text(
+                    "Anonymous",
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
+                  ),
+                ],
+              ),
             ],
-          ),
-          const SizedBox(height: 16),
-        ],
+            Padding(
+              padding: EdgeInsets.only(
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[850] : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _commentController,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Write a comment...',
+                          hintStyle: TextStyle(
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _isPostingComment
+                      ? SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                          ),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: primaryColor,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.send, color: Colors.white),
+                            onPressed: _postComment,
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

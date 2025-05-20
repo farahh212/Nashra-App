@@ -5,12 +5,14 @@ import './announcements.dart';
 import 'package:nashra_project2/models/announcement.dart';
 import './announcementsCard.dart';
 import 'package:nashra_project2/screens/announcement&pollGovernment/ButtomSheetAnnouncement.dart';
-
+import 'package:nashra_project2/widgets/bottom_navigation_bar.dart';
 import 'package:nashra_project2/Sidebars/citizenSidebar.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:provider/provider.dart';
 // import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/announcementsProvider.dart' ;// Replace with the correct path
+import 'package:nashra_project2/providers/languageProvider.dart';
+import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
 
 class Announcements extends StatefulWidget {
   @override
@@ -35,29 +37,45 @@ class _AnnouncementsState extends State<Announcements> {
     final announcements = announcementsProvider.announcements;
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isAdmin = auth.isAdmin;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
 
 
     return Scaffold(
-      backgroundColor: Color(0xFFFEFFF3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('NASHRA', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        backgroundColor: Color(0xFFFEFFF3),
+        title: Text(
+          'NASHRA',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+          ),
+        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        iconTheme: IconThemeData(
+          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+        ),
+        elevation: 0,
         actions: [
           if(isAdmin)
-IconButton(
-  onPressed: () {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // Allows the sheet to take full height
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.50,
-        child: Buttomsheetannouncement(), // Make sure this class/widget exists and is correctly named
-      ),
-    );
-  },
-  icon: Icon(Icons.add, color: Colors.black),
-)
+            IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) => Container(
+                    height: MediaQuery.of(context).size.height * 0.50,
+                    child: Buttomsheetannouncement(),
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.add,
+                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+              ),
+            )
         ],
       ),
       drawer:isAdmin? GovSidebar():CitizenSidebar(), 
@@ -65,37 +83,84 @@ IconButton(
         future: _announcementsFuture,
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                ),
+              ),
+            );
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error loading announcements'));
+            return Center(
+              child: Text(
+                'Error loading announcements',
+                style: TextStyle(
+                  color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                ),
+              ),
+            );
           } else {
             return Column(
               children: [
                 SizedBox(height: 20),
                 Container(
-                   child:  Row(children: [
-  SizedBox(width: 60),
-                    TextButton(onPressed: () {
-                      setState(() {
-                         Navigator.pushNamed(context, '/announcements');
-                selectedButton = 'Announcements';
-              });
-                    },style: TextButton.styleFrom(
-    backgroundColor: selectedButton == 'Announcements' ? Colors.green :const Color.fromARGB(255, 106, 106, 106),
-    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Optional padding
-  ), child: Text('Announcements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 247, 253, 248)))),
-  SizedBox(width: 16),
-TextButton(onPressed: () {
-                      setState(() {
-                        Navigator.pushNamed(context, '/polls');
-                selectedButton = 'Polls';
-              });
-},style: TextButton.styleFrom(
-    backgroundColor: selectedButton == 'Polls' ? Colors.green : const Color.fromARGB(255, 106, 106, 106), // Set background color here
-    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Optional padding
-  ), child: Text('Polls', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 247, 253, 248)))),
-
-                   ],)
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            Navigator.pushNamed(context, '/announcements');
+                            selectedButton = 'Announcements';
+                          });
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: selectedButton == 'Announcements'
+                              ? (isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2))
+                              : Colors.grey[700],
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          'Announcements',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            Navigator.pushNamed(context, '/polls');
+                            selectedButton = 'Polls';
+                          });
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: selectedButton == 'Polls'
+                              ? (isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2))
+                              : Colors.grey[700],
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          'Polls',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 30),
                 Expanded(
@@ -109,16 +174,7 @@ TextButton(onPressed: () {
           }
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFFDEFBD5),
-        selectedItemColor: Colors.green[800],
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
-      ),
+      bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
 }
