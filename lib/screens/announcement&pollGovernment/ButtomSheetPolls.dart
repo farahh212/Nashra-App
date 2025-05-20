@@ -103,7 +103,7 @@ class ButtomsheetpollsState extends State<Buttomsheetpolls> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
+              color: isDark ? const Color.fromARGB(255, 255, 255, 255) : Colors.black,
             ),
           ),
           SizedBox(height: 10),
@@ -193,7 +193,7 @@ class ButtomsheetpollsState extends State<Buttomsheetpolls> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              icon: Icon(Icons.add, color: primaryColor),
+              icon: Icon(Icons.add, color:  Colors.grey[850]),
               label: Text(
                 'Add Option',
                 style: TextStyle(color: primaryColor),
@@ -256,7 +256,7 @@ class ButtomsheetpollsState extends State<Buttomsheetpolls> {
           ElevatedButton(
             onPressed: postPoll,
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
+              backgroundColor: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(

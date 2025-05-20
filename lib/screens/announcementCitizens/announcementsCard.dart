@@ -271,7 +271,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                     },
                     icon: Icon(
                       Icons.thumb_up_off_alt_rounded,
-                      color: isLiked ? primaryColor : (isDark ? Colors.grey[400] : Colors.grey[700]),
+                      color: widget.announcement.likedByUser.contains(auth.userId) ? primaryColor : (isDark ? Colors.grey[400] : Colors.grey[700]),
                     ),
                     tooltip: 'Like',
                   ),
