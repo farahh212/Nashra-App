@@ -309,24 +309,8 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
                               )
                             ],
                           )
-                        : null,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(16),
-                        child: FutureBuilder<String>(
-                          future: _translateText(contact.title, currentLanguage),
-                          builder: (context, snapshot) {
-                            return Text(
-                              snapshot.data ?? contact.title,
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black87,
-                                fontSize: 16,
-                              ),
-                            );
-                          }
-                        ),
-                      ),
-                    ],
+                        : SizedBox.shrink(),
+                    children: [],
                   ),
                 );
               },
