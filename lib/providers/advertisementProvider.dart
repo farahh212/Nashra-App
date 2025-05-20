@@ -95,29 +95,37 @@ class AdvertisementProvider with ChangeNotifier {
   }
 
   // ✅ Update advertisement
-  Future<void> updateAdvertisement(String id, Advertisement updatedAd, String token) async {
-    final url = Uri.parse(
-        'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AdvertisementDB/$id.json?auth=$token');
+Future<void> updateAdvertisement(String id, Advertisement updatedAd, String token) async {
+  final url = Uri.parse(
+      'https://nahra-316ee-default-rtdb.europe-west1.firebasedatabase.app/AdvertisementDB/$id.json?auth=$token');
 
-    try {
-      await http.patch(url,
-          body: json.encode({
-            'title': updatedAd.title,
-            'description': updatedAd.description,
-            'imageUrl': updatedAd.imageUrl,
-            'status': updatedAd.status.toString().split('.').last,
-          }));
+  try {
+    await http.patch(url,
+        body: json.encode({
+          'title': updatedAd.title,
+          'description': updatedAd.description,
+          'imageUrl': updatedAd.imageUrl,
+          'status': 'pending', // ✅ Always reset status to pending
+        }));
 
-      final index = _advertisements.indexWhere((ad) => ad.id == id);
-      if (index >= 0) {
-        _advertisements[index] = updatedAd;
-        notifyListeners();
-      }
-    } catch (error) {
-      print("❌ Failed to update advertisement");
-      throw error;
+    final index = _advertisements.indexWhere((ad) => ad.id == id);
+    if (index >= 0) {
+      _advertisements[index] = Advertisement(
+        id: updatedAd.id,
+        title: updatedAd.title,
+        description: updatedAd.description,
+        imageUrl: updatedAd.imageUrl,
+        status: AdvertisementStatus.pending, // ✅ Ensure local state is also pending
+        ownerId: updatedAd.ownerId,
+      );
+      notifyListeners();
     }
+  } catch (error) {
+    print("❌ Failed to update advertisement");
+    throw error;
   }
+}
+
 
   // ✅ Delete advertisement
   Future<void> deleteAdvertisemnt(String id, String token) async {

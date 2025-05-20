@@ -71,6 +71,36 @@ class _GovernmentAdvertisementsScreenState
     }
     return null;
   }
+  void _confirmAndDelete(String adId) {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: const Text("Delete Advertisement"),
+      content: const Text("Are you sure you want to delete this advertisement?"),
+      actions: [
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () => Navigator.of(ctx).pop(),
+        ),
+        TextButton(
+          child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          onPressed: () async {
+            Navigator.of(ctx).pop();
+            final token = Provider.of<AuthProvider>(context, listen: false).token;
+            await Provider.of<AdvertisementProvider>(context, listen: false)
+                .deleteAdvertisemnt(adId, token);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Advertisement deleted")),
+            );
+            _loadAdvertisements();
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 
   void _updateStatus(String id, AdvertisementStatus newStatus) async {
     final provider =
@@ -223,28 +253,33 @@ class _GovernmentAdvertisementsScreenState
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(fontSize: 14),
                                     ),
-                                    if (status == AdvertisementStatus.pending)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: Row(
-                                          children: [
-                                            TextButton(
-                                              onPressed: () => _updateStatus(
-                                                  ad.id, AdvertisementStatus.approved),
-                                              child: const Text('Approve'),
-                                              style: TextButton.styleFrom(
-                                                  foregroundColor: Color(0xFF1B5E20)),
-                                            ),
-                                            TextButton(
-                                              onPressed: () => _updateStatus(
-                                                  ad.id, AdvertisementStatus.rejected),
-                                              child: const Text('Reject'),
-                                              style: TextButton.styleFrom(
-                                                  foregroundColor: Colors.red),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                   Padding(
+  padding: const EdgeInsets.only(top: 8),
+  child: Row(
+    children: [
+      if (status == AdvertisementStatus.pending) ...[
+        TextButton(
+          onPressed: () => _updateStatus(ad.id, AdvertisementStatus.approved),
+          child: const Text('Approve'),
+          style: TextButton.styleFrom(foregroundColor: Color(0xFF1B5E20)),
+        ),
+        TextButton(
+          onPressed: () => _updateStatus(ad.id, AdvertisementStatus.rejected),
+          child: const Text('Reject'),
+          style: TextButton.styleFrom(foregroundColor: Colors.red),
+        ),
+      ],
+      if (status == AdvertisementStatus.approved) ...[
+        const Spacer(),
+        IconButton(
+          icon: Icon(Icons.delete_forever, color: Colors.red),
+          tooltip: 'Delete',
+          onPressed: () => _confirmAndDelete(ad.id),
+        ),
+      ]
+    ],
+  ),
+              ),
                                   ],
                                 ),
                               ),
