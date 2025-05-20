@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nashra_project2/screens/poll_results_screen.dart';
+import '../screens/poll_results_screen.dart';
 import '../screens/emergency_screen.dart';
 import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
@@ -14,19 +14,18 @@ import '../providers/authProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GovSidebar extends StatelessWidget {
-  GovSidebar({super.key});
-
-  final GoogleTranslator _translator = GoogleTranslator();
-  final Map<String, String> _translations = {};
+  const GovSidebar({super.key});
 
   Future<String> _translateText(String text, String targetLang) async {
+    final translator = GoogleTranslator();
+    final translations = <String, String>{};
     final key = '${text}_$targetLang';
-    if (_translations.containsKey(key)) {
-      return _translations[key]!;
+    if (translations.containsKey(key)) {
+      return translations[key]!;
     }
     try {
-      final translation = await _translator.translate(text, to: targetLang);
-      _translations[key] = translation.text;
+      final translation = await translator.translate(text, to: targetLang);
+      translations[key] = translation.text;
       return translation.text;
     } catch (e) {
       print('Translation error: $e');
@@ -117,7 +116,7 @@ class GovSidebar extends StatelessWidget {
                     titleWidget: _translatedDrawerItemTitle(context, "Poll Results"),
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+                      MaterialPageRoute(builder: (_) => const PollResultsScreen()),
                     ),
                   ),
                 ],

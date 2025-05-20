@@ -10,30 +10,19 @@ import 'package:translator/translator.dart';
 import '../providers/authProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CitizenSidebar extends StatefulWidget {
+class CitizenSidebar extends StatelessWidget {
   const CitizenSidebar({super.key});
 
-  @override
-  State<CitizenSidebar> createState() => _CitizenSidebarState();
-}
-
-class _CitizenSidebarState extends State<CitizenSidebar> {
-      
-
-
-  final _translator = GoogleTranslator();
-  final Map<String, String> _translations = {};
-
-  
-
   Future<String> _translateText(String text, String targetLang) async {
+    final translator = GoogleTranslator();
+    final translations = <String, String>{};
     final key = '${text}_$targetLang';
-    if (_translations.containsKey(key)) {
-      return _translations[key]!;
+    if (translations.containsKey(key)) {
+      return translations[key]!;
     }
     try {
-      final translation = await _translator.translate(text, to: targetLang);
-      _translations[key] = translation.text;
+      final translation = await translator.translate(text, to: targetLang);
+      translations[key] = translation.text;
       return translation.text;
     } catch (e) {
       print('Translation error: $e');
@@ -42,7 +31,7 @@ class _CitizenSidebarState extends State<CitizenSidebar> {
   }
 
   // Helper widget to build a translated drawer item title
-  Widget _translatedDrawerItemTitle(String text) {
+  Widget _translatedDrawerItemTitle(BuildContext context, String text) {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final currentLang = languageProvider.currentLanguageCode;
 
@@ -77,14 +66,14 @@ class _CitizenSidebarState extends State<CitizenSidebar> {
                 items: [
                   _DrawerItem(
                     icon: Icons.post_add,
-                    titleWidget: _translatedDrawerItemTitle("Create Advertisement"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Create Advertisement"),
                     onTap: () {
                       Navigator.pushNamed(context, '/advertisement');
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.chat,
-                    titleWidget: _translatedDrawerItemTitle("Contact Government"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Contact Government"),
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const CitizenMessageWrapper()));
@@ -92,14 +81,14 @@ class _CitizenSidebarState extends State<CitizenSidebar> {
                   ),
                   _DrawerItem(
                     icon: Icons.report_problem,
-                    titleWidget: _translatedDrawerItemTitle("Report a Problem"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Report a Problem"),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => AllReports()));
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.local_phone,
-                    titleWidget: _translatedDrawerItemTitle("Emergency Numbers"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Emergency Numbers"),
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const EmergencyNumbersScreen()));
@@ -107,14 +96,14 @@ class _CitizenSidebarState extends State<CitizenSidebar> {
                   ),
                   _DrawerItem(
                     icon: Icons.announcement,
-                    titleWidget: _translatedDrawerItemTitle("Check Announcements"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Check Announcements"),
                     onTap: () {
                       Navigator.pushNamed(context, '/announcements');
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.poll,
-                    titleWidget: _translatedDrawerItemTitle("Polls"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Polls"),
                     onTap: () {
                       Navigator.pushNamed(context, '/polls');
                     },
@@ -127,7 +116,7 @@ class _CitizenSidebarState extends State<CitizenSidebar> {
                 items: [
                   _DrawerItem(
                     icon: Icons.logout,
-                    titleWidget: _translatedDrawerItemTitle("Logout"),
+                    titleWidget: _translatedDrawerItemTitle(context, "Logout"),
                     onTap: () async {
                       await Provider.of<my_auth.AuthProvider>(context, listen: false).logout();
                       Navigator.pushReplacementNamed(context, '/login');
