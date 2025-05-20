@@ -102,66 +102,8 @@ class _AnnouncementsState extends State<Announcements> {
           } else {
             return Column(
               children: [
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            Navigator.pushNamed(context, '/announcements');
-                            selectedButton = 'Announcements';
-                          });
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: selectedButton == 'Announcements'
-                              ? (isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2))
-                              : Colors.grey[700],
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Announcements',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            Navigator.pushNamed(context, '/polls');
-                            selectedButton = 'Polls';
-                          });
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: selectedButton == 'Polls'
-                              ? (isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2))
-                              : Colors.grey[700],
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Polls',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                
+            
                 SizedBox(height: 30),
                 Expanded(
                   child: ListView.builder(

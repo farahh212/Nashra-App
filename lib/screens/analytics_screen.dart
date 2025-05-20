@@ -73,7 +73,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
     final currentLanguage = languageProvider.currentLanguageCode;
 
     return Scaffold(
-      drawer: GovSidebar(),
+      drawer: const GovSidebar(),
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
