@@ -10,6 +10,8 @@ import 'package:nashra_project2/screens/announcement&pollGovernment/ButtomSheetP
 import 'package:nashra_project2/widgets/bottom_navigation_bar.dart';
 import './pollsCard.dart';
 import 'package:provider/provider.dart';
+import 'package:translator/translator.dart';
+import 'package:nashra_project2/providers/languageProvider.dart';
 
 class pollScreen extends StatefulWidget {
   const pollScreen({super.key});
@@ -21,6 +23,24 @@ class pollScreen extends StatefulWidget {
 class _pollScreenState extends State<pollScreen> {
   late Future<void> pollsFuture;
   String selectedButton = 'Polls';
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
+  String _addPollTooltip = 'Add New Poll';
+
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
   @override
   void initState() {
@@ -28,6 +48,18 @@ class _pollScreenState extends State<pollScreen> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final pollsProvider = Provider.of<Pollsprovider>(context, listen: false);
     pollsFuture = pollsProvider.fetchPollsFromServer(auth.token);
+    _loadTranslations();
+  }
+
+  Future<void> _loadTranslations() async {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLang = languageProvider.currentLanguageCode;
+    
+    _addPollTooltip = await _translateText('Add New Poll', currentLang);
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -39,17 +71,24 @@ class _pollScreenState extends State<pollScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLang = languageProvider.currentLanguageCode;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          'NASHRA',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
+        title: FutureBuilder<String>(
+          future: _translateText('NASHRA', currentLang),
+          builder: (context, snapshot) {
+            return Text(
+              snapshot.data ?? 'NASHRA',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            );
+          },
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: isDark ? 0 : 1,
@@ -69,7 +108,7 @@ class _pollScreenState extends State<pollScreen> {
                 );
               },
               icon: Icon(Icons.add, color: primaryColor),
-              tooltip: 'Add New Poll',
+              tooltip: _addPollTooltip,
             ),
         ],
       ),
@@ -94,12 +133,17 @@ class _pollScreenState extends State<pollScreen> {
                     color: isDark ? Colors.red[300] : Colors.red,
                   ),
                   SizedBox(height: 16),
-                  Text(
-                    'Error loading polls',
-                    style: TextStyle(
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
-                      fontSize: 16,
-                    ),
+                  FutureBuilder<String>(
+                    future: _translateText('Error loading polls', currentLang),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? 'Error loading polls',
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[300] : Colors.grey[700],
+                          fontSize: 16,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -120,12 +164,17 @@ class _pollScreenState extends State<pollScreen> {
                             color: isDark ? Colors.grey[400] : Colors.grey[600],
                           ),
                           SizedBox(height: 16),
-                          Text(
-                            'No polls available',
-                            style: TextStyle(
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
-                              fontSize: 16,
-                            ),
+                          FutureBuilder<String>(
+                            future: _translateText('No polls available', currentLang),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? 'No polls available',
+                                style: TextStyle(
+                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  fontSize: 16,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

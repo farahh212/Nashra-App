@@ -1,16 +1,13 @@
 // import 'package:flutter/material.dart';
 // import 'package:nashra_project2/screens/announcement&pollGovernment/ButtomSheetAnnouncement.dart';
 // import 'package:nashra_project2/screens/announcementCitizens/announcementsCard.dart';
-// // import 'package:nashra_project2/CitizenPages/announcementCard.dart' ;
-// // import 'package:nashra_project2/screens/announcementCitizens/announcements';
 // import 'package:nashra_project2/models/announcement.dart';
-// // import './announcementsCard.dart';
-
 // import 'package:nashra_project2/Sidebars/citizenSidebar.dart';
 // import 'package:nashra_project2/providers/authProvider.dart';
 // import 'package:provider/provider.dart';
-// // import 'package:nashra_project2/providers/announcementsProvider.dart';
-// import 'package:nashra_project2/providers/announcementsProvider.dart' ;// Replace with the correct path
+// import 'package:nashra_project2/providers/announcementsProvider.dart';
+// import 'package:translator/translator.dart';
+// import '../../providers/languageProvider.dart';
 
 // class Addannouncement extends StatefulWidget {
 //   @override
@@ -20,6 +17,23 @@
 // class AddnnouncementState extends State<Addannouncement> {
 //   late Future<void> _announcementsFuture;
 //   String selectedButton = 'Announcements';
+//   final _translator = GoogleTranslator();
+//   final Map<String, String> _translations = {};
+
+//   Future<String> _translateText(String text, String targetLang) async {
+//     final key = '${text}_$targetLang';
+//     if (_translations.containsKey(key)) {
+//       return _translations[key]!;
+//     }
+//     try {
+//       final translation = await _translator.translate(text, to: targetLang);
+//       _translations[key] = translation.text;
+//       return translation.text;
+//     } catch (e) {
+//       print('Translation error: $e');
+//       return text;
+//     }
+//   }
 
 //   @override
 //   void initState() {
@@ -33,73 +47,111 @@
 //   Widget build(BuildContext context) {
 //     final announcementsProvider = Provider.of<Announcementsprovider>(context);
 //     final announcements = announcementsProvider.announcements;
+//     final languageProvider = Provider.of<LanguageProvider>(context);
+//     final currentLang = languageProvider.currentLanguageCode;
 
 //     return Scaffold(
 //       backgroundColor: Color(0xFFFEFFF3),
 //       appBar: AppBar(
 //         title: Image.asset(
-//       'assets/images/logo.png', // Path to your logo image
-      
-//       height: 40, // Adjust height as needed
-//       fit: BoxFit.contain,
-//        // Maintain aspect ratio
-//     ),
-//     actions: [
-//       IconButton(
-//         onPressed: () {
-//            showModalBottomSheet(
-          
-          
-//       context: context,
-//       isScrollControlled: true, // Allows the sheet to take full height
-//       builder: (context) => Container(
-//         height: MediaQuery.of(context).size.height * 0.50,
-//          child: Buttomsheetannouncement(),
+//           'assets/images/logo.png',
+//           height: 40,
+//           fit: BoxFit.contain,
+//         ),
+//         actions: [
+//           IconButton(
+//             onPressed: () {
+//               showModalBottomSheet(
+//                 context: context,
+//                 isScrollControlled: true,
+//                 builder: (context) => Container(
+//                   height: MediaQuery.of(context).size.height * 0.50,
+//                   child: Buttomsheetannouncement(),
+//                 ),
+//               );
+//             },
+//             icon: Icon(Icons.add, color: Colors.black),
+//           )
+//         ],
 //       ),
-      
-//            );
-//         },
-//         icon: Icon(Icons.add, color: Colors.black),
-//       )
-//     ],
-        
-//       ),
-//       drawer: CitizenSidebar(), 
+//       drawer: CitizenSidebar(),
 //       body: FutureBuilder(
 //         future: _announcementsFuture,
 //         builder: (ctx, snapshot) {
 //           if (snapshot.connectionState == ConnectionState.waiting) {
 //             return Center(child: CircularProgressIndicator());
 //           } else if (snapshot.hasError) {
-//             return Center(child: Text('Error loading announcements'));
+//             return FutureBuilder<String>(
+//               future: _translateText('Error loading announcements', currentLang),
+//               builder: (context, snapshot) {
+//                 return Center(child: Text(snapshot.data ?? 'Error loading announcements'));
+//               },
+//             );
 //           } else {
 //             return Column(
 //               children: [
 //                 SizedBox(height: 20),
 //                 Container(
-//                    child:  Row(children: [
-//   SizedBox(width: 60),
-//                     TextButton(onPressed: () {
-//                       setState(() {
-//                          Navigator.pushNamed(context, '/announcements');
-//                 selectedButton = 'Announcements';
-//               });
-//                     },style: TextButton.styleFrom(
-//     backgroundColor: selectedButton == 'Announcements' ? Colors.green :const Color.fromARGB(255, 106, 106, 106),
-//     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Optional padding
-//   ), child: Text('Announcements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 247, 253, 248)))),
-//   SizedBox(width: 16),
-// TextButton(onPressed: () {
-//                       setState(() {
-//                         Navigator.pushNamed(context, '/polls');
-//                 selectedButton = 'Polls';
-//               });
-// },style: TextButton.styleFrom(
-//     backgroundColor: selectedButton == 'Polls' ? Colors.green : const Color.fromARGB(255, 106, 106, 106), // Set background color here
-//     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Optional padding
-//   ), child: Text('Polls', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 247, 253, 248)))),
-
-//                    ],)
+//                   child: Row(
+//                     children: [
+//                       SizedBox(width: 60),
+//                       FutureBuilder<String>(
+//                         future: _translateText('Announcements', currentLang),
+//                         builder: (context, snapshot) {
+//                           return TextButton(
+//                             onPressed: () {
+//                               setState(() {
+//                                 Navigator.pushNamed(context, '/announcements');
+//                                 selectedButton = 'Announcements';
+//                               });
+//                             },
+//                             style: TextButton.styleFrom(
+//                               backgroundColor: selectedButton == 'Announcements'
+//                                   ? Colors.green
+//                                   : const Color.fromARGB(255, 106, 106, 106),
+//                               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                             ),
+//                             child: Text(
+//                               snapshot.data ?? 'Announcements',
+//                               style: TextStyle(
+//                                 fontSize: 20,
+//                                 fontWeight: FontWeight.bold,
+//                                 color: const Color.fromARGB(255, 247, 253, 248),
+//                               ),
+//                             ),
+//                           );
+//                         },
+//                       ),
+//                       SizedBox(width: 16),
+//                       FutureBuilder<String>(
+//                         future: _translateText('Polls', currentLang),
+//                         builder: (context, snapshot) {
+//                           return TextButton(
+//                             onPressed: () {
+//                               setState(() {
+//                                 Navigator.pushNamed(context, '/polls');
+//                                 selectedButton = 'Polls';
+//                               });
+//                             },
+//                             style: TextButton.styleFrom(
+//                               backgroundColor: selectedButton == 'Polls'
+//                                   ? Colors.green
+//                                   : const Color.fromARGB(255, 106, 106, 106),
+//                               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                             ),
+//                             child: Text(
+//                               snapshot.data ?? 'Polls',
+//                               style: TextStyle(
+//                                 fontSize: 20,
+//                                 fontWeight: FontWeight.bold,
+//                                 color: const Color.fromARGB(255, 247, 253, 248),
+//                               ),
+//                             ),
+//                           );
+//                         },
+//                       ),
+//                     ],
+//                   ),
 //                 ),
 //                 SizedBox(height: 30),
 //                 Expanded(
@@ -118,15 +170,23 @@
 //         selectedItemColor: Colors.green[800],
 //         unselectedItemColor: Colors.grey,
 //         items: [
-//           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-//           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-//           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.home),
+//             label: 'Home',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.notifications),
+//             label: 'Notifications',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.settings),
+//             label: 'Settings',
+//           ),
 //         ],
 //       ),
 //     );
 //   }
 // }
-
 
 // //NOTE: (since I created the authprovider, u will find methods to extract and use token details)
 // // from chatgpt:
@@ -140,7 +200,7 @@
 
 // //in urls later on, use the token and userId from the authprovider to get the data from the server
 // //format to add at the end of the url:  ?auth=[our token value] 
-// //ex: var ideasURL =Uri.parse('https://our DB URL/IdeasDB.json?auth=$token’);
+// //ex: var ideasURL =Uri.parse('https://our DB URL/IdeasDB.json?auth=$token');
 
 // //IMPP: STILL can include userId in constructor if needed, but not the token, since we can access it globally now
 // //this can be the case if we want to use the userId to get specific data from the server, like in the case of the ideas page, where we want to get the ideas of a specific user

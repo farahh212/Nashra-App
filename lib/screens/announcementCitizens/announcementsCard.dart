@@ -3,11 +3,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:nashra_project2/screens/announcement&pollGovernment/EditButtomSheetAnnouncement.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import './commentsFetched.dart';
-
 import 'package:nashra_project2/models/announcement.dart';
 import 'package:nashra_project2/providers/announcementsProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:translator/translator.dart';
+import '../../providers/languageProvider.dart';
 
 class Announcementcard extends StatefulWidget {
   final Announcement announcement;
@@ -20,8 +21,27 @@ class Announcementcard extends StatefulWidget {
 class _AnnouncementcardState extends State<Announcementcard> {
   late Future<void> _announcementsFuture;
   bool isLiked = false;
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
+  String _deleteTooltip = 'Delete Announcement';
+  String _editTooltip = 'Edit Announcement';
+  String _viewCommentsTooltip = 'View Comments';
+  String _likeTooltip = 'Like';
 
-  
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
   @override
   void initState() {
@@ -29,6 +49,21 @@ class _AnnouncementcardState extends State<Announcementcard> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
     _announcementsFuture = announcementsProvider.fetchAnnouncementsFromServer(auth.token);
+    _loadTranslations();
+  }
+
+  Future<void> _loadTranslations() async {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLang = languageProvider.currentLanguageCode;
+    
+    _deleteTooltip = await _translateText('Delete Announcement', currentLang);
+    _editTooltip = await _translateText('Edit Announcement', currentLang);
+    _viewCommentsTooltip = await _translateText('View Comments', currentLang);
+    _likeTooltip = await _translateText('Like', currentLang);
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -39,6 +74,8 @@ class _AnnouncementcardState extends State<Announcementcard> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLang = languageProvider.currentLanguageCode;
 
     return Card(
       margin: const EdgeInsets.all(8.0),
@@ -50,18 +87,22 @@ class _AnnouncementcardState extends State<Announcementcard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and admin actions row
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    widget.announcement.title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
+                  child: FutureBuilder<String>(
+                    future: _translateText(widget.announcement.title, currentLang),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? widget.announcement.title,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 if (isAdmin) ...[
@@ -74,7 +115,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                       );
                     },
                     icon: Icon(Icons.delete, color: primaryColor),
-                    tooltip: 'Delete Announcement',
+                    tooltip: _deleteTooltip,
                   ),
                   IconButton(
                     onPressed: () {
@@ -88,7 +129,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                       );
                     },
                     icon: Icon(Icons.edit, color: primaryColor),
-                    tooltip: 'Edit Announcement',
+                    tooltip: _editTooltip,
                   ),
                 ],
               ],
@@ -105,22 +146,6 @@ class _AnnouncementcardState extends State<Announcementcard> {
             ),
 
             const SizedBox(height: 12),
-// if (widget.announcement.imageUrl != null &&
-//     widget.announcement.imageUrl!.isNotEmpty)
-//   Padding(
-//     padding: const EdgeInsets.only(top: 8.0, bottom: 12.0),
-//     child: ClipRRect(
-//       borderRadius: BorderRadius.circular(12),
-//       child: Image.network(
-//         widget.announcement.imageUrl!,
-//         fit: BoxFit.cover,
-//         width: double.infinity,
-//         height: 200,
-//         errorBuilder: (context, error, stackTrace) =>
-//             const Text("Failed to load image"),
-//       ),
-//     ),
-//   ),
 
             if (widget.announcement.imageUrl != null &&
                 widget.announcement.imageUrl!.isNotEmpty)
@@ -155,11 +180,16 @@ class _AnnouncementcardState extends State<Announcementcard> {
                             color: isDark ? Colors.grey[400] : Colors.grey[600],
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            "Failed to load image",
-                            style: TextStyle(
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
-                            ),
+                          FutureBuilder<String>(
+                            future: _translateText('Failed to load image', currentLang),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? 'Failed to load image',
+                                style: TextStyle(
+                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -168,7 +198,6 @@ class _AnnouncementcardState extends State<Announcementcard> {
                 ),
               ),
 
-            // If the file is not an image (e.g., PDF), show a button to open it
             if (widget.announcement.fileUrl != null &&
                 widget.announcement.fileUrl!.isNotEmpty)
               Padding(
@@ -180,7 +209,12 @@ class _AnnouncementcardState extends State<Announcementcard> {
                       MaterialPageRoute(
                         builder: (context) => Scaffold(
                           appBar: AppBar(
-                            title: Text('View Attachment'),
+                            title: FutureBuilder<String>(
+                              future: _translateText('View Attachment', currentLang),
+                              builder: (context, snapshot) {
+                                return Text(snapshot.data ?? 'View Attachment');
+                              },
+                            ),
                             backgroundColor: isDark ? Colors.grey[900] : Colors.white,
                             iconTheme: IconThemeData(color: primaryColor),
                             elevation: 0,
@@ -191,7 +225,12 @@ class _AnnouncementcardState extends State<Announcementcard> {
                     );
                   },
                   icon: Icon(Icons.attach_file, color: Colors.white),
-                  label: const Text("View Attached File"),
+                  label: FutureBuilder<String>(
+                    future: _translateText('View Attached File', currentLang),
+                    builder: (context, snapshot) {
+                      return Text(snapshot.data ?? 'View Attached File');
+                    },
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
@@ -208,19 +247,23 @@ class _AnnouncementcardState extends State<Announcementcard> {
 
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text(
-                widget.announcement.description,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDark ? Colors.grey[300] : Colors.black87,
-                  height: 1.5,
-                ),
+              child: FutureBuilder<String>(
+                future: _translateText(widget.announcement.description, currentLang),
+                builder: (context, snapshot) {
+                  return Text(
+                    snapshot.data ?? widget.announcement.description,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark ? Colors.grey[300] : Colors.black87,
+                      height: 1.5,
+                    ),
+                  );
+                },
               ),
             ),
 
             Divider(color: isDark ? Colors.grey[700] : Colors.grey[300]),
 
-            // Comment and Like row
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -242,7 +285,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                       ),
                     );
                   },
-                  tooltip: 'View Comments',
+                  tooltip: _viewCommentsTooltip,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -273,7 +316,7 @@ class _AnnouncementcardState extends State<Announcementcard> {
                       Icons.thumb_up_off_alt_rounded,
                       color: widget.announcement.likedByUser.contains(auth.userId) ? primaryColor : (isDark ? Colors.grey[400] : Colors.grey[700]),
                     ),
-                    tooltip: 'Like',
+                    tooltip: _likeTooltip,
                   ),
                   Text(
                     widget.announcement.likes.toString(),

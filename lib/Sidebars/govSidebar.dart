@@ -13,19 +13,35 @@ import 'package:translator/translator.dart';
 import '../providers/authProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class GovSidebar extends StatelessWidget {
+class GovSidebar extends StatefulWidget {
   const GovSidebar({super.key});
 
+  @override
+  State<GovSidebar> createState() => _GovSidebarState();
+}
+
+class _GovSidebarState extends State<GovSidebar> {
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
+  String _controlPanelText = 'Control Panel';
+  String _manageEmergencyText = 'Manage Emergency Numbers';
+  String _manageAnnouncementsText = 'Manage Announcements';
+  String _manageAdvertisementsText = 'Manage Advertisements';
+  String _analyticsDashboardText = 'Analytics Dashboard';
+  String _viewReportsText = 'View Reports';
+  String _viewMessagesText = 'View Messages';
+  String _pollResultsText = 'Poll Results';
+  String _adminText = 'Admin';
+  String _govPortalText = 'Government Portal';
+
   Future<String> _translateText(String text, String targetLang) async {
-    final translator = GoogleTranslator();
-    final translations = <String, String>{};
     final key = '${text}_$targetLang';
-    if (translations.containsKey(key)) {
-      return translations[key]!;
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
     }
     try {
-      final translation = await translator.translate(text, to: targetLang);
-      translations[key] = translation.text;
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
       return translation.text;
     } catch (e) {
       print('Translation error: $e');
@@ -33,24 +49,30 @@ class GovSidebar extends StatelessWidget {
     }
   }
 
-  Widget _translatedDrawerItemTitle(BuildContext context, String text) {
+  @override
+  void initState() {
+    super.initState();
+    _loadTranslations();
+  }
+
+  Future<void> _loadTranslations() async {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final currentLang = languageProvider.currentLanguageCode;
-
-    return FutureBuilder<String>(
-      future: _translateText(text, currentLang),
-      builder: (context, snapshot) {
-        return Text(
-          snapshot.hasData ? snapshot.data! : text,
-          style: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Color(0xFF64B5F6)
-                : Color(0xFF1976D2),
-          ),
-        );
-      },
-    );
+    
+    _controlPanelText = await _translateText('Control Panel', currentLang);
+    _manageEmergencyText = await _translateText('Manage Emergency Numbers', currentLang);
+    _manageAnnouncementsText = await _translateText('Manage Announcements', currentLang);
+    _manageAdvertisementsText = await _translateText('Manage Advertisements', currentLang);
+    _analyticsDashboardText = await _translateText('Analytics Dashboard', currentLang);
+    _viewReportsText = await _translateText('View Reports', currentLang);
+    _viewMessagesText = await _translateText('View Messages', currentLang);
+    _pollResultsText = await _translateText('Poll Results', currentLang);
+    _adminText = await _translateText('Admin', currentLang);
+    _govPortalText = await _translateText('Government Portal', currentLang);
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -64,14 +86,17 @@ class GovSidebar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
           child: ListView(
             children: [
-              _GovProfileCard(),
+              _GovProfileCard(
+                adminText: _adminText,
+                govPortalText: _govPortalText,
+              ),
               const SizedBox(height: 20),
               _DrawerSection(
-                title: "Control Panel",
+                title: _controlPanelText,
                 items: [
                   _DrawerItem(
                     icon: Icons.phone,
-                    titleWidget: _translatedDrawerItemTitle(context, "Manage Emergency Numbers"),
+                    title: _manageEmergencyText,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const EmergencyNumbersScreen()),
@@ -79,17 +104,17 @@ class GovSidebar extends StatelessWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.announcement,
-                    titleWidget: _translatedDrawerItemTitle(context, "Manage Announcements"),
+                    title: _manageAnnouncementsText,
                     onTap: () => Navigator.pushNamed(context, '/announcements'),
                   ),
                   _DrawerItem(
                     icon: Icons.campaign,
-                    titleWidget: _translatedDrawerItemTitle(context, "Manage Advertisements"),
+                    title: _manageAdvertisementsText,
                     onTap: () => Navigator.pushNamed(context, '/gov_advertisement'),
                   ),
                   _DrawerItem(
                     icon: Icons.analytics,
-                    titleWidget: _translatedDrawerItemTitle(context, "Analytics Dashboard"),
+                    title: _analyticsDashboardText,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
@@ -97,7 +122,7 @@ class GovSidebar extends StatelessWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.report,
-                    titleWidget: _translatedDrawerItemTitle(context, "View Reports"),
+                    title: _viewReportsText,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => ViewReportsPage()),
@@ -105,7 +130,7 @@ class GovSidebar extends StatelessWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.message,
-                    titleWidget: _translatedDrawerItemTitle(context, "View Messages"),
+                    title: _viewMessagesText,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const ChatsPage()),
@@ -113,7 +138,7 @@ class GovSidebar extends StatelessWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.poll,
-                    titleWidget: _translatedDrawerItemTitle(context, "Poll Results"),
+                    title: _pollResultsText,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const PollResultsScreen()),
@@ -129,8 +154,15 @@ class GovSidebar extends StatelessWidget {
   }
 }
 
-
 class _GovProfileCard extends StatelessWidget {
+  final String adminText;
+  final String govPortalText;
+
+  const _GovProfileCard({
+    required this.adminText,
+    required this.govPortalText,
+  });
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -155,14 +187,14 @@ class _GovProfileCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Admin",
+                    adminText,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
                     ),
                   ),
                   Text(
-                    "Government Portal",
+                    govPortalText,
                     style: TextStyle(
                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
@@ -220,12 +252,12 @@ class _DrawerSection extends StatelessWidget {
 
 class _DrawerItem extends StatelessWidget {
   final IconData icon;
-  final Widget titleWidget; // Changed from String title
+  final String title;
   final VoidCallback onTap;
 
   const _DrawerItem({
     required this.icon,
-    required this.titleWidget,
+    required this.title,
     required this.onTap,
   });
 
@@ -241,7 +273,13 @@ class _DrawerItem extends StatelessWidget {
         size: 28,
         color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
       ),
-      title: titleWidget,
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+        ),
+      ),
       onTap: () {
         Navigator.pop(context);
         onTap();

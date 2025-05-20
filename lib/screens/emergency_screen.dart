@@ -80,7 +80,10 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       drawer: _isAdmin ? GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
+         backgroundColor: (isDark ? Colors.black : Colors.white),
+        iconTheme: IconThemeData(
+          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+        ),
         elevation: 0,
         title: FutureBuilder<String>(
           future: _translateText(
@@ -98,9 +101,9 @@ class _EmergencyNumbersScreenState extends State<EmergencyNumbersScreen> {
             );
           },
         ),
-        iconTheme: IconThemeData(
-          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-        ),
+        // iconTheme: IconThemeData(
+        //   color: isDark ? Color(0xFF64B5F6) : Color.fromARGB(255, 246, 246, 247),
+        // ),
       ),
       body: Consumer<EmergencyProvider>(
         builder: (context, provider, _) {

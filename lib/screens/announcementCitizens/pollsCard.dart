@@ -4,6 +4,8 @@ import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/providers/pollsProvider.dart';
 import 'package:nashra_project2/screens/announcementCitizens/pollsComments.dart';
 import 'package:provider/provider.dart';
+import 'package:nashra_project2/providers/languageProvider.dart';
+import 'package:translator/translator.dart';
 
 class PollCard extends StatefulWidget {
   final Poll poll;
@@ -16,12 +18,42 @@ class PollCard extends StatefulWidget {
 class _PollCardState extends State<PollCard> {
   String? _selectedOption;
   bool _isSubmitting = false;
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
+  String _tooltipText = 'View Comments';
+
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     final auth = Provider.of<AuthProvider>(context, listen: false);
     _selectedOption = widget.poll.voterToOption[auth.userId];
+    _loadTranslations();
+  }
+
+  Future<void> _loadTranslations() async {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLang = languageProvider.currentLanguageCode;
+    
+    _tooltipText = await _translateText('View Comments', currentLang);
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _submitVote(String option) async {
@@ -40,8 +72,13 @@ class _PollCardState extends State<PollCard> {
       );
       setState(() => _selectedOption = option);
     } catch (e) {
+      final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+      final currentLang = languageProvider.currentLanguageCode;
+
+      final errorMessage = await _translateText('Failed to submit vote', currentLang);
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to submit vote: ${e.toString()}')),
+        SnackBar(content: Text('$errorMessage: ${e.toString()}')),
       );
     } finally {
       setState(() => _isSubmitting = false);
@@ -64,7 +101,8 @@ class _PollCardState extends State<PollCard> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
-    final commentsN= widget.poll.comments.length.toString();
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLang = languageProvider.currentLanguageCode;
 
     return Card(
       margin: const EdgeInsets.all(12.0),
@@ -78,13 +116,18 @@ class _PollCardState extends State<PollCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.poll.question,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+            FutureBuilder<String>(
+              future: _translateText(widget.poll.question, currentLang),
+              builder: (context, snapshot) {
+                return Text(
+                  snapshot.data ?? widget.poll.question,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 16),
             ...widget.poll.options.map((option) {
@@ -122,15 +165,20 @@ class _PollCardState extends State<PollCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              option,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected 
-                                  ? primaryColor 
-                                  : (isDark ? Colors.white : Colors.black87),
-                              ),
+                            FutureBuilder<String>(
+                              future: _translateText(option, currentLang),
+                              builder: (context, snapshot) {
+                                return Text(
+                                  snapshot.data ?? option,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color: isSelected 
+                                      ? primaryColor 
+                                      : (isDark ? Colors.white : Colors.black87),
+                                  ),
+                                );
+                              },
                             ),
                             if (showResults)
                               Text(
@@ -175,12 +223,17 @@ class _PollCardState extends State<PollCard> {
                   children: [
                     Icon(Icons.circle, size: 8, color: primaryColor),
                     const SizedBox(width: 6),
-                    Text(
-                      'Live  |  $totalVotes votes',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      ),
+                    FutureBuilder<String>(
+                      future: _translateText('Live  |  $totalVotes votes', currentLang),
+                      builder: (context, snapshot) {
+                        return Text(
+                          snapshot.data ?? 'Live  |  $totalVotes votes',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -209,6 +262,7 @@ class _PollCardState extends State<PollCard> {
                     Icons.mode_comment_rounded,
                     color: primaryColor,
                   ),
+                  tooltip: _tooltipText,
                 ),
                 const SizedBox(width: 4),
                 Text(

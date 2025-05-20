@@ -75,7 +75,13 @@ class _SignUpPageState extends State<SignUpPage> {
           shaderCallback: (bounds) => LinearGradient(
             colors: isDark 
               ? [Color(0xFF64B5F6), Color(0xFF2196F3), Color(0xFF1976D2)]
-              : [Color(0xFF1976D2), Color(0xFF2196F3), Color(0xFF64B5F6)],
+              : [
+  Color(0xFF0D47A1), // Navy Blue (deep)
+  Color(0xFF1976D2), // Strong Blue (mid)
+  Color(0xFF42A5F5), // Sky Blue (soft mid)
+  Color(0xFFBBDEFB), // Light Blue (almost white)
+]
+,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ).createShader(bounds),
