@@ -66,10 +66,10 @@ class _AnnouncementsState extends State<Announcements> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: FutureBuilder<String>(
-          future: _translateText('NASHRA', currentLang),
+          future: _translateText('Announcements', currentLang),
           builder: (context, snapshot) {
             return Text(
-              snapshot.data ?? 'NASHRA',
+              snapshot.data ?? 'Announcements',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -91,7 +91,7 @@ class _AnnouncementsState extends State<Announcements> {
                   context: context,
                   isScrollControlled: true,
                   builder: (context) => Container(
-                    height: MediaQuery.of(context).size.height * 0.50,
+                    height: MediaQuery.of(context).size.height * 0.80,
                     child: Buttomsheetannouncement(),
                   ),
                 );
@@ -132,76 +132,6 @@ class _AnnouncementsState extends State<Announcements> {
           } else {
             return Column(
               children: [
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            Navigator.pushNamed(context, '/announcements');
-                            selectedButton = 'Announcements';
-                          });
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: selectedButton == 'Announcements'
-                              ? (isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2))
-                              : Colors.grey[700],
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: FutureBuilder<String>(
-                          future: _translateText('Announcements', currentLang),
-                          builder: (context, snapshot) {
-                            return Text(
-                              snapshot.data ?? 'Announcements',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            Navigator.pushNamed(context, '/polls');
-                            selectedButton = 'Polls';
-                          });
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: selectedButton == 'Polls'
-                              ? (isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2))
-                              : Colors.grey[700],
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: FutureBuilder<String>(
-                          future: _translateText('Polls', currentLang),
-                          builder: (context, snapshot) {
-                            return Text(
-                              snapshot.data ?? 'Polls',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 SizedBox(height: 30),
                 Expanded(
                   child: ListView.builder(

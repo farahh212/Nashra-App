@@ -328,7 +328,7 @@ class _GovernmentAdvertisementsScreenState
 
 return Container(
   decoration: BoxDecoration(
-    color: Colors.white,
+    color: isDark ?const Color(0xFF1E1E1E): Colors.white,
     borderRadius: BorderRadius.circular(16),
     border: Border.all(color: Colors.grey.shade300, width: 1.5),
   ),
