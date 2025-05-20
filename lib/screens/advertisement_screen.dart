@@ -5,8 +5,9 @@ import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/screens/ad_card.dart';
 import 'package:nashra_project2/screens/create_ad_screen.dart';
 import 'package:nashra_project2/screens/myAdvertisementScreen.dart';
-
+import 'package:nashra_project2/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
+
 class AdvertisementScreen extends StatefulWidget {
   @override
   _AdvertisementScreenState createState() => _AdvertisementScreenState();
@@ -39,62 +40,79 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
         .where((ad) => ad.status == AdvertisementStatus.approved)
         .toList();
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Advertisement")),
-      body: Stack(
-        children: [
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : ads.isEmpty
-                  ? Center(child: Text("No ads available."))
-                  : ListView.builder(
-                      padding: EdgeInsets.only(bottom: 100),
-                      itemCount: ads.length,
-                      itemBuilder: (context, index) => AdCard(ad: ads[index]),
-                    ),
-          Positioned(
-            bottom: 20,
-            left: 30,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyAdvertisementsScreen()),
-                );
-              },
-              icon: Icon(Icons.list, color: Colors.green.shade800),
-              label: Text("My Ads", style: TextStyle(color: Colors.green.shade800)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                side: BorderSide(color: Colors.green.shade800, width: 1.5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        elevation: 0.5,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? (isDark ? Colors.black : Colors.white),
+        title: Text(
+          "Advertisement",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add, color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2)),
+            tooltip: 'Create Ad',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CreateAdScreen()),
+              );
+            },
+          ),
+          TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyAdvertisementsScreen()),
+              );
+            },
+            label: Text(
+              "My Ads",
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 30,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreateAdScreen()),
-                );
-              },
-              backgroundColor: Colors.green.shade800,
-              child: Icon(Icons.add, color: Colors.white),
+           
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
+          const SizedBox(width: 6),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.language), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
-      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                ),
+              ),
+            )
+          : ads.isEmpty
+              ? Center(
+                  child: Text(
+                    "No ads available.",
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  itemCount: ads.length,
+                  itemBuilder: (context, index) => AdCard(ad: ads[index]),
+                ),
+      bottomNavigationBar: const CustomBottomNavigationBar(),
     );
   }
 }
