@@ -9,7 +9,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:translator/translator.dart';
+import '../../providers/languageProvider.dart';
 
 class Buttomsheetannouncement extends StatefulWidget {
   @override
@@ -20,177 +21,163 @@ class ButtomsheetannouncementState extends State<Buttomsheetannouncement> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final fileUrlController = TextEditingController();
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
 
   File? _imageFile;
-  String? _imageUrl; // Add this to your state
-
-
-  // final ImagePicker _imagePicker = ImagePicker();
+  String? _imageUrl;
   List<String>? _pickedFilePaths;
-  
 
-// New method to pick files:
-// Future<void> _pickFiles() async {
-//   FilePickerResult? result = await FilePicker.platform.pickFiles(
-//     allowMultiple: true, // or false if you want just one file
-//     type: FileType.any,
-//   );
-
-//   if (result != null) {
-//     setState(() {
-//       _pickedFilePaths = result.paths.whereType<String>().toList();
-//       // // Optionally, clear the fileUrlController.text if you no longer want URL input
-//       // fileUrlController.clear();
-//     });
-//       print('Picked file paths: $_pickedFilePaths');
-//   }
-// }
-Future<void> _pickFiles() async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-    allowMultiple: true,
-    type: FileType.any,
-  );
-
-  if (result != null) {
-    setState(() {
-      _pickedFilePaths = result.paths.whereType<String>().toList();
-    });
-  }
-}
-
-
-Future<void> _uploadPickedFiles() async {
-  if (_pickedFilePaths == null || _pickedFilePaths!.isEmpty) return;
-
-  List<String> uploadedUrls = [];
-
-  for (String path in _pickedFilePaths!) {
-    File file = File(path);
-    String fileName = path.split('/').last;
-
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('announcements')
-        .child('${DateTime.now().millisecondsSinceEpoch}_$fileName');
-
-    // Upload the file
-    UploadTask uploadTask = ref.putFile(file);
-    TaskSnapshot snapshot = await uploadTask;
-
-    // Get the download URL
-    String downloadUrl = await snapshot.ref.getDownloadURL();
-
-    uploadedUrls.add(downloadUrl);
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
   }
 
-  // Now set the URLs for use in your announcement
-  setState(() {
-    _pickedFilePaths = uploadedUrls;
-    
-  });
-}
-
-void openFile(String url) async {
-  final uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Could not open file')),
+  Future<void> _pickFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.any,
     );
+
+    if (result != null) {
+      setState(() {
+        _pickedFilePaths = result.paths.whereType<String>().toList();
+      });
+    }
   }
-}
 
-Future<void> _uploadImage() async {
-  if (_imageFile == null) return;
+  Future<void> _uploadPickedFiles() async {
+    if (_pickedFilePaths == null || _pickedFilePaths!.isEmpty) return;
 
-  try {
-    // Create a reference to the location you want to upload to in Firebase Storage
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('announcement_images')
-        .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+    List<String> uploadedUrls = [];
 
-    // Upload the file
-    UploadTask uploadTask = ref.putFile(_imageFile!);
-    TaskSnapshot snapshot = await uploadTask;
+    for (String path in _pickedFilePaths!) {
+      File file = File(path);
+      String fileName = path.split('/').last;
 
-    // Get the download URL
-    String downloadUrl = await snapshot.ref.getDownloadURL();
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('announcements')
+          .child('${DateTime.now().millisecondsSinceEpoch}_$fileName');
 
-    setState(() {
-      _imageUrl = downloadUrl;
-    });
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to upload image: ${e.toString()}')),
-    );
-  }
-}
-Future<void> _pickImages() async {
-  final picker = ImagePicker();
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-  if (pickedFile != null) {
-    setState(() {
-      _imageFile = File(pickedFile.path);
-    });
-    // Upload the image immediately after picking
-    await _uploadImage();
-  }
-}
-
-
-
-Future<void> postAnnouncement() async {
-  final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
-  final auth = Provider.of<AuthProvider>(context, listen: false);
-
-  try {
-    // Upload files to Firebase Storage and get download URLs
-    await _uploadPickedFiles();
-   
-
-    String? combinedFilePaths;
-    if (_pickedFilePaths != null && _pickedFilePaths!.isNotEmpty) {
-      combinedFilePaths = _pickedFilePaths!.join(','); // Join all URLs with commas
-    } else if (fileUrlController.text.trim().isNotEmpty) {
-      combinedFilePaths = fileUrlController.text.trim();
+      UploadTask uploadTask = ref.putFile(file);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      uploadedUrls.add(downloadUrl);
     }
 
-    
-
-    final newAnnouncement = Announcement(
-      id: '',
-      title: titleController.text,
-      description: descriptionController.text,
-      likes: 0,
-      likedByUser: [],
-      createdAt: DateTime.now(),
-      imageUrl: _imageUrl,
-
- // (You can also upload this image similarly)
-      fileUrl: combinedFilePaths,
-      commentsNo: 0,
-    );
-
-    await announcementsProvider.addAnnouncement(newAnnouncement, auth.token);
-
-    Navigator.pop(context);
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to post announcement: ${e.toString()}')),
-    );
+    setState(() {
+      _pickedFilePaths = uploadedUrls;
+    });
   }
-}
 
+  void openFile(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+      final currentLang = languageProvider.currentLanguageCode;
+      String errorMessage = await _translateText('Could not open file', currentLang);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    }
+  }
 
+  Future<void> _uploadImage() async {
+    if (_imageFile == null) return;
+
+    try {
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('announcement_images')
+          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      UploadTask uploadTask = ref.putFile(_imageFile!);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      setState(() {
+        _imageUrl = downloadUrl;
+      });
+    } catch (e) {
+      final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+      final currentLang = languageProvider.currentLanguageCode;
+      String errorMessage = await _translateText('Failed to upload image', currentLang);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$errorMessage: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _pickImages() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+      await _uploadImage();
+    }
+  }
+
+  Future<void> postAnnouncement() async {
+    final announcementsProvider = Provider.of<Announcementsprovider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLang = languageProvider.currentLanguageCode;
+
+    try {
+      await _uploadPickedFiles();
+
+      String? combinedFilePaths;
+      if (_pickedFilePaths != null && _pickedFilePaths!.isNotEmpty) {
+        combinedFilePaths = _pickedFilePaths!.join(',');
+      } else if (fileUrlController.text.trim().isNotEmpty) {
+        combinedFilePaths = fileUrlController.text.trim();
+      }
+
+      final newAnnouncement = Announcement(
+        id: '',
+        title: titleController.text,
+        description: descriptionController.text,
+        likes: 0,
+        likedByUser: [],
+        createdAt: DateTime.now(),
+        imageUrl: _imageUrl,
+        fileUrl: combinedFilePaths,
+        commentsNo: 0,
+      );
+
+      await announcementsProvider.addAnnouncement(newAnnouncement, auth.token);
+      Navigator.pop(context);
+    } catch (e) {
+      String errorMessage = await _translateText('Failed to post announcement', currentLang);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$errorMessage: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLang = languageProvider.currentLanguageCode;
 
     return Container(
       decoration: BoxDecoration(
@@ -211,13 +198,18 @@ Future<void> postAnnouncement() async {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Add Announcement',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+              FutureBuilder<String>(
+                future: _translateText('Add Announcement', currentLang),
+                builder: (context, snapshot) {
+                  return Text(
+                    snapshot.data ?? 'Add Announcement',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  );
+                },
               ),
               IconButton(
                 icon: Icon(Icons.close, color: primaryColor),
@@ -235,22 +227,27 @@ Future<void> postAnnouncement() async {
                 color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               ),
             ),
-            child: TextField(
-              controller: titleController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Announcement title',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
+            child: FutureBuilder<String>(
+              future: _translateText('Announcement title', currentLang),
+              builder: (context, snapshot) {
+                return TextField(
+                  controller: titleController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: snapshot.data ?? 'Announcement title',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 16),
@@ -263,23 +260,28 @@ Future<void> postAnnouncement() async {
                 color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               ),
             ),
-            child: TextField(
-              controller: descriptionController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: 'Announcement description',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
+            child: FutureBuilder<String>(
+              future: _translateText('Announcement description', currentLang),
+              builder: (context, snapshot) {
+                return TextField(
+                  controller: descriptionController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: snapshot.data ?? 'Announcement description',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 20),
@@ -296,17 +298,22 @@ Future<void> postAnnouncement() async {
                 ),
               ),
               child: _pickedFilePaths == null || _pickedFilePaths!.isEmpty
-                  ? Row(
-                      children: [
-                        Icon(Icons.attach_file, color: primaryColor),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Tap to select files',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black87,
-                          ),
-                        ),
-                      ],
+                  ? FutureBuilder<String>(
+                      future: _translateText('Tap to select files', currentLang),
+                      builder: (context, snapshot) {
+                        return Row(
+                          children: [
+                            Icon(Icons.attach_file, color: primaryColor),
+                            const SizedBox(width: 12),
+                            Text(
+                              snapshot.data ?? 'Tap to select files',
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,12 +345,17 @@ Future<void> postAnnouncement() async {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
-            'Add Image:',
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.bold,
-            ),
+          FutureBuilder<String>(
+            future: _translateText('Add Image:', currentLang),
+            builder: (context, snapshot) {
+              return Text(
+                snapshot.data ?? 'Add Image:',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
           ),
           const SizedBox(height: 8),
           GestureDetector(
@@ -360,18 +372,23 @@ Future<void> postAnnouncement() async {
               ),
               child: Center(
                 child: _imageFile == null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.image, color: primaryColor, size: 32),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Select image",
-                            style: TextStyle(
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
-                            ),
-                          ),
-                        ],
+                    ? FutureBuilder<String>(
+                        future: _translateText('Select image', currentLang),
+                        builder: (context, snapshot) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.image, color: primaryColor, size: 32),
+                              const SizedBox(height: 8),
+                              Text(
+                                snapshot.data ?? 'Select image',
+                                style: TextStyle(
+                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       )
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -381,24 +398,29 @@ Future<void> postAnnouncement() async {
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: postAnnouncement,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: isDark ? 0 : 2,
-            ),
-            child: const Text(
-              'Post',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          FutureBuilder<String>(
+            future: _translateText('Post', currentLang),
+            builder: (context, snapshot) {
+              return ElevatedButton(
+                onPressed: postAnnouncement,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: isDark ? 0 : 2,
+                ),
+                child: Text(
+                  snapshot.data ?? 'Post',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

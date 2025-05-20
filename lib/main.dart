@@ -14,6 +14,7 @@ import 'package:nashra_project2/screens/announcementCitizens/pollsScreen.dart';
 import 'package:nashra_project2/screens/emergency_screen.dart';
 import 'package:nashra_project2/screens/gov_advertisments.dart';
 import 'package:nashra_project2/screens/home.dart';
+import 'package:nashra_project2/screens/poll_results_screen.dart';
 import 'package:nashra_project2/screens/reports/gov_reports_screen.dart';
 import 'firebase_options.dart';
 import 'screens/notifications_screen.dart';
@@ -92,7 +93,8 @@ Future<void> main() async {
               '/gov_chats': (context) => ChatsPage(),
               '/emergency': (context) => EmergencyNumbersScreen(),
               '/analytics': (context) => AnalyticsScreen(),
-              '/report_gov': (context)=> ViewReportsPage(),
+              '/govreports': (context)=> ViewReportsPage(),
+              '/polls_results': (context) => PollResultsScreen(),
             },
           );
         },

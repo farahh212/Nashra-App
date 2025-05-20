@@ -349,20 +349,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      drawer: isAdmin ? const GovSidebar() : const CitizenSidebar(),
+      drawer: isAdmin ?  GovSidebar() : const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
+        backgroundColor: theme.primaryColor,
         elevation: 0,
         title: Text(
           'Welcome to Nashra',
-          style: theme.appBarTheme.titleTextStyle,
+          // style: theme.appBarTheme.titleTextStyle,
+          style: const TextStyle(color: Colors.white),
         ),
         iconTheme: theme.appBarTheme.iconTheme,
         actions: [
           IconButton(
             icon: Icon(
               themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: theme.appBarTheme.iconTheme?.color,
+              color: Colors.white,
             ),
             onPressed: () => themeProvider.toggleTheme(),
           ),
@@ -664,7 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildFeatureTile(context, Icons.announcement, 'Announcements', '/announcements'),
         _buildFeatureTile(context, Icons.campaign, 'Ads', '/gov_advertisement'),
         _buildFeatureTile(context, Icons.poll, 'Polls', '/polls'),
-        _buildFeatureTile(context, Icons.report, 'Reports', '/gov_reports'),
+        _buildFeatureTile(context, Icons.report, 'Reports', '/govreports'),
         _buildFeatureTile(context, Icons.analytics, 'Analytics', '/analytics'),
         _buildFeatureTile(context, Icons.chat, 'Messages', '/gov_chats'),
       ];
