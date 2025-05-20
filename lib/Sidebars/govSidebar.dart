@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nashra_project2/screens/poll_results_screen.dart';
+import '../screens/poll_results_screen.dart';
 import '../screens/emergency_screen.dart';
 import '../screens/announcementCitizens/announcements.dart';
 import '../screens/advertisement_screen.dart';
@@ -88,7 +88,7 @@ class GovSidebar extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+                        MaterialPageRoute(builder: (_) => const PollResultsScreen()),
                       );
                     },
                   ),
