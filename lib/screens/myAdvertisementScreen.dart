@@ -341,10 +341,22 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
         title: FutureBuilder<String>(
           future: _translateText("My Advertisements", currentLanguage),
           builder: (context, snapshot) {
-            return Text(snapshot.data ?? "My Advertisements");
+            return Text(
+              snapshot.data ?? "My Advertisements",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Color(0xFF1976D2),
+              ),
+            );
           },
         ),
+        backgroundColor: isDark ? Colors.black : Colors.white,
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
       ),
+      
       body: RefreshIndicator(
         onRefresh: _loadUserAds,
         child: _isLoading

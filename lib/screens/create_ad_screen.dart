@@ -110,9 +110,20 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
         title: FutureBuilder<String>(
           future: _translateText("Create Advertisement", currentLanguage),
           builder: (context, snapshot) {
-            return Text(snapshot.data ?? "Create Advertisement");
+            return Text(
+              snapshot.data ?? "Create Advertisement",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color(0xFF1976D2),
+              ),
+            );
           },
         ),
+        iconTheme: IconThemeData(
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color(0xFF1976D2),
+        ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

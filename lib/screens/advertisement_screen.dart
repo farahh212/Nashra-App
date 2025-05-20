@@ -212,13 +212,13 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
                   snapshot.data ?? 'My Ads',
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                    color: isDark ? Color.fromARGB(255, 255, 255, 255) : Color(0xFF1976D2),
                   ),
                 );
               }
             ),
             icon: Icon(Icons.person,
-                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2)),
+                color: isDark ? Color.fromARGB(255, 255, 255, 255) : Color(0xFF1976D2)),
           ),
           const SizedBox(width: 6),
         ],

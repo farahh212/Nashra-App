@@ -229,7 +229,7 @@ class _AllReportsState extends State<AllReports> {
       appBar: AppBar(
         backgroundColor: (isDark ? Colors.black : Colors.white),
         iconTheme: IconThemeData(
-          color: isDark ? Colors.white : Color(0xFF1976D2),
+          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
         ),
         elevation: 0,
         title: FutureBuilder<String>(
@@ -240,7 +240,7 @@ class _AllReportsState extends State<AllReports> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white :  Color(0xFF1976D2),
+                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
               ),
             );
           },
