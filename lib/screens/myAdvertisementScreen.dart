@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nashra_project2/models/advertisement.dart';
@@ -7,6 +6,8 @@ import 'package:nashra_project2/providers/advertisementProvider.dart';
 import 'package:nashra_project2/providers/authProvider.dart';
 import 'package:nashra_project2/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:translator/translator.dart';
+import '../providers/languageProvider.dart';
 
 class MyAdvertisementsScreen extends StatefulWidget {
   @override
@@ -16,68 +17,106 @@ class MyAdvertisementsScreen extends StatefulWidget {
 class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
   List<Advertisement> _userAds = [];
   bool _isLoading = true;
+  bool _hasError = false;
   File? _pickedImage;
+  final _translator = GoogleTranslator();
+  final Map<String, String> _translations = {};
 
-  @override
-  void initState() {
-    super.initState();
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    final userId = Provider.of<AuthProvider>(context, listen: false).userId;
-    final adProvider = Provider.of<AdvertisementProvider>(context, listen: false);
+  Future<String> _translateText(String text, String targetLang) async {
+    final key = '${text}_$targetLang';
+    if (_translations.containsKey(key)) {
+      return _translations[key]!;
+    }
+    try {
+      final translation = await _translator.translate(text, to: targetLang);
+      _translations[key] = translation.text;
+      return translation.text;
+    } catch (e) {
+      print('Translation error: $e');
+      return text;
+    }
+  }
 
-    adProvider.getUserAdvertisements(token, userId).then((ads) {
+  Future<void> _loadUserAds() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+      });
+      
+      final token = Provider.of<AuthProvider>(context, listen: false).token;
+      final userId = Provider.of<AuthProvider>(context, listen: false).userId;
+      final ads = await Provider.of<AdvertisementProvider>(context, listen: false)
+          .getUserAdvertisements(token, userId);
+          
       setState(() {
         _userAds = ads;
         _isLoading = false;
       });
-    });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
   }
 
-  void _confirmAndDeleteAdFor(Advertisement ad) {
+  @override
+  void initState() {
+    super.initState();
+    _loadUserAds();
+  }
+
+  void _confirmAndDeleteAdFor(Advertisement ad) async {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLanguage = languageProvider.currentLanguageCode;
+
+    final title = await _translateText("Delete Advertisement", currentLanguage);
+    final content = await _translateText(
+      "Are you sure you want to delete the advertisement for '${ad.title}'?",
+      currentLanguage,
+    );
+    final yesText = await _translateText("Yes", currentLanguage);
+    final noText = await _translateText("No", currentLanguage);
+    final successMessage = await _translateText(
+      "Advertisement deleted successfully",
+      currentLanguage,
+    );
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Theme.of(context).dialogBackgroundColor,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Are you sure you want to delete the advertisement for '${ad.title}'?",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 36),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    Navigator.of(ctx).pop();
-                    final token = Provider.of<AuthProvider>(context, listen: false).token;
-                    final adProvider = Provider.of<AdvertisementProvider>(context, listen: false);
-                    await adProvider.deleteAdvertisemnt(ad.id, token);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Advertisement deleted successfully')),
-                    );
-                    setState(() {
-                      _userAds.removeWhere((a) => a.id == ad.id);
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1976D2),
-                  ),
-                  child: const Text('Yes'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                  child: const Text('No'),
-                ),
-              ],
-            )
-          ],
+        title: Text(title, textAlign: TextAlign.center),
+        content: Text(
+          content,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final token = Provider.of<AuthProvider>(context, listen: false).token;
+              final adProvider = Provider.of<AdvertisementProvider>(context, listen: false);
+              await adProvider.deleteAdvertisemnt(ad.id, token);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(successMessage)),
+              );
+              await _loadUserAds(); // Refresh the list after deletion
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1976D2),
+            ),
+            child: Text(yesText),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+            child: Text(noText),
+          ),
+        ],
       ),
     );
   }
@@ -91,10 +130,23 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
     }
   }
 
-  void _showUpdateFormFor(Advertisement ad) {
+  void _showUpdateFormFor(Advertisement ad) async {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLanguage = languageProvider.currentLanguageCode;
+
+    final formTitle = await _translateText("Update Advertisement", currentLanguage);
+    final titleLabel = await _translateText("New Title", currentLanguage);
+    final descLabel = await _translateText("New Description", currentLanguage);
+    final imageLabel = await _translateText("Select New Image", currentLanguage);
+    final submitText = await _translateText("Submit", currentLanguage);
+    final titleRequired = await _translateText("Title required", currentLanguage);
+    final descRequired = await _translateText("Description required", currentLanguage);
+    final successMessage = await _translateText("Advertisement updated", currentLanguage);
+
     final _formKey = GlobalKey<FormState>();
     String updatedTitle = ad.title;
     String updatedDescription = ad.description;
+    File? pickedImageTemp = _pickedImage;
 
     showDialog(
       context: context,
@@ -102,36 +154,47 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         content: StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setStateDialog) {
             return SingleChildScrollView(
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("Update Advertisement", style: Theme.of(context).textTheme.titleLarge),
+                    Text(formTitle, style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 20),
                     TextFormField(
                       initialValue: updatedTitle,
-                      decoration: const InputDecoration(
-                          labelText: "New Title :", border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                        labelText: "$titleLabel:",
+                        border: OutlineInputBorder(),
+                      ),
                       onChanged: (val) => updatedTitle = val,
-                      validator: (val) => val == null || val.isEmpty ? 'Title required' : null,
+                      validator: (val) => val == null || val.isEmpty ? titleRequired : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       initialValue: updatedDescription,
                       maxLines: 3,
-                      decoration: const InputDecoration(
-                          labelText: "New Description :", border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                        labelText: "$descLabel:",
+                        border: OutlineInputBorder(),
+                      ),
                       onChanged: (val) => updatedDescription = val,
-                      validator: (val) => val == null || val.isEmpty ? 'Description required' : null,
+                      validator: (val) => val == null || val.isEmpty ? descRequired : null,
                     ),
                     const SizedBox(height: 16),
-                    const Text("Select New Image:"),
+                    Text(imageLabel),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: _pickImage,
+                      onTap: () async {
+                        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          setStateDialog(() {
+                            pickedImageTemp = File(pickedFile.path);
+                          });
+                        }
+                      },
                       child: Container(
                         height: 100,
                         width: double.infinity,
@@ -139,8 +202,8 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
                           color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: _pickedImage != null
-                            ? Image.file(_pickedImage!, fit: BoxFit.cover)
+                        child: pickedImageTemp != null
+                            ? Image.file(pickedImageTemp!, fit: BoxFit.cover)
                             : const Icon(Icons.image, color: Colors.grey, size: 40),
                       ),
                     ),
@@ -154,26 +217,22 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
                             id: ad.id,
                             title: updatedTitle,
                             description: updatedDescription,
-                            imageUrl: _pickedImage?.path ?? ad.imageUrl,
+                            imageUrl: pickedImageTemp?.path ?? ad.imageUrl,
                             status: ad.status,
                             ownerId: ad.ownerId,
                           );
                           await adProvider.updateAdvertisement(ad.id, updatedAd, token);
                           Navigator.of(ctx).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Advertisement updated")),
+                            SnackBar(content: Text(successMessage)),
                           );
-                          setState(() {
-                            int index = _userAds.indexWhere((a) => a.id == ad.id);
-                            _userAds[index] = updatedAd;
-                            _pickedImage = null;
-                          });
+                          await _loadUserAds(); // Refresh the list after update
                         }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1976D2),
                       ),
-                      child: const Text("Submit"),
+                      child: Text(submitText),
                     ),
                   ],
                 ),
@@ -185,125 +244,199 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
     );
   }
 
+  Widget _buildEmptyState(BuildContext context, String currentLanguage) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.announcement_outlined,
+            size: 64,
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
+          ),
+          const SizedBox(height: 16),
+          FutureBuilder<String>(
+            future: _translateText("You don't have any ads yet", currentLanguage),
+            builder: (context, snapshot) {
+              return Text(
+                snapshot.data ?? "You don't have any ads yet",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          FutureBuilder<String>(
+            future: _translateText("Create your first advertisement now", currentLanguage),
+            builder: (context, snapshot) {
+              return Text(
+                snapshot.data ?? "Create your first advertisement now",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String currentLanguage) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red[400],
+          ),
+          const SizedBox(height: 16),
+          FutureBuilder<String>(
+            future: _translateText("Failed to load your ads", currentLanguage),
+            builder: (context, snapshot) {
+              return Text(
+                snapshot.data ?? "Failed to load your ads",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _loadUserAds,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+            ),
+            child: FutureBuilder<String>(
+              future: _translateText("Try Again", currentLanguage),
+              builder: (context, snapshot) {
+                return Text(snapshot.data ?? "Try Again");
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final currentLanguage = languageProvider.currentLanguageCode;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("My Advertisements")),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _userAds.isEmpty
-              ? const Center(child: Text("You have no ads."))
-              : ListView.builder(
-                  itemCount: _userAds.length,
-                  itemBuilder: (ctx, i) {
-                    final ad = _userAds[i];
-                    final hasImage = ad.imageUrl != null && ad.imageUrl!.isNotEmpty;
-                    final isLocal = hasImage && ad.imageUrl!.startsWith('/data/');
-                    final isNetwork = hasImage && ad.imageUrl!.startsWith('http');
+      appBar: AppBar(
+        title: FutureBuilder<String>(
+          future: _translateText("My Advertisements", currentLanguage),
+          builder: (context, snapshot) {
+            return Text(snapshot.data ?? "My Advertisements");
+          },
+        ),
+      ),
+      body: RefreshIndicator(
+        onRefresh: _loadUserAds,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _hasError
+                ? _buildErrorState(context, currentLanguage)
+                : _userAds.isEmpty
+                    ? _buildEmptyState(context, currentLanguage)
+                    : ListView.builder(
+                        itemCount: _userAds.length,
+                        itemBuilder: (ctx, i) {
+                          final ad = _userAds[i];
+                          final hasImage = ad.imageUrl != null && ad.imageUrl!.isNotEmpty;
+                          final isLocal = hasImage && ad.imageUrl!.startsWith('/data/');
+                          final isNetwork = hasImage && ad.imageUrl!.startsWith('http');
 
-                    Widget imageWidget = Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: isDark ? Colors.grey[900] : Colors.grey[100],
-                        border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey.shade300),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: hasImage
-                            ? isNetwork
-                                ? Image.network(
-                                    ad.imageUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const Icon(Icons.broken_image,
-                                        size: 40, color: Colors.grey),
-                                  )
-                                : Image.file(File(ad.imageUrl!), fit: BoxFit.cover)
-                            : const Icon(Icons.image_not_supported,
-                                size: 40, color: Colors.grey),
-                      ),
-                    );
+                          Widget imageWidget = Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.image_not_supported, size: 40),
+                          );
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isDark ? Theme.of(context).cardColor : Colors.white,
-                          border: Border.all(
-                              color: isDark ? Colors.grey[700]! : Colors.grey.shade300, width: 1.5),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              imageWidget,
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      ad.title,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      ad.description,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: isDark ? Colors.white70 : Colors.black87),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Status: ${ad.status.name}",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: isDark ? Colors.grey[400] : Colors.grey[700],
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () => _showUpdateFormFor(ad),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF1976D2),
-                                          ),
-                                          child: const Text('Update'),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        ElevatedButton(
-                                          onPressed: () => _confirmAndDeleteAdFor(ad),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.grey,
-                                          ),
-                                          child: const Text('Delete'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                          if (hasImage) {
+                            if (isLocal) {
+                              imageWidget = Image.file(
+                                File(ad.imageUrl!), 
+                                width: 100, 
+                                height: 100, 
+                                fit: BoxFit.cover
+                              );
+                            } else if (isNetwork) {
+                              imageWidget = Image.network(
+                                ad.imageUrl!, 
+                                width: 100, 
+                                height: 100, 
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.broken_image, size: 40),
                                 ),
+                              );
+                            }
+                          }
+
+                          return Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: imageWidget,
                               ),
-                            ],
-                          ),
-                        ),
+                              title: Text(ad.title),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ad.description,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Status: ${ad.status.name}",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () => _showUpdateFormFor(ad),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _confirmAndDeleteAdFor(ad),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+      ),
       bottomNavigationBar: const CustomBottomNavigationBar(),
     );
   }
