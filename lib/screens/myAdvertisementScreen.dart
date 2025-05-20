@@ -190,7 +190,20 @@ class _MyAdvertisementsScreenState extends State<MyAdvertisementsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("My Advertisements")),
+      appBar: AppBar(
+        title: Text(
+          "My Advertisements",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Color(0xFF1976D2),
+          ),
+        ),
+        backgroundColor: isDark ? Colors.black : Colors.white,
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _userAds.isEmpty

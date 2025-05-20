@@ -54,12 +54,26 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to submit advertisement')));
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create Advertisement"),
+        title: Text(
+          "Create Advertisement",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Color(0xFF1976D2),
+          ),
+        ),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
+        backgroundColor: (isDark ? Colors.black : Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

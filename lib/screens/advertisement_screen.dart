@@ -47,18 +47,21 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0.5,
-        backgroundColor: theme.appBarTheme.backgroundColor ?? (isDark ? Colors.black : Colors.white),
+        backgroundColor: (isDark ? Colors.black : Colors.white),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
         title: Text(
           "Advertisement",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
+            color: isDark ? Colors.white : Color(0xFF1976D2),
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.add, color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2)),
+            icon: Icon(Icons.add, color: isDark ? Colors.white : Color(0xFF1976D2)),
             tooltip: 'Create Ad',
             onPressed: () {
               Navigator.push(
@@ -78,7 +81,7 @@ class _AdvertisementScreenState extends State<AdvertisementScreen> {
               "My Ads",
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+                color: isDark ? Colors.white : Color(0xFF1976D2),
               ),
             ),
            

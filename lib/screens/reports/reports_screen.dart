@@ -227,7 +227,10 @@ class _AllReportsState extends State<AllReports> {
     return Scaffold(
       drawer: const CitizenSidebar(),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: (isDark ? Colors.black : Colors.white),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Color(0xFF1976D2),
+        ),
         elevation: 0,
         title: FutureBuilder<String>(
           future: _translateText('Report a Problem', currentLanguage),
@@ -237,14 +240,14 @@ class _AllReportsState extends State<AllReports> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black,
+                color: isDark ? Colors.white :  Color(0xFF1976D2),
               ),
             );
           },
         ),
-        iconTheme: IconThemeData(
-          color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
-        ),
+        // iconTheme: IconThemeData(
+        //   color: isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2),
+        // ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(),
       body: Container(

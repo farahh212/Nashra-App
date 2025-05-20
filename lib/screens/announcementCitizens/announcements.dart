@@ -46,7 +46,7 @@ class _AnnouncementsState extends State<Announcements> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'NASHRA',
+          'Announcements',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,

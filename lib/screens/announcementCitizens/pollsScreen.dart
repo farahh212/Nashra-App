@@ -44,11 +44,11 @@ class _pollScreenState extends State<pollScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'NASHRA',
+          'Polls',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
+            color: isDark ? Colors.white : Color(0xFF1976D2),
           ),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
