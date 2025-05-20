@@ -172,24 +172,15 @@ class AddnnouncementState extends State<Addannouncement> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: FutureBuilder<String>(
-              future: _translateText('Home', currentLang),
-              builder: (context, snapshot) => snapshot.data ?? 'Home',
-            ),
+            label: currentLang == 'en' ? 'Home' : 'الرئيسية',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
-            label: FutureBuilder<String>(
-              future: _translateText('Notifications', currentLang),
-              builder: (context, snapshot) => snapshot.data ?? 'Notifications',
-            ),
+            label: currentLang == 'en' ? 'Notifications' : 'الإشعارات',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: FutureBuilder<String>(
-              future: _translateText('Settings', currentLang),
-              builder: (context, snapshot) => snapshot.data ?? 'Settings',
-            ),
+            label: currentLang == 'en' ? 'Settings' : 'الإعدادات',
           ),
         ],
       ),
