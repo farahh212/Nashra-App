@@ -54,6 +54,8 @@ class _PollCardState extends State<PollCard> {
     return (widget.poll.votes[option] ?? 0) / totalVotes;
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context, listen: false);
@@ -62,6 +64,7 @@ class _PollCardState extends State<PollCard> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? Color(0xFF64B5F6) : Color(0xFF1976D2);
+    final commentsN= widget.poll.comments.length.toString();
 
     return Card(
       margin: const EdgeInsets.all(12.0),
@@ -209,7 +212,7 @@ class _PollCardState extends State<PollCard> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${widget.poll.commentsNo ?? 0}',
+                  widget.poll.commentsNo.toString(),
                   style: TextStyle(
                     color: primaryColor,
                     fontWeight: FontWeight.bold,

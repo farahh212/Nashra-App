@@ -69,7 +69,7 @@ class Poll {
     createdAt: DateTime.parse(map['createdAt']),
     endDate: DateTime.parse(map['endDate']),
     imageUrl: map['imageUrl'],
-    commentsNo: map['coomentsNo']?? 0,
+    commentsNo: map['commentsNo']?? 0,
     );
   }
 } 

@@ -51,7 +51,7 @@ class Announcement {
       fileUrl: map['fileUrl'],
       createdAt: DateTime.parse(map['createdAt']),
       likes: map['likes'] ?? 0,
-      commentsNo: map['coomentsNo']?? 0,
+      commentsNo: map['commentsNo']?? 0,
       likedByUser: List<String>.from(map['likedByUser'] ?? []),
     );
   }
