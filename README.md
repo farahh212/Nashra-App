@@ -45,13 +45,30 @@ lib/
 
 ## Features
 
-- User Authentication
-- Community Announcements
-- Polls and Surveys
-- Emergency Contacts
-- Chat System
-- Advertisement Management
-- Report Generation
+### 🔐 Core Features
+
+* **User Authentication**
+* **Community Announcements** 
+* **Polls and Surveys**
+* **Emergency Contacts**
+* **Real Time Chat System**
+* **Advertisement Management** 
+* **Document and Photo Upload with Preview** (for announcements and ads) 
+* **Report Generation**
+
+##
+
+### ✨ Extra Features
+
+* **Push Notifications** (mobile alerts 🔔)
+* **Google Translate Integration** (multi-language support 🌐)
+* **Dark Mode / Light Mode** (UI theme toggle 🌙☀️)
+* **Google Maps Integration** (location features 📍)
+* **Bad Word Detection** (filter inappropriate content 🚫)
+* **Animations** (smooth UI interactions 🎞️)
+* **Good Design / UI/UX** (modern and clean layout 🎨)
+* **Analytics** (track usage & behavior 📊)
+
 
 ## Dependencies
 
