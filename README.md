@@ -54,8 +54,8 @@ lib/
 * **Real Time Chat System**
 * **Advertisement Management** 
 * **Document and Photo Upload with Preview** (for announcements and ads) 
-* **Report Generation**
-
+* **Analytics** (Track Polls and Surveys)
+  
 ##
 
 ### ✨ Extra Features
@@ -67,7 +67,7 @@ lib/
 * **Bad Word Detection** (filter inappropriate content 🚫)
 * **Animations** (smooth UI interactions 🎞️)
 * **Good Design / UI/UX** (modern and clean layout 🎨)
-* **Analytics** (track usage & behavior 📊)
+
 
 
 ## Dependencies
